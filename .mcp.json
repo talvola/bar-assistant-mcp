@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "bar-assistant": {
+      "command": "/home/erik/bar-assistant-mcp/.venv/bin/python",
+      "args": ["-m", "bar_assistant_mcp.server"],
+      "env": {
+        "BAR_ASSISTANT_URL": "https://erikbarapi.duckdns.org",
+        "BAR_ASSISTANT_TOKEN": "9|YSNENtLjPXhbDyMoq1qSOVX7qzF1vcR9FqiMqPjW90764201"
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+# Build artifacts
+build/
+dist/
+*.mcpb
+
+# Secrets (never commit!)
+secrets.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/

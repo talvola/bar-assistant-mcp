@@ -1,0 +1,140 @@
+{
+  "manifest_version": "0.3",
+  "name": "bar-assistant",
+  "version": "1.0.0",
+  "display_name": "Bar Assistant",
+  "description": "MCP server for Bar Assistant cocktail management - search cocktails, manage your shelf, and explore recipes",
+  "long_description": "MCP server for Bar Assistant, a cocktail recipe and bar management application.\n\n**Features:**\n- Search and browse cocktails with detailed recipes\n- Find cocktails you can make with your current ingredients\n- Manage your shelf (ingredients you have)\n- Track shopping lists\n- Browse collections, tags, glasses, and methods\n\n**Setup:**\n1. Get your API token from Bar Assistant (Profile → Personal Access Tokens)\n2. Configure the server URL and token in settings\n3. Start exploring your cocktail collection!",
+  "author": {
+    "name": "Erik Talvola"
+  },
+  "license": "MIT",
+  "keywords": ["mcp", "cocktails", "bar-assistant", "bartending", "recipes"],
+  "server": {
+    "type": "python",
+    "entry_point": "bar_assistant_mcp/server.py",
+    "mcp_config": {
+      "command": "python",
+      "args": [
+        "-m", "bar_assistant_mcp.server"
+      ],
+      "env": {
+        "BAR_ASSISTANT_URL": "${user_config.BAR_ASSISTANT_URL}",
+        "BAR_ASSISTANT_TOKEN": "${user_config.BAR_ASSISTANT_TOKEN}",
+        "BAR_ASSISTANT_BAR_ID": "${user_config.BAR_ASSISTANT_BAR_ID}"
+      }
+    }
+  },
+  "user_config": {
+    "BAR_ASSISTANT_URL": {
+      "type": "string",
+      "title": "Bar Assistant API URL",
+      "description": "The base URL of your Bar Assistant API (e.g., https://erikbarapi.duckdns.org)",
+      "default": "",
+      "required": true
+    },
+    "BAR_ASSISTANT_TOKEN": {
+      "type": "string",
+      "title": "API Token",
+      "description": "Personal Access Token from Bar Assistant (Profile → Personal Access Tokens)",
+      "default": "",
+      "required": true,
+      "sensitive": true
+    },
+    "BAR_ASSISTANT_BAR_ID": {
+      "type": "string",
+      "title": "Bar ID",
+      "description": "The bar ID to use (default: 1)",
+      "default": "1",
+      "required": false
+    }
+  },
+  "tools": [
+    {
+      "name": "bar_search_cocktails",
+      "description": "Search for cocktails by name"
+    },
+    {
+      "name": "bar_get_cocktail",
+      "description": "Get detailed information about a specific cocktail"
+    },
+    {
+      "name": "bar_list_cocktails",
+      "description": "List cocktails with optional filters"
+    },
+    {
+      "name": "bar_makeable_cocktails",
+      "description": "Get cocktails you can make with shelf ingredients"
+    },
+    {
+      "name": "bar_favorite_cocktails",
+      "description": "Get user's favorite cocktails"
+    },
+    {
+      "name": "bar_search_ingredients",
+      "description": "Search for ingredients by name"
+    },
+    {
+      "name": "bar_get_ingredient",
+      "description": "Get detailed information about an ingredient"
+    },
+    {
+      "name": "bar_list_ingredients",
+      "description": "List ingredients with optional filters"
+    },
+    {
+      "name": "bar_ingredient_cocktails",
+      "description": "Get cocktails that use a specific ingredient"
+    },
+    {
+      "name": "bar_get_shelf",
+      "description": "Get ingredients on the user's shelf"
+    },
+    {
+      "name": "bar_add_to_shelf",
+      "description": "Add ingredients to the shelf"
+    },
+    {
+      "name": "bar_remove_from_shelf",
+      "description": "Remove ingredients from the shelf"
+    },
+    {
+      "name": "bar_get_shopping_list",
+      "description": "Get the user's shopping list"
+    },
+    {
+      "name": "bar_add_to_shopping_list",
+      "description": "Add ingredients to the shopping list"
+    },
+    {
+      "name": "bar_list_collections",
+      "description": "List cocktail collections"
+    },
+    {
+      "name": "bar_get_collection",
+      "description": "Get a specific collection with its cocktails"
+    },
+    {
+      "name": "bar_list_tags",
+      "description": "List all cocktail tags"
+    },
+    {
+      "name": "bar_list_glasses",
+      "description": "List all glass types"
+    },
+    {
+      "name": "bar_list_methods",
+      "description": "List cocktail preparation methods"
+    },
+    {
+      "name": "bar_stats",
+      "description": "Get bar statistics"
+    }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "python": ">=3.10"
+    }
+  }
+}
