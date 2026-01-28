@@ -33,7 +33,9 @@ def get_api() -> BarAssistantAPI:
 
 def format_cocktail(cocktail: dict[str, Any], detailed: bool = False) -> str:
     """Format a cocktail for display."""
-    lines = [f"**{cocktail.get('name', 'Unknown')}**"]
+    cocktail_id = cocktail.get('id', '')
+    name = cocktail.get('name', 'Unknown')
+    lines = [f"**{name}** (ID: {cocktail_id})" if cocktail_id else f"**{name}**"]
 
     if cocktail.get("short_description"):
         lines.append(f"_{cocktail['short_description']}_")
@@ -541,6 +543,10 @@ async def list_tools() -> list[Tool]:
                         "items": {"type": "integer"},
                         "description": "List of image IDs to attach",
                     },
+                    "parent_cocktail_id": {
+                        "type": "integer",
+                        "description": "ID of parent cocktail if this is a variant/riff of another cocktail",
+                    },
                 },
                 "required": ["name", "instructions", "ingredients"],
             },
@@ -607,6 +613,10 @@ async def list_tools() -> list[Tool]:
                         "type": "array",
                         "items": {"type": "integer"},
                         "description": "List of image IDs",
+                    },
+                    "parent_cocktail_id": {
+                        "type": "integer",
+                        "description": "ID of parent cocktail if this is a variant/riff of another cocktail",
                     },
                 },
                 "required": ["id"],
@@ -984,6 +994,8 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
                 cocktail_data["tags"] = arguments["tags"]
             if arguments.get("images"):
                 cocktail_data["images"] = arguments["images"]
+            if arguments.get("parent_cocktail_id"):
+                cocktail_data["parent_cocktail_id"] = arguments["parent_cocktail_id"]
 
             data = client.create_cocktail(cocktail_data)
             cocktail = data.get("data", data)
@@ -1042,10 +1054,14 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             method = existing.get("method")
             if method and isinstance(method, dict) and method.get("id"):
                 cocktail_data["cocktail_method_id"] = method["id"]
+            parent = existing.get("parent_cocktail")
+            if parent and isinstance(parent, dict) and parent.get("id"):
+                cocktail_data["parent_cocktail_id"] = parent["id"]
 
             # Override with user's changes
             for key in ["name", "instructions", "description", "source", "garnish",
-                       "glass_id", "cocktail_method_id", "tags", "ingredients", "images"]:
+                       "glass_id", "cocktail_method_id", "tags", "ingredients", "images",
+                       "parent_cocktail_id"]:
                 if arguments.get(key) is not None:
                     cocktail_data[key] = arguments[key]
 
