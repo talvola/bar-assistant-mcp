@@ -192,7 +192,7 @@ class BarAssistantAPI:
         """Add ingredients to user's shelf."""
         return self.post(
             f"/api/users/{user_id}/ingredients/batch-store",
-            json={"ingredient_ids": ingredient_ids},
+            json={"ingredients": ingredient_ids},
         )
 
     def remove_from_shelf(
@@ -201,7 +201,7 @@ class BarAssistantAPI:
         """Remove ingredients from user's shelf."""
         return self.post(
             f"/api/users/{user_id}/ingredients/batch-delete",
-            json={"ingredient_ids": ingredient_ids},
+            json={"ingredients": ingredient_ids},
         )
 
     # ===== Shopping List =====
@@ -216,7 +216,7 @@ class BarAssistantAPI:
         """Add ingredients to shopping list."""
         return self.post(
             f"/api/users/{user_id}/shopping-list/batch-store",
-            json={"ingredient_ids": ingredient_ids},
+            json={"ingredients": ingredient_ids},
         )
 
     def remove_from_shopping_list(
@@ -225,7 +225,7 @@ class BarAssistantAPI:
         """Remove ingredients from shopping list."""
         return self.post(
             f"/api/users/{user_id}/shopping-list/batch-delete",
-            json={"ingredient_ids": ingredient_ids},
+            json={"ingredients": ingredient_ids},
         )
 
     # ===== Collections =====
