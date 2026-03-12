@@ -35,6 +35,8 @@ class BarAssistantAPI:
 
         response = self.client.request(method, endpoint, params=params, json=json)
         response.raise_for_status()
+        if not response.content:
+            return {}
         return response.json()
 
     def get(

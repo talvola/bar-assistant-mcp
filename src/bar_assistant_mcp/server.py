@@ -8,27 +8,53 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from mcp.server import Server
-from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+from mcp.server.fastmcp import FastMCP
 
 from .api import BarAssistantAPI
 
-# Initialize server
-server = Server("bar-assistant")
+# Initialize FastMCP server (auth wired in main() for HTTP mode)
+mcp = FastMCP(
+    "bar-assistant",
+    host="0.0.0.0",
+    port=8100,
+    streamable_http_path="/mcp",
+)
 
-# Global API client (initialized on startup)
-api: BarAssistantAPI | None = None
+# Global API client (initialized on startup for stdio mode)
+_api: BarAssistantAPI | None = None
+
+# OAuth provider reference (set in main() for HTTP mode)
+_oauth_provider = None
 
 
 def get_api() -> BarAssistantAPI:
-    """Get the API client, raising error if not configured."""
-    if api is None:
-        raise RuntimeError(
-            "Bar Assistant API not configured. "
-            "Set BAR_ASSISTANT_URL and BAR_ASSISTANT_TOKEN environment variables."
-        )
-    return api
+    """Get the API client for the current request.
+
+    In stdio mode: returns the global client (env var auth).
+    In HTTP mode: looks up the BA token from the OAuth access token.
+    """
+    if _api is not None:
+        return _api
+
+    # HTTP mode: resolve per-request API client from OAuth token
+    if _oauth_provider is not None:
+        from mcp.server.auth.middleware.auth_context import get_access_token
+
+        from .auth import StoredAccessToken
+
+        access_token = get_access_token()
+        if access_token is not None and isinstance(access_token, StoredAccessToken):
+            return BarAssistantAPI(
+                access_token.ba_url, access_token.ba_token, access_token.ba_bar_id
+            )
+
+    raise RuntimeError(
+        "Bar Assistant API not configured. "
+        "Set BAR_ASSISTANT_URL and BAR_ASSISTANT_TOKEN environment variables."
+    )
+
+
+# ===== Formatting Helpers =====
 
 
 def format_cocktail(cocktail: dict[str, Any], detailed: bool = False) -> str:
@@ -107,1068 +133,694 @@ def format_ingredient(ingredient: dict[str, Any], detailed: bool = False) -> str
     return "\n".join(lines)
 
 
-@server.list_tools()
-async def list_tools() -> list[Tool]:
-    """List available tools."""
-    return [
-        # Cocktails
-        Tool(
-            name="bar_search_cocktails",
-            description="Search for cocktails by name. Returns matching cocktails with their ingredients.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Search query (cocktail name)",
-                    },
-                    "limit": {
-                        "type": "integer",
-                        "description": "Maximum results (default 10)",
-                        "default": 10,
-                    },
-                },
-                "required": ["query"],
-            },
-        ),
-        Tool(
-            name="bar_get_cocktail",
-            description="Get detailed information about a specific cocktail by ID or slug.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Cocktail ID or slug",
-                    },
-                },
-                "required": ["id"],
-            },
-        ),
-        Tool(
-            name="bar_list_cocktails",
-            description="List cocktails with optional filters. Use to browse the cocktail collection.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "limit": {
-                        "type": "integer",
-                        "description": "Results per page (default 25)",
-                        "default": 25,
-                    },
-                    "page": {
-                        "type": "integer",
-                        "description": "Page number (default 1)",
-                        "default": 1,
-                    },
-                    "favorites_only": {
-                        "type": "boolean",
-                        "description": "Only show favorites",
-                    },
-                    "tag": {
-                        "type": "string",
-                        "description": "Filter by tag name",
-                    },
-                    "sort": {
-                        "type": "string",
-                        "description": "Sort field (name, created_at, average_rating)",
-                    },
-                },
-            },
-        ),
-        Tool(
-            name="bar_makeable_cocktails",
-            description="Get cocktails that can be made with ingredients currently on the shelf.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "user_id": {
-                        "type": "integer",
-                        "description": "User ID (default 1)",
-                        "default": 1,
-                    },
-                },
-            },
-        ),
-        Tool(
-            name="bar_favorite_cocktails",
-            description="Get user's favorite cocktails.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "user_id": {
-                        "type": "integer",
-                        "description": "User ID (default 1)",
-                        "default": 1,
-                    },
-                },
-            },
-        ),
-        # Ingredients
-        Tool(
-            name="bar_search_ingredients",
-            description="Search for ingredients by name.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Search query (ingredient name)",
-                    },
-                    "limit": {
-                        "type": "integer",
-                        "description": "Maximum results (default 10)",
-                        "default": 10,
-                    },
-                },
-                "required": ["query"],
-            },
-        ),
-        Tool(
-            name="bar_get_ingredient",
-            description="Get detailed information about a specific ingredient.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Ingredient ID or slug",
-                    },
-                },
-                "required": ["id"],
-            },
-        ),
-        Tool(
-            name="bar_list_ingredients",
-            description="List ingredients with optional filters.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "limit": {
-                        "type": "integer",
-                        "description": "Results per page (default 50)",
-                        "default": 50,
-                    },
-                    "page": {
-                        "type": "integer",
-                        "description": "Page number (default 1)",
-                        "default": 1,
-                    },
-                    "on_shelf_only": {
-                        "type": "boolean",
-                        "description": "Only show ingredients on shelf",
-                    },
-                    "sort": {
-                        "type": "string",
-                        "description": "Sort field (name, created_at)",
-                    },
-                },
-            },
-        ),
-        Tool(
-            name="bar_ingredient_cocktails",
-            description="Get cocktails that use a specific ingredient.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Ingredient ID or slug",
-                    },
-                },
-                "required": ["id"],
-            },
-        ),
-        # Shelf
-        Tool(
-            name="bar_get_shelf",
-            description="Get ingredients currently on the user's shelf (what they have available).",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "user_id": {
-                        "type": "integer",
-                        "description": "User ID (default 1)",
-                        "default": 1,
-                    },
-                },
-            },
-        ),
-        Tool(
-            name="bar_add_to_shelf",
-            description="Add ingredients to the shelf.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "ingredient_ids": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                        "description": "List of ingredient IDs to add",
-                    },
-                    "user_id": {
-                        "type": "integer",
-                        "description": "User ID (default 1)",
-                        "default": 1,
-                    },
-                },
-                "required": ["ingredient_ids"],
-            },
-        ),
-        Tool(
-            name="bar_remove_from_shelf",
-            description="Remove ingredients from the shelf.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "ingredient_ids": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                        "description": "List of ingredient IDs to remove",
-                    },
-                    "user_id": {
-                        "type": "integer",
-                        "description": "User ID (default 1)",
-                        "default": 1,
-                    },
-                },
-                "required": ["ingredient_ids"],
-            },
-        ),
-        # Shopping List
-        Tool(
-            name="bar_get_shopping_list",
-            description="Get the user's shopping list.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "user_id": {
-                        "type": "integer",
-                        "description": "User ID (default 1)",
-                        "default": 1,
-                    },
-                },
-            },
-        ),
-        Tool(
-            name="bar_add_to_shopping_list",
-            description="Add ingredients to the shopping list.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "ingredient_ids": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                        "description": "List of ingredient IDs to add",
-                    },
-                    "user_id": {
-                        "type": "integer",
-                        "description": "User ID (default 1)",
-                        "default": 1,
-                    },
-                },
-                "required": ["ingredient_ids"],
-            },
-        ),
-        # Collections
-        Tool(
-            name="bar_list_collections",
-            description="List cocktail collections.",
-            inputSchema={"type": "object", "properties": {}},
-        ),
-        Tool(
-            name="bar_get_collection",
-            description="Get a specific cocktail collection with its cocktails.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "description": "Collection ID",
-                    },
-                },
-                "required": ["id"],
-            },
-        ),
-        # Reference data
-        Tool(
-            name="bar_list_tags",
-            description="List all cocktail tags.",
-            inputSchema={"type": "object", "properties": {}},
-        ),
-        Tool(
-            name="bar_list_glasses",
-            description="List all glass types.",
-            inputSchema={"type": "object", "properties": {}},
-        ),
-        Tool(
-            name="bar_list_methods",
-            description="List cocktail preparation methods.",
-            inputSchema={"type": "object", "properties": {}},
-        ),
-        # Stats
-        Tool(
-            name="bar_stats",
-            description="Get bar statistics (total cocktails, ingredients, etc).",
-            inputSchema={"type": "object", "properties": {}},
-        ),
-        # Create operations
-        Tool(
-            name="bar_upload_image",
-            description="Upload an image from a URL. Returns the image ID to use when creating cocktails or ingredients.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "image_url": {
-                        "type": "string",
-                        "description": "URL of the image to upload",
-                    },
-                    "copyright": {
-                        "type": "string",
-                        "description": "Copyright attribution for the image",
-                    },
-                },
-                "required": ["image_url"],
-            },
-        ),
-        Tool(
-            name="bar_upload_image_file",
-            description="Upload an image from a local file path. Returns the image ID to use when creating cocktails or ingredients.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "file_path": {
-                        "type": "string",
-                        "description": "Local file path to the image (e.g., /path/to/image.jpg or C:\\temp\\image.webp)",
-                    },
-                    "copyright": {
-                        "type": "string",
-                        "description": "Copyright attribution for the image",
-                    },
-                },
-                "required": ["file_path"],
-            },
-        ),
-        Tool(
-            name="bar_create_ingredient",
-            description="Create a new ingredient. Use parent_ingredient_id to place it in the hierarchy (e.g., under 'Gin' or 'Bourbon').",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "description": "Name of the ingredient",
-                    },
-                    "strength": {
-                        "type": "number",
-                        "description": "Alcohol strength as percentage (e.g., 40 for 40% ABV)",
-                        "default": 0,
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "Description of the ingredient",
-                    },
-                    "origin": {
-                        "type": "string",
-                        "description": "Origin/country of the ingredient",
-                    },
-                    "parent_ingredient_id": {
-                        "type": "integer",
-                        "description": "ID of parent ingredient for categorization hierarchy",
-                    },
-                    "images": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                        "description": "List of image IDs to attach",
-                    },
-                },
-                "required": ["name"],
-            },
-        ),
-        Tool(
-            name="bar_create_cocktail",
-            description="Create a new cocktail recipe with ingredients, instructions, and optional image.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "description": "Name of the cocktail",
-                    },
-                    "instructions": {
-                        "type": "string",
-                        "description": "Step-by-step preparation instructions",
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "Short description of the cocktail",
-                    },
-                    "source": {
-                        "type": "string",
-                        "description": "Source/origin of the recipe (URL, book, bartender name)",
-                    },
-                    "garnish": {
-                        "type": "string",
-                        "description": "Garnish description",
-                    },
-                    "glass_id": {
-                        "type": "integer",
-                        "description": "ID of the glass type",
-                    },
-                    "cocktail_method_id": {
-                        "type": "integer",
-                        "description": "ID of the preparation method (stirred, shaken, etc)",
-                    },
-                    "tags": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "description": "List of tag names",
-                    },
-                    "ingredients": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "ingredient_id": {"type": "integer", "description": "ID of the ingredient"},
-                                "amount": {"type": "number", "description": "Amount of ingredient"},
-                                "units": {"type": "string", "description": "Units (ml, oz, dash, etc)"},
-                                "optional": {"type": "boolean", "description": "Whether ingredient is optional"},
-                                "sort": {"type": "integer", "description": "Sort order"},
-                            },
-                            "required": ["ingredient_id", "amount", "units"],
-                        },
-                        "description": "List of ingredients with amounts",
-                    },
-                    "images": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                        "description": "List of image IDs to attach",
-                    },
-                    "parent_cocktail_id": {
-                        "type": "integer",
-                        "description": "ID of parent cocktail if this is a variant/riff of another cocktail",
-                    },
-                },
-                "required": ["name", "instructions", "ingredients"],
-            },
-        ),
-        Tool(
-            name="bar_update_cocktail",
-            description="Update an existing cocktail. Only provide fields you want to change.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Cocktail ID or slug",
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "Name of the cocktail",
-                    },
-                    "instructions": {
-                        "type": "string",
-                        "description": "Step-by-step preparation instructions",
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "Short description of the cocktail",
-                    },
-                    "source": {
-                        "type": "string",
-                        "description": "Source/origin of the recipe",
-                    },
-                    "garnish": {
-                        "type": "string",
-                        "description": "Garnish description",
-                    },
-                    "glass_id": {
-                        "type": "integer",
-                        "description": "ID of the glass type",
-                    },
-                    "cocktail_method_id": {
-                        "type": "integer",
-                        "description": "ID of the preparation method",
-                    },
-                    "tags": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "description": "List of tag names",
-                    },
-                    "ingredients": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "ingredient_id": {"type": "integer"},
-                                "amount": {"type": "number"},
-                                "units": {"type": "string"},
-                                "optional": {"type": "boolean"},
-                                "sort": {"type": "integer"},
-                            },
-                            "required": ["ingredient_id", "amount", "units"],
-                        },
-                        "description": "List of ingredients (replaces existing)",
-                    },
-                    "images": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                        "description": "List of image IDs",
-                    },
-                    "parent_cocktail_id": {
-                        "type": "integer",
-                        "description": "ID of parent cocktail if this is a variant/riff of another cocktail",
-                    },
-                },
-                "required": ["id"],
-            },
-        ),
-        Tool(
-            name="bar_delete_cocktail",
-            description="Delete a cocktail by ID or slug.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Cocktail ID or slug",
-                    },
-                },
-                "required": ["id"],
-            },
-        ),
-        Tool(
-            name="bar_update_ingredient",
-            description="Update an existing ingredient. Only provide fields you want to change.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Ingredient ID or slug",
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "Name of the ingredient",
-                    },
-                    "strength": {
-                        "type": "number",
-                        "description": "Alcohol strength as percentage",
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "Description of the ingredient",
-                    },
-                    "origin": {
-                        "type": "string",
-                        "description": "Origin/country of the ingredient",
-                    },
-                    "parent_ingredient_id": {
-                        "type": "integer",
-                        "description": "ID of parent ingredient",
-                    },
-                    "images": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                        "description": "List of image IDs",
-                    },
-                },
-                "required": ["id"],
-            },
-        ),
-        Tool(
-            name="bar_delete_ingredient",
-            description="Delete an ingredient by ID or slug.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Ingredient ID or slug",
-                    },
-                },
-                "required": ["id"],
-            },
-        ),
-    ]
+# ===== Cocktail Tools =====
 
 
-@server.call_tool()
-async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
-    """Handle tool calls."""
-    try:
-        client = get_api()
-        result: Any = None
+@mcp.tool()
+def bar_search_cocktails(query: str, limit: int = 10) -> str:
+    """Search for cocktails by name. Returns matching cocktails with their ingredients."""
+    client = get_api()
+    data = client.search_cocktails(query, limit)
+    cocktails = data.get("data", [])
+    if not cocktails:
+        return f"No cocktails found matching '{query}'"
+    formatted = [format_cocktail(c) for c in cocktails]
+    return f"Found {len(cocktails)} cocktails:\n\n" + "\n\n---\n\n".join(formatted)
 
-        # Cocktails
-        if name == "bar_search_cocktails":
-            query = arguments.get("query", "")
-            limit = arguments.get("limit", 10)
-            data = client.search_cocktails(query, limit)
-            cocktails = data.get("data", [])
-            if not cocktails:
-                result = f"No cocktails found matching '{query}'"
-            else:
-                formatted = [format_cocktail(c) for c in cocktails]
-                result = f"Found {len(cocktails)} cocktails:\n\n" + "\n\n---\n\n".join(
-                    formatted
-                )
 
-        elif name == "bar_get_cocktail":
-            cocktail_id = arguments.get("id")
-            data = client.get_cocktail(cocktail_id)
-            cocktail = data.get("data", data)
-            result = format_cocktail(cocktail, detailed=True)
+@mcp.tool()
+def bar_get_cocktail(id: str) -> str:
+    """Get detailed information about a specific cocktail by ID or slug."""
+    client = get_api()
+    data = client.get_cocktail(id)
+    cocktail = data.get("data", data)
+    return format_cocktail(cocktail, detailed=True)
 
-        elif name == "bar_list_cocktails":
-            data = client.list_cocktails(
-                limit=arguments.get("limit", 25),
-                page=arguments.get("page", 1),
-                filter_favorites=arguments.get("favorites_only"),
-                sort=arguments.get("sort"),
-            )
-            cocktails = data.get("data", [])
-            meta = data.get("meta", {})
-            total = meta.get("total", len(cocktails))
-            formatted = [f"- {c.get('name')}" for c in cocktails]
-            result = f"Cocktails ({len(cocktails)} of {total}):\n" + "\n".join(
-                formatted
-            )
 
-        elif name == "bar_makeable_cocktails":
-            user_id = arguments.get("user_id", 1)
-            data = client.get_makeable_cocktails(user_id)
-            cocktails = data.get("data", [])
-            if not cocktails:
-                result = "No cocktails can be made with current shelf ingredients."
-            else:
-                formatted = [f"- {c.get('name')}" for c in cocktails]
-                result = f"You can make {len(cocktails)} cocktails:\n" + "\n".join(
-                    formatted
-                )
+@mcp.tool()
+def bar_list_cocktails(
+    limit: int = 25,
+    page: int = 1,
+    favorites_only: bool | None = None,
+    tag: str | None = None,
+    sort: str | None = None,
+) -> str:
+    """List cocktails with optional filters. Use to browse the cocktail collection."""
+    client = get_api()
+    data = client.list_cocktails(
+        limit=limit,
+        page=page,
+        filter_favorites=favorites_only,
+        sort=sort,
+    )
+    cocktails = data.get("data", [])
+    meta = data.get("meta", {})
+    total = meta.get("total", len(cocktails))
+    formatted = [f"- {c.get('name')}" for c in cocktails]
+    return f"Cocktails ({len(cocktails)} of {total}):\n" + "\n".join(formatted)
 
-        elif name == "bar_favorite_cocktails":
-            user_id = arguments.get("user_id", 1)
-            data = client.get_favorite_cocktails(user_id)
-            cocktails = data.get("data", [])
-            if not cocktails:
-                result = "No favorite cocktails."
-            else:
-                formatted = [f"- {c.get('name')}" for c in cocktails]
-                result = f"Favorite cocktails ({len(cocktails)}):\n" + "\n".join(
-                    formatted
-                )
 
-        # Ingredients
-        elif name == "bar_search_ingredients":
-            query = arguments.get("query", "")
-            limit = arguments.get("limit", 10)
-            data = client.search_ingredients(query, limit)
-            ingredients = data.get("data", [])
-            if not ingredients:
-                result = f"No ingredients found matching '{query}'"
-            else:
-                formatted = [format_ingredient(i) for i in ingredients]
-                result = f"Found {len(ingredients)} ingredients:\n\n" + "\n\n---\n\n".join(
-                    formatted
-                )
+@mcp.tool()
+def bar_makeable_cocktails(user_id: int = 1) -> str:
+    """Get cocktails that can be made with ingredients currently on the shelf."""
+    client = get_api()
+    data = client.get_makeable_cocktails(user_id)
+    cocktails = data.get("data", [])
+    if not cocktails:
+        return "No cocktails can be made with current shelf ingredients."
+    formatted = [f"- {c.get('name')}" for c in cocktails]
+    return f"You can make {len(cocktails)} cocktails:\n" + "\n".join(formatted)
 
-        elif name == "bar_get_ingredient":
-            ingredient_id = arguments.get("id")
-            data = client.get_ingredient(ingredient_id)
-            ingredient = data.get("data", data)
-            result = format_ingredient(ingredient, detailed=True)
 
-        elif name == "bar_list_ingredients":
-            data = client.list_ingredients(
-                limit=arguments.get("limit", 50),
-                page=arguments.get("page", 1),
-                filter_on_shelf=arguments.get("on_shelf_only"),
-                sort=arguments.get("sort"),
-            )
-            ingredients = data.get("data", [])
-            meta = data.get("meta", {})
-            total = meta.get("total", len(ingredients))
-            formatted = [f"- {i.get('name')}" for i in ingredients]
-            result = f"Ingredients ({len(ingredients)} of {total}):\n" + "\n".join(
-                formatted
-            )
+@mcp.tool()
+def bar_favorite_cocktails(user_id: int = 1) -> str:
+    """Get user's favorite cocktails."""
+    client = get_api()
+    data = client.get_favorite_cocktails(user_id)
+    cocktails = data.get("data", [])
+    if not cocktails:
+        return "No favorite cocktails."
+    formatted = [f"- {c.get('name')}" for c in cocktails]
+    return f"Favorite cocktails ({len(cocktails)}):\n" + "\n".join(formatted)
 
-        elif name == "bar_ingredient_cocktails":
-            ingredient_id = arguments.get("id")
-            data = client.get_ingredient_cocktails(ingredient_id)
-            cocktails = data.get("data", [])
-            if not cocktails:
-                result = "No cocktails use this ingredient."
-            else:
-                formatted = [f"- {c.get('name')}" for c in cocktails]
-                result = f"Cocktails using this ingredient ({len(cocktails)}):\n" + "\n".join(
-                    formatted
-                )
 
-        # Shelf
-        elif name == "bar_get_shelf":
-            user_id = arguments.get("user_id", 1)
-            data = client.get_shelf(user_id)
-            ingredients = data.get("data", [])
-            if not ingredients:
-                result = "Shelf is empty."
-            else:
-                formatted = [f"- {i.get('name')}" for i in ingredients]
-                result = f"Shelf ingredients ({len(ingredients)}):\n" + "\n".join(
-                    formatted
-                )
+# ===== Ingredient Tools =====
 
-        elif name == "bar_add_to_shelf":
-            user_id = arguments.get("user_id", 1)
-            ingredient_ids = arguments.get("ingredient_ids", [])
-            client.add_to_shelf(user_id, ingredient_ids)
-            result = f"Added {len(ingredient_ids)} ingredient(s) to shelf."
 
-        elif name == "bar_remove_from_shelf":
-            user_id = arguments.get("user_id", 1)
-            ingredient_ids = arguments.get("ingredient_ids", [])
-            client.remove_from_shelf(user_id, ingredient_ids)
-            result = f"Removed {len(ingredient_ids)} ingredient(s) from shelf."
+@mcp.tool()
+def bar_search_ingredients(query: str, limit: int = 10) -> str:
+    """Search for ingredients by name."""
+    client = get_api()
+    data = client.search_ingredients(query, limit)
+    ingredients = data.get("data", [])
+    if not ingredients:
+        return f"No ingredients found matching '{query}'"
+    formatted = [format_ingredient(i) for i in ingredients]
+    return f"Found {len(ingredients)} ingredients:\n\n" + "\n\n---\n\n".join(formatted)
 
-        # Shopping List
-        elif name == "bar_get_shopping_list":
-            user_id = arguments.get("user_id", 1)
-            data = client.get_shopping_list(user_id)
-            items = data.get("data", [])
-            if not items:
-                result = "Shopping list is empty."
-            else:
-                formatted = [f"- {i.get('name')}" for i in items]
-                result = f"Shopping list ({len(items)}):\n" + "\n".join(formatted)
 
-        elif name == "bar_add_to_shopping_list":
-            user_id = arguments.get("user_id", 1)
-            ingredient_ids = arguments.get("ingredient_ids", [])
-            client.add_to_shopping_list(user_id, ingredient_ids)
-            result = f"Added {len(ingredient_ids)} item(s) to shopping list."
+@mcp.tool()
+def bar_get_ingredient(id: str) -> str:
+    """Get detailed information about a specific ingredient."""
+    client = get_api()
+    data = client.get_ingredient(id)
+    ingredient = data.get("data", data)
+    return format_ingredient(ingredient, detailed=True)
 
-        # Collections
-        elif name == "bar_list_collections":
-            data = client.list_collections()
-            collections = data.get("data", [])
-            if not collections:
-                result = "No collections found."
-            else:
-                formatted = [
-                    f"- {c.get('name')} (ID: {c.get('id')})" for c in collections
-                ]
-                result = f"Collections ({len(collections)}):\n" + "\n".join(formatted)
 
-        elif name == "bar_get_collection":
-            collection_id = arguments.get("id")
-            data = client.get_collection(collection_id)
-            collection = data.get("data", data)
-            name_str = collection.get("name", "Unknown")
-            cocktails = collection.get("cocktails", [])
-            formatted = [f"- {c.get('name')}" for c in cocktails]
-            result = f"**{name_str}**\n\nCocktails ({len(cocktails)}):\n" + "\n".join(
-                formatted
-            )
+@mcp.tool()
+def bar_list_ingredients(
+    limit: int = 50,
+    page: int = 1,
+    on_shelf_only: bool | None = None,
+    sort: str | None = None,
+) -> str:
+    """List ingredients with optional filters."""
+    client = get_api()
+    data = client.list_ingredients(
+        limit=limit,
+        page=page,
+        filter_on_shelf=on_shelf_only,
+        sort=sort,
+    )
+    ingredients = data.get("data", [])
+    meta = data.get("meta", {})
+    total = meta.get("total", len(ingredients))
+    formatted = [f"- {i.get('name')}" for i in ingredients]
+    return f"Ingredients ({len(ingredients)} of {total}):\n" + "\n".join(formatted)
 
-        # Reference data
-        elif name == "bar_list_tags":
-            data = client.list_tags()
-            tags = data.get("data", [])
-            formatted = [f"- {t.get('name')} (ID: {t.get('id')})" for t in tags]
-            result = f"Tags ({len(tags)}):\n" + "\n".join(formatted)
 
-        elif name == "bar_list_glasses":
-            data = client.list_glasses()
-            glasses = data.get("data", [])
-            formatted = [f"- {g.get('name')} (ID: {g.get('id')})" for g in glasses]
-            result = f"Glasses ({len(glasses)}):\n" + "\n".join(formatted)
+@mcp.tool()
+def bar_ingredient_cocktails(id: str) -> str:
+    """Get cocktails that use a specific ingredient."""
+    client = get_api()
+    data = client.get_ingredient_cocktails(id)
+    cocktails = data.get("data", [])
+    if not cocktails:
+        return "No cocktails use this ingredient."
+    formatted = [f"- {c.get('name')}" for c in cocktails]
+    return f"Cocktails using this ingredient ({len(cocktails)}):\n" + "\n".join(formatted)
 
-        elif name == "bar_list_methods":
-            data = client.list_methods()
-            methods = data.get("data", [])
-            formatted = [f"- {m.get('name')} (ID: {m.get('id')})" for m in methods]
-            result = f"Methods ({len(methods)}):\n" + "\n".join(formatted)
 
-        # Stats
-        elif name == "bar_stats":
-            data = client.get_bar_stats()
-            stats = data.get("data", data)
-            lines = ["**Bar Statistics**"]
-            if isinstance(stats, dict):
-                for key, value in stats.items():
-                    lines.append(f"- {key.replace('_', ' ').title()}: {value}")
-            result = "\n".join(lines)
+# ===== Shelf Tools =====
 
-        # Create operations
-        elif name == "bar_upload_image":
-            image_url = arguments.get("image_url")
-            copyright_text = arguments.get("copyright")
-            image_data = {"image": image_url}
-            if copyright_text:
-                image_data["copyright"] = copyright_text
-            data = client.upload_images([image_data])
-            images = data.get("data", [])
-            if images:
-                img = images[0]
-                result = f"Image uploaded successfully!\nID: {img.get('id')}\nPath: {img.get('file_path')}"
-            else:
-                result = "Failed to upload image"
 
-        elif name == "bar_upload_image_file":
-            file_path_str = arguments.get("file_path")
-            copyright_text = arguments.get("copyright")
+@mcp.tool()
+def bar_get_shelf(user_id: int = 1) -> str:
+    """Get ingredients currently on the user's shelf (what they have available)."""
+    client = get_api()
+    data = client.get_shelf(user_id)
+    ingredients = data.get("data", [])
+    if not ingredients:
+        return "Shelf is empty."
+    formatted = [f"- {i.get('name')}" for i in ingredients]
+    return f"Shelf ingredients ({len(ingredients)}):\n" + "\n".join(formatted)
 
-            # Handle the file path (support both Unix and Windows paths)
-            file_path = Path(file_path_str)
-            if not file_path.exists():
-                result = f"Error: File not found: {file_path_str}"
-            else:
-                # Read file and encode as base64
-                file_bytes = file_path.read_bytes()
-                base64_data = base64.b64encode(file_bytes).decode("utf-8")
 
-                # Determine MIME type
-                mime_type, _ = mimetypes.guess_type(str(file_path))
-                if not mime_type:
-                    # Default based on extension
-                    ext = file_path.suffix.lower()
-                    mime_types = {
-                        ".jpg": "image/jpeg",
-                        ".jpeg": "image/jpeg",
-                        ".png": "image/png",
-                        ".gif": "image/gif",
-                        ".webp": "image/webp",
-                    }
-                    mime_type = mime_types.get(ext, "image/jpeg")
+@mcp.tool()
+def bar_add_to_shelf(ingredient_ids: list[int], user_id: int = 1) -> str:
+    """Add ingredients to the shelf."""
+    client = get_api()
+    client.add_to_shelf(user_id, ingredient_ids)
+    return f"Added {len(ingredient_ids)} ingredient(s) to shelf."
 
-                # Format as data URL
-                data_url = f"data:{mime_type};base64,{base64_data}"
 
-                image_data = {"image": data_url}
-                if copyright_text:
-                    image_data["copyright"] = copyright_text
+@mcp.tool()
+def bar_remove_from_shelf(ingredient_ids: list[int], user_id: int = 1) -> str:
+    """Remove ingredients from the shelf."""
+    client = get_api()
+    client.remove_from_shelf(user_id, ingredient_ids)
+    return f"Removed {len(ingredient_ids)} ingredient(s) from shelf."
 
-                data = client.upload_images([image_data])
-                images = data.get("data", [])
-                if images:
-                    img = images[0]
-                    result = f"Image uploaded successfully from local file!\nID: {img.get('id')}\nPath: {img.get('file_path')}"
-                else:
-                    result = "Failed to upload image"
 
-        elif name == "bar_create_ingredient":
-            ingredient_data = {
-                "name": arguments.get("name"),
-                "strength": arguments.get("strength", 0),
+# ===== Shopping List Tools =====
+
+
+@mcp.tool()
+def bar_get_shopping_list(user_id: int = 1) -> str:
+    """Get the user's shopping list."""
+    client = get_api()
+    data = client.get_shopping_list(user_id)
+    items = data.get("data", [])
+    if not items:
+        return "Shopping list is empty."
+    formatted = [f"- {i.get('name')}" for i in items]
+    return f"Shopping list ({len(items)}):\n" + "\n".join(formatted)
+
+
+@mcp.tool()
+def bar_add_to_shopping_list(ingredient_ids: list[int], user_id: int = 1) -> str:
+    """Add ingredients to the shopping list."""
+    client = get_api()
+    client.add_to_shopping_list(user_id, ingredient_ids)
+    return f"Added {len(ingredient_ids)} item(s) to shopping list."
+
+
+# ===== Collection Tools =====
+
+
+@mcp.tool()
+def bar_list_collections() -> str:
+    """List cocktail collections."""
+    client = get_api()
+    data = client.list_collections()
+    collections = data.get("data", [])
+    if not collections:
+        return "No collections found."
+    formatted = [f"- {c.get('name')} (ID: {c.get('id')})" for c in collections]
+    return f"Collections ({len(collections)}):\n" + "\n".join(formatted)
+
+
+@mcp.tool()
+def bar_get_collection(id: int) -> str:
+    """Get a specific cocktail collection with its cocktails."""
+    client = get_api()
+    data = client.get_collection(id)
+    collection = data.get("data", data)
+    name = collection.get("name", "Unknown")
+    cocktails = collection.get("cocktails", [])
+    formatted = [f"- {c.get('name')}" for c in cocktails]
+    return f"**{name}**\n\nCocktails ({len(cocktails)}):\n" + "\n".join(formatted)
+
+
+# ===== Reference Data Tools =====
+
+
+@mcp.tool()
+def bar_list_tags() -> str:
+    """List all cocktail tags."""
+    client = get_api()
+    data = client.list_tags()
+    tags = data.get("data", [])
+    formatted = [f"- {t.get('name')} (ID: {t.get('id')})" for t in tags]
+    return f"Tags ({len(tags)}):\n" + "\n".join(formatted)
+
+
+@mcp.tool()
+def bar_list_glasses() -> str:
+    """List all glass types."""
+    client = get_api()
+    data = client.list_glasses()
+    glasses = data.get("data", [])
+    formatted = [f"- {g.get('name')} (ID: {g.get('id')})" for g in glasses]
+    return f"Glasses ({len(glasses)}):\n" + "\n".join(formatted)
+
+
+@mcp.tool()
+def bar_list_methods() -> str:
+    """List cocktail preparation methods."""
+    client = get_api()
+    data = client.list_methods()
+    methods = data.get("data", [])
+    formatted = [f"- {m.get('name')} (ID: {m.get('id')})" for m in methods]
+    return f"Methods ({len(methods)}):\n" + "\n".join(formatted)
+
+
+# ===== Stats =====
+
+
+@mcp.tool()
+def bar_stats() -> str:
+    """Get bar statistics (total cocktails, ingredients, etc)."""
+    client = get_api()
+    data = client.get_bar_stats()
+    stats = data.get("data", data)
+    lines = ["**Bar Statistics**"]
+    if isinstance(stats, dict):
+        for key, value in stats.items():
+            lines.append(f"- {key.replace('_', ' ').title()}: {value}")
+    return "\n".join(lines)
+
+
+# ===== Image Upload Tools =====
+
+
+@mcp.tool()
+def bar_upload_image(image_url: str, copyright: str | None = None) -> str:
+    """Upload an image from a URL. Returns the image ID to use when creating cocktails or ingredients."""
+    client = get_api()
+    image_data: dict[str, Any] = {"image": image_url}
+    if copyright:
+        image_data["copyright"] = copyright
+    data = client.upload_images([image_data])
+    images = data.get("data", [])
+    if images:
+        img = images[0]
+        return f"Image uploaded successfully!\nID: {img.get('id')}\nPath: {img.get('file_path')}"
+    return "Failed to upload image"
+
+
+@mcp.tool()
+def bar_upload_image_file(file_path: str, copyright: str | None = None) -> str:
+    """Upload an image from a local file path. Returns the image ID to use when creating cocktails or ingredients."""
+    client = get_api()
+    p = Path(file_path)
+    if not p.exists():
+        return f"Error: File not found: {file_path}"
+
+    file_bytes = p.read_bytes()
+    base64_data = base64.b64encode(file_bytes).decode("utf-8")
+
+    mime_type, _ = mimetypes.guess_type(str(p))
+    if not mime_type:
+        ext = p.suffix.lower()
+        mime_types = {
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".png": "image/png",
+            ".gif": "image/gif",
+            ".webp": "image/webp",
+        }
+        mime_type = mime_types.get(ext, "image/jpeg")
+
+    data_url = f"data:{mime_type};base64,{base64_data}"
+    image_data: dict[str, Any] = {"image": data_url}
+    if copyright:
+        image_data["copyright"] = copyright
+
+    data = client.upload_images([image_data])
+    images = data.get("data", [])
+    if images:
+        img = images[0]
+        return f"Image uploaded successfully from local file!\nID: {img.get('id')}\nPath: {img.get('file_path')}"
+    return "Failed to upload image"
+
+
+# ===== Create/Update/Delete Tools =====
+
+
+@mcp.tool()
+def bar_create_ingredient(
+    name: str,
+    strength: float = 0,
+    description: str | None = None,
+    origin: str | None = None,
+    parent_ingredient_id: int | None = None,
+    images: list[int] | None = None,
+) -> str:
+    """Create a new ingredient. Use parent_ingredient_id to place it in the hierarchy (e.g., under 'Gin' or 'Bourbon')."""
+    client = get_api()
+    ingredient_data: dict[str, Any] = {"name": name, "strength": strength}
+    if description:
+        ingredient_data["description"] = description
+    if origin:
+        ingredient_data["origin"] = origin
+    if parent_ingredient_id:
+        ingredient_data["parent_ingredient_id"] = parent_ingredient_id
+    if images:
+        ingredient_data["images"] = images
+
+    data = client.create_ingredient(ingredient_data)
+    ingredient = data.get("data", data)
+    return f"Created ingredient: **{ingredient.get('name')}** (ID: {ingredient.get('id')})"
+
+
+@mcp.tool()
+def bar_create_cocktail(
+    name: str,
+    instructions: str,
+    ingredients: list[dict[str, Any]],
+    description: str | None = None,
+    source: str | None = None,
+    garnish: str | None = None,
+    glass_id: int | None = None,
+    cocktail_method_id: int | None = None,
+    tags: list[str] | None = None,
+    images: list[int] | None = None,
+    parent_cocktail_id: int | None = None,
+) -> str:
+    """Create a new cocktail recipe with ingredients, instructions, and optional image."""
+    client = get_api()
+    cocktail_data: dict[str, Any] = {
+        "name": name,
+        "instructions": instructions,
+        "ingredients": ingredients,
+    }
+    if description:
+        cocktail_data["description"] = description
+    if source:
+        cocktail_data["source"] = source
+    if garnish:
+        cocktail_data["garnish"] = garnish
+    if glass_id:
+        cocktail_data["glass_id"] = glass_id
+    if cocktail_method_id:
+        cocktail_data["cocktail_method_id"] = cocktail_method_id
+    if tags:
+        cocktail_data["tags"] = tags
+    if images:
+        cocktail_data["images"] = images
+    if parent_cocktail_id:
+        cocktail_data["parent_cocktail_id"] = parent_cocktail_id
+
+    data = client.create_cocktail(cocktail_data)
+    cocktail = data.get("data", data)
+    return (
+        f"Created cocktail: **{cocktail.get('name')}** (ID: {cocktail.get('id')})\n\n"
+        + format_cocktail(cocktail, detailed=True)
+    )
+
+
+@mcp.tool()
+def bar_update_cocktail(
+    id: str,
+    name: str | None = None,
+    instructions: str | None = None,
+    description: str | None = None,
+    source: str | None = None,
+    garnish: str | None = None,
+    glass_id: int | None = None,
+    cocktail_method_id: int | None = None,
+    tags: list[str] | None = None,
+    ingredients: list[dict[str, Any]] | None = None,
+    images: list[int] | None = None,
+    parent_cocktail_id: int | None = None,
+) -> str:
+    """Update an existing cocktail. Only provide fields you want to change."""
+    client = get_api()
+
+    # Fetch existing cocktail to preserve fields not being updated
+    existing_data = client.get_cocktail(id)
+    existing = existing_data.get("data") if existing_data else None
+    if not existing:
+        existing = existing_data if isinstance(existing_data, dict) else {}
+
+    # Start with required fields from existing cocktail
+    cocktail_data: dict[str, Any] = {
+        "name": existing.get("name"),
+        "instructions": existing.get("instructions"),
+    }
+
+    # Preserve existing ingredients if not provided (convert format)
+    if ingredients is None:
+        existing_ingredients = existing.get("ingredients", [])
+        cocktail_data["ingredients"] = [
+            {
+                "ingredient_id": ing.get("ingredient", {}).get("id") or ing.get("ingredient_id"),
+                "amount": ing.get("amount", 0),
+                "units": ing.get("units", ""),
+                "optional": ing.get("optional", False),
+                "sort": ing.get("sort", idx + 1),
             }
-            if arguments.get("description"):
-                ingredient_data["description"] = arguments["description"]
-            if arguments.get("origin"):
-                ingredient_data["origin"] = arguments["origin"]
-            if arguments.get("parent_ingredient_id"):
-                ingredient_data["parent_ingredient_id"] = arguments["parent_ingredient_id"]
-            if arguments.get("images"):
-                ingredient_data["images"] = arguments["images"]
+            for idx, ing in enumerate(existing_ingredients)
+            if ing.get("ingredient", {}).get("id") or ing.get("ingredient_id")
+        ]
 
-            data = client.create_ingredient(ingredient_data)
-            ingredient = data.get("data", data)
-            result = f"Created ingredient: **{ingredient.get('name')}** (ID: {ingredient.get('id')})"
+    # Preserve existing tags if not provided
+    if tags is None:
+        existing_tags = existing.get("tags", [])
+        cocktail_data["tags"] = [
+            tag.get("name") for tag in existing_tags if tag.get("name")
+        ]
 
-        elif name == "bar_create_cocktail":
-            cocktail_data = {
-                "name": arguments.get("name"),
-                "instructions": arguments.get("instructions"),
-                "ingredients": arguments.get("ingredients", []),
-            }
-            if arguments.get("description"):
-                cocktail_data["description"] = arguments["description"]
-            if arguments.get("source"):
-                cocktail_data["source"] = arguments["source"]
-            if arguments.get("garnish"):
-                cocktail_data["garnish"] = arguments["garnish"]
-            if arguments.get("glass_id"):
-                cocktail_data["glass_id"] = arguments["glass_id"]
-            if arguments.get("cocktail_method_id"):
-                cocktail_data["cocktail_method_id"] = arguments["cocktail_method_id"]
-            if arguments.get("tags"):
-                cocktail_data["tags"] = arguments["tags"]
-            if arguments.get("images"):
-                cocktail_data["images"] = arguments["images"]
-            if arguments.get("parent_cocktail_id"):
-                cocktail_data["parent_cocktail_id"] = arguments["parent_cocktail_id"]
+    # Preserve existing images if not provided
+    if images is None:
+        existing_images = existing.get("images", [])
+        cocktail_data["images"] = [
+            img.get("id") for img in existing_images if img.get("id")
+        ]
 
-            data = client.create_cocktail(cocktail_data)
-            cocktail = data.get("data", data)
-            result = f"Created cocktail: **{cocktail.get('name')}** (ID: {cocktail.get('id')})\n\n{format_cocktail(cocktail, detailed=True)}"
+    # Preserve other optional fields if they exist
+    for key in ["description", "source", "garnish"]:
+        if existing.get(key):
+            cocktail_data[key] = existing[key]
+    glass = existing.get("glass")
+    if glass and isinstance(glass, dict) and glass.get("id"):
+        cocktail_data["glass_id"] = glass["id"]
+    method = existing.get("method")
+    if method and isinstance(method, dict) and method.get("id"):
+        cocktail_data["cocktail_method_id"] = method["id"]
+    parent = existing.get("parent_cocktail")
+    if parent and isinstance(parent, dict) and parent.get("id"):
+        cocktail_data["parent_cocktail_id"] = parent["id"]
 
-        elif name == "bar_update_cocktail":
-            cocktail_id = arguments.get("id")
-            # Fetch existing cocktail to preserve fields not being updated
-            existing_data = client.get_cocktail(cocktail_id)
-            existing = existing_data.get("data") if existing_data else None
-            if not existing:
-                existing = existing_data if isinstance(existing_data, dict) else {}
+    # Override with provided changes
+    updates: dict[str, Any] = {}
+    if name is not None:
+        updates["name"] = name
+    if instructions is not None:
+        updates["instructions"] = instructions
+    if description is not None:
+        updates["description"] = description
+    if source is not None:
+        updates["source"] = source
+    if garnish is not None:
+        updates["garnish"] = garnish
+    if glass_id is not None:
+        updates["glass_id"] = glass_id
+    if cocktail_method_id is not None:
+        updates["cocktail_method_id"] = cocktail_method_id
+    if tags is not None:
+        updates["tags"] = tags
+    if ingredients is not None:
+        updates["ingredients"] = ingredients
+    if images is not None:
+        updates["images"] = images
+    if parent_cocktail_id is not None:
+        updates["parent_cocktail_id"] = parent_cocktail_id
+    cocktail_data.update(updates)
 
-            # Start with required fields from existing cocktail
-            cocktail_data = {
-                "name": existing.get("name"),
-                "instructions": existing.get("instructions"),
-            }
-
-            # Preserve existing ingredients if not provided (convert format)
-            if arguments.get("ingredients") is None:
-                existing_ingredients = existing.get("ingredients", [])
-                cocktail_data["ingredients"] = [
-                    {
-                        "ingredient_id": ing.get("ingredient", {}).get("id") or ing.get("ingredient_id"),
-                        "amount": ing.get("amount", 0),
-                        "units": ing.get("units", ""),
-                        "optional": ing.get("optional", False),
-                        "sort": ing.get("sort", idx + 1),
-                    }
-                    for idx, ing in enumerate(existing_ingredients)
-                    if ing.get("ingredient", {}).get("id") or ing.get("ingredient_id")
-                ]
-
-            # Preserve existing tags if not provided (extract tag names)
-            if arguments.get("tags") is None:
-                existing_tags = existing.get("tags", [])
-                cocktail_data["tags"] = [
-                    tag.get("name") for tag in existing_tags if tag.get("name")
-                ]
-
-            # Preserve existing images if not provided (extract image IDs)
-            if arguments.get("images") is None:
-                existing_images = existing.get("images", [])
-                cocktail_data["images"] = [
-                    img.get("id") for img in existing_images if img.get("id")
-                ]
-
-            # Preserve other optional fields if they exist
-            for key in ["description", "source", "garnish"]:
-                if existing.get(key):
-                    cocktail_data[key] = existing[key]
-            glass = existing.get("glass")
-            if glass and isinstance(glass, dict) and glass.get("id"):
-                cocktail_data["glass_id"] = glass["id"]
-            method = existing.get("method")
-            if method and isinstance(method, dict) and method.get("id"):
-                cocktail_data["cocktail_method_id"] = method["id"]
-            parent = existing.get("parent_cocktail")
-            if parent and isinstance(parent, dict) and parent.get("id"):
-                cocktail_data["parent_cocktail_id"] = parent["id"]
-
-            # Override with user's changes
-            for key in ["name", "instructions", "description", "source", "garnish",
-                       "glass_id", "cocktail_method_id", "tags", "ingredients", "images",
-                       "parent_cocktail_id"]:
-                if arguments.get(key) is not None:
-                    cocktail_data[key] = arguments[key]
-
-            data = client.update_cocktail(cocktail_id, cocktail_data)
-            cocktail = data.get("data") if data else None
-            if not cocktail:
-                cocktail = data if isinstance(data, dict) and data.get("name") else None
-            if cocktail and isinstance(cocktail, dict):
-                result = f"Updated cocktail: **{cocktail.get('name')}** (ID: {cocktail.get('id')})"
-            else:
-                # API may not return the updated cocktail, use the name we already have
-                result = f"Updated cocktail: **{cocktail_data.get('name')}** (ID: {cocktail_id})"
-
-        elif name == "bar_delete_cocktail":
-            cocktail_id = arguments.get("id")
-            client.delete_cocktail(cocktail_id)
-            result = f"Deleted cocktail: {cocktail_id}"
-
-        elif name == "bar_update_ingredient":
-            ingredient_id = arguments.get("id")
-            # Fetch existing ingredient to preserve fields not being updated
-            existing_data = client.get_ingredient(ingredient_id)
-            existing = existing_data.get("data") if existing_data else None
-            if not existing:
-                existing = existing_data if isinstance(existing_data, dict) else {}
-
-            # Start with required fields from existing ingredient
-            ingredient_data = {
-                "name": existing.get("name"),
-            }
-
-            # Preserve existing optional fields
-            if existing.get("strength") is not None:
-                ingredient_data["strength"] = existing["strength"]
-            if existing.get("description"):
-                ingredient_data["description"] = existing["description"]
-            if existing.get("origin"):
-                ingredient_data["origin"] = existing["origin"]
-            if existing.get("parent_ingredient", {}).get("id"):
-                ingredient_data["parent_ingredient_id"] = existing["parent_ingredient"]["id"]
-
-            # Preserve existing images if not provided (extract image IDs)
-            if arguments.get("images") is None:
-                existing_images = existing.get("images", [])
-                ingredient_data["images"] = [
-                    img.get("id") for img in existing_images if img.get("id")
-                ]
-
-            # Override with user's changes
-            for key in ["name", "strength", "description", "origin",
-                       "parent_ingredient_id", "images"]:
-                if arguments.get(key) is not None:
-                    ingredient_data[key] = arguments[key]
-
-            data = client.update_ingredient(ingredient_id, ingredient_data)
-            ingredient = data.get("data") if data else None
-            if not ingredient:
-                ingredient = data if isinstance(data, dict) and data.get("name") else None
-            if ingredient and isinstance(ingredient, dict):
-                result = f"Updated ingredient: **{ingredient.get('name')}** (ID: {ingredient.get('id')})"
-            else:
-                # API may not return the updated ingredient, use the name we already have
-                result = f"Updated ingredient: **{ingredient_data.get('name')}** (ID: {ingredient_id})"
-
-        elif name == "bar_delete_ingredient":
-            ingredient_id = arguments.get("id")
-            client.delete_ingredient(ingredient_id)
-            result = f"Deleted ingredient: {ingredient_id}"
-
-        else:
-            result = f"Unknown tool: {name}"
-
-        return [TextContent(type="text", text=str(result))]
-
-    except Exception as e:
-        return [TextContent(type="text", text=f"Error: {str(e)}")]
+    data = client.update_cocktail(id, cocktail_data)
+    cocktail = data.get("data") if data else None
+    if not cocktail:
+        cocktail = data if isinstance(data, dict) and data.get("name") else None
+    if cocktail and isinstance(cocktail, dict):
+        return f"Updated cocktail: **{cocktail.get('name')}** (ID: {cocktail.get('id')})"
+    return f"Updated cocktail: **{cocktail_data.get('name')}** (ID: {id})"
 
 
-async def run():
-    """Run the MCP server."""
-    global api
+@mcp.tool()
+def bar_delete_cocktail(id: str) -> str:
+    """Delete a cocktail by ID or slug."""
+    client = get_api()
+    client.delete_cocktail(id)
+    return f"Deleted cocktail: {id}"
 
-    # Get configuration from environment
-    base_url = os.environ.get("BAR_ASSISTANT_URL")
-    api_token = os.environ.get("BAR_ASSISTANT_TOKEN")
-    bar_id = int(os.environ.get("BAR_ASSISTANT_BAR_ID", "1"))
 
-    if not base_url or not api_token:
-        print(
-            "Error: BAR_ASSISTANT_URL and BAR_ASSISTANT_TOKEN environment variables required.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+@mcp.tool()
+def bar_update_ingredient(
+    id: str,
+    name: str | None = None,
+    strength: float | None = None,
+    description: str | None = None,
+    origin: str | None = None,
+    parent_ingredient_id: int | None = None,
+    images: list[int] | None = None,
+) -> str:
+    """Update an existing ingredient. Only provide fields you want to change."""
+    client = get_api()
 
-    # Initialize API client
-    api = BarAssistantAPI(base_url, api_token, bar_id)
+    # Fetch existing ingredient to preserve fields not being updated
+    existing_data = client.get_ingredient(id)
+    existing = existing_data.get("data") if existing_data else None
+    if not existing:
+        existing = existing_data if isinstance(existing_data, dict) else {}
 
-    # Run server
-    async with stdio_server() as (read_stream, write_stream):
-        await server.run(read_stream, write_stream, server.create_initialization_options())
+    ingredient_data: dict[str, Any] = {"name": existing.get("name")}
+
+    # Preserve existing optional fields
+    if existing.get("strength") is not None:
+        ingredient_data["strength"] = existing["strength"]
+    if existing.get("description"):
+        ingredient_data["description"] = existing["description"]
+    if existing.get("origin"):
+        ingredient_data["origin"] = existing["origin"]
+    if existing.get("parent_ingredient", {}).get("id"):
+        ingredient_data["parent_ingredient_id"] = existing["parent_ingredient"]["id"]
+
+    # Preserve existing images if not provided
+    if images is None:
+        existing_images = existing.get("images", [])
+        ingredient_data["images"] = [
+            img.get("id") for img in existing_images if img.get("id")
+        ]
+
+    # Override with provided changes
+    if name is not None:
+        ingredient_data["name"] = name
+    if strength is not None:
+        ingredient_data["strength"] = strength
+    if description is not None:
+        ingredient_data["description"] = description
+    if origin is not None:
+        ingredient_data["origin"] = origin
+    if parent_ingredient_id is not None:
+        ingredient_data["parent_ingredient_id"] = parent_ingredient_id
+    if images is not None:
+        ingredient_data["images"] = images
+
+    data = client.update_ingredient(id, ingredient_data)
+    ingredient = data.get("data") if data else None
+    if not ingredient:
+        ingredient = data if isinstance(data, dict) and data.get("name") else None
+    if ingredient and isinstance(ingredient, dict):
+        return f"Updated ingredient: **{ingredient.get('name')}** (ID: {ingredient.get('id')})"
+    return f"Updated ingredient: **{ingredient_data.get('name')}** (ID: {id})"
+
+
+@mcp.tool()
+def bar_delete_ingredient(id: str) -> str:
+    """Delete an ingredient by ID or slug."""
+    client = get_api()
+    client.delete_ingredient(id)
+    return f"Deleted ingredient: {id}"
+
+
+# ===== Server Startup =====
 
 
 def main():
     """Main entry point."""
-    import asyncio
+    global _api, _oauth_provider
 
-    asyncio.run(run())
+    # Determine transport from CLI args
+    transport = "stdio"
+    if "--transport" in sys.argv:
+        idx = sys.argv.index("--transport")
+        if idx + 1 < len(sys.argv):
+            transport = sys.argv[idx + 1]
+
+    # For stdio mode, require env vars for API config
+    if transport == "stdio":
+        base_url = os.environ.get("BAR_ASSISTANT_URL")
+        api_token = os.environ.get("BAR_ASSISTANT_TOKEN")
+        bar_id = int(os.environ.get("BAR_ASSISTANT_BAR_ID", "1"))
+
+        if not base_url or not api_token:
+            print(
+                "Error: BAR_ASSISTANT_URL and BAR_ASSISTANT_TOKEN environment variables required.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
+        _api = BarAssistantAPI(base_url, api_token, bar_id)
+
+    elif transport == "streamable-http":
+        _setup_http_auth()
+
+    mcp.run(transport=transport)
+
+
+def _setup_http_auth():
+    """Configure OAuth 2.1 auth for HTTP transport mode."""
+    global _oauth_provider
+
+    from urllib.parse import urlencode
+
+    from mcp.server.auth.settings import (
+        AuthSettings,
+        ClientRegistrationOptions,
+        RevocationOptions,
+    )
+    from pydantic import AnyHttpUrl
+    from starlette.requests import Request
+    from starlette.responses import HTMLResponse, RedirectResponse
+
+    from mcp.server.auth.provider import ProviderTokenVerifier
+
+    from .auth import LOGIN_PAGE_TEMPLATE, BarAssistantOAuthProvider
+
+    # Required env vars for HTTP mode
+    ba_url = os.environ.get("BAR_ASSISTANT_URL")
+    if not ba_url:
+        print("Error: BAR_ASSISTANT_URL environment variable required.", file=sys.stderr)
+        sys.exit(1)
+
+    issuer_url = os.environ.get("MCP_ISSUER_URL", "http://localhost:8100")
+    ba_bar_id = int(os.environ.get("BAR_ASSISTANT_BAR_ID", "1"))
+
+    # Create OAuth provider
+    _oauth_provider = BarAssistantOAuthProvider(
+        ba_url=ba_url,
+        ba_bar_id=ba_bar_id,
+        issuer_url=issuer_url,
+    )
+
+    # Configure auth settings on FastMCP
+    mcp.settings.auth = AuthSettings(
+        issuer_url=AnyHttpUrl(issuer_url),
+        client_registration_options=ClientRegistrationOptions(
+            enabled=True,
+            valid_scopes=["bar.read", "bar.write"],
+            default_scopes=["bar.read", "bar.write"],
+        ),
+        revocation_options=RevocationOptions(enabled=True),
+        required_scopes=[],
+        resource_server_url=AnyHttpUrl(issuer_url),
+    )
+    mcp._auth_server_provider = _oauth_provider
+    mcp._token_verifier = ProviderTokenVerifier(_oauth_provider)
+
+    # Login page (GET)
+    @mcp.custom_route("/auth/login", methods=["GET"])
+    async def login_page(request: Request):
+        from string import Template
+
+        code_id = request.query_params.get("code_id", "")
+        html = Template(LOGIN_PAGE_TEMPLATE).safe_substitute(code_id=code_id, error="")
+        return HTMLResponse(html)
+
+    # Login form submission (POST)
+    @mcp.custom_route("/auth/login", methods=["POST"])
+    async def login_submit(request: Request):
+        from string import Template
+
+        form = await request.form()
+        code_id = str(form.get("code_id", ""))
+        email = str(form.get("email", ""))
+        password = str(form.get("password", ""))
+
+        try:
+            redirect_url = await _oauth_provider.complete_authorization(
+                code_id, email, password
+            )
+            return RedirectResponse(url=redirect_url, status_code=302)
+        except ValueError as e:
+            error_html = f'<div class="error">{str(e)}</div>'
+            html = Template(LOGIN_PAGE_TEMPLATE).safe_substitute(
+                code_id=code_id, error=error_html
+            )
+            return HTMLResponse(html, status_code=400)
 
 
 if __name__ == "__main__":
