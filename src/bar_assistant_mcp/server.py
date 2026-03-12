@@ -737,6 +737,7 @@ def main():
 
     elif transport == "streamable-http":
         _setup_http_auth()
+        _add_debug_logging()
 
     mcp.run(transport=transport)
 
@@ -786,10 +787,98 @@ def _setup_http_auth():
         ),
         revocation_options=RevocationOptions(enabled=True),
         required_scopes=[],
-        resource_server_url=AnyHttpUrl(issuer_url),
+        resource_server_url=AnyHttpUrl(f"{issuer_url.rstrip('/')}/mcp"),
     )
     mcp._auth_server_provider = _oauth_provider
     mcp._token_verifier = ProviderTokenVerifier(_oauth_provider)
+
+    # Monkey-patch build_metadata to include "none" in token auth methods
+    # (needed for public clients like Claude.ai)
+    import mcp.server.auth.routes as _auth_routes
+
+    _orig_build_metadata = _auth_routes.build_metadata
+
+    def _patched_build_metadata(*args, **kwargs):
+        metadata = _orig_build_metadata(*args, **kwargs)
+        # Add "none" for public clients (Claude.ai)
+        methods = list(metadata.token_endpoint_auth_methods_supported or [])
+        if "none" not in methods:
+            methods.append("none")
+        metadata.token_endpoint_auth_methods_supported = methods
+        return metadata
+
+    _auth_routes.build_metadata = _patched_build_metadata
+
+    # Fix Pydantic AnyHttpUrl trailing slash on issuer/authorization_servers
+    # AnyHttpUrl("https://example.com") always serializes as "https://example.com/"
+    # which can cause issuer URL mismatches in strict OAuth implementations
+    import re
+    from mcp.server.auth.json_response import PydanticJSONResponse
+
+    _orig_render = PydanticJSONResponse.render
+
+    def _patched_render(self, content):
+        data = _orig_render(self, content)
+        # Strip trailing slash from issuer URL (but not from path-based URLs)
+        text = data.decode("utf-8")
+        issuer_base = issuer_url.rstrip("/")
+        # Fix "issuer":"https://example.com/" → "issuer":"https://example.com"
+        text = text.replace(f'"{issuer_base}/"', f'"{issuer_base}"')
+        return text.encode("utf-8")
+
+    PydanticJSONResponse.render = _patched_render
+
+    # Monkey-patch RequireAuthMiddleware to fix WWW-Authenticate for no-token requests
+    # Per RFC 6750, when no token is provided, the challenge should be plain "Bearer"
+    # without error="invalid_token" (which signals a failed token, not missing auth)
+    from mcp.server.auth.middleware.bearer_auth import RequireAuthMiddleware
+
+    _orig_call = RequireAuthMiddleware.__call__
+
+    async def _patched_call(self, scope, receive, send):
+        from starlette.requests import HTTPConnection
+        conn = HTTPConnection(scope)
+        auth_header = conn.headers.get("authorization", "")
+        if not auth_header.lower().startswith("bearer "):
+            # No token provided — send plain Bearer challenge (RFC 6750 §3)
+            await self._send_auth_error(
+                send, status_code=401, error="", description="Authentication required"
+            )
+            return
+        await _orig_call(self, scope, receive, send)
+
+    RequireAuthMiddleware.__call__ = _patched_call
+
+    # Also patch _send_auth_error to handle empty error code
+    _orig_send_error = RequireAuthMiddleware._send_auth_error
+
+    async def _patched_send_error(self, send, status_code, error, description):
+        import json as _json
+        if not error:
+            # Plain Bearer challenge for no-token case
+            www_auth_parts = []
+            if description:
+                www_auth_parts.append(f'error_description="{description}"')
+            if self.resource_metadata_url:
+                www_auth_parts.append(f'resource_metadata="{self.resource_metadata_url}"')
+            www_authenticate = "Bearer" + (f" {', '.join(www_auth_parts)}" if www_auth_parts else "")
+
+            body = {"error": "unauthorized", "error_description": description}
+            body_bytes = _json.dumps(body).encode()
+            await send({
+                "type": "http.response.start",
+                "status": status_code,
+                "headers": [
+                    (b"content-type", b"application/json"),
+                    (b"content-length", str(len(body_bytes)).encode()),
+                    (b"www-authenticate", www_authenticate.encode()),
+                ],
+            })
+            await send({"type": "http.response.body", "body": body_bytes})
+        else:
+            await _orig_send_error(self, send, status_code, error, description)
+
+    RequireAuthMiddleware._send_auth_error = _patched_send_error
 
     # Login page (GET)
     @mcp.custom_route("/auth/login", methods=["GET"])
@@ -821,6 +910,16 @@ def _setup_http_auth():
                 code_id=code_id, error=error_html
             )
             return HTMLResponse(html, status_code=400)
+
+
+def _add_debug_logging():
+    """Add debug logging for auth-related requests."""
+    import logging
+
+    logging.basicConfig(level=logging.DEBUG)
+    # Enable debug logging for all MCP auth components
+    for name in ("mcp", "uvicorn", "starlette"):
+        logging.getLogger(name).setLevel(logging.DEBUG)
 
 
 if __name__ == "__main__":

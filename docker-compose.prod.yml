@@ -1,0 +1,11 @@
+services:
+  mcp:
+    build: .
+    container_name: bar-assistant-mcp
+    restart: unless-stopped
+    ports:
+      - "8100:8100"
+    environment:
+      - BAR_ASSISTANT_URL=https://erikbarapi.duckdns.org
+      - BAR_ASSISTANT_BAR_ID=1
+      - MCP_ISSUER_URL=https://erikbar.duckdns.org
