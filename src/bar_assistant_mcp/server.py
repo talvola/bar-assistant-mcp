@@ -665,8 +665,9 @@ def bar_update_ingredient(
         ingredient_data["description"] = existing["description"]
     if existing.get("origin"):
         ingredient_data["origin"] = existing["origin"]
-    if existing.get("parent_ingredient", {}).get("id"):
-        ingredient_data["parent_ingredient_id"] = existing["parent_ingredient"]["id"]
+    parent = existing.get("hierarchy", {}).get("parent_ingredient")
+    if parent and parent.get("id"):
+        ingredient_data["parent_ingredient_id"] = parent["id"]
 
     # Preserve existing images if not provided
     if images is None:
