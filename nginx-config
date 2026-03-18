@@ -1,0 +1,118 @@
+location = /.well-known/oauth-authorization-server {
+    if ($request_method = OPTIONS) {
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type" always;
+        add_header Access-Control-Max-Age 600;
+        return 204;
+    }
+    proxy_pass http://192.168.1.64:8100;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    add_header Access-Control-Allow-Origin * always;
+}
+
+location /.well-known/oauth-protected-resource {
+    if ($request_method = OPTIONS) {
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type" always;
+        add_header Access-Control-Max-Age 600;
+        return 204;
+    }
+    proxy_pass http://192.168.1.64:8100;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    add_header Access-Control-Allow-Origin * always;
+}
+
+location = /authorize {
+    proxy_pass http://192.168.1.64:8100;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+location = /token {
+    if ($request_method = OPTIONS) {
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type" always;
+        add_header Access-Control-Max-Age 600;
+        return 204;
+    }
+    proxy_pass http://192.168.1.64:8100;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    add_header Access-Control-Allow-Origin * always;
+}
+
+location = /register {
+    if ($request_method = OPTIONS) {
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type" always;
+        add_header Access-Control-Max-Age 600;
+        return 204;
+    }
+    proxy_pass http://192.168.1.64:8100;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    add_header Access-Control-Allow-Origin * always;
+}
+
+location = /revoke {
+    if ($request_method = OPTIONS) {
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type" always;
+        add_header Access-Control-Max-Age 600;
+        return 204;
+    }
+    proxy_pass http://192.168.1.64:8100;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    add_header Access-Control-Allow-Origin * always;
+}
+
+location /auth/login {
+    proxy_pass http://192.168.1.64:8100;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+location = /mcp {
+    if ($request_method = OPTIONS) {
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods "GET, POST, DELETE, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type, mcp-protocol-version, Last-Event-ID" always;
+        add_header Access-Control-Expose-Headers "Content-Type" always;
+        add_header Access-Control-Max-Age 600;
+        return 204;
+    }
+    proxy_pass http://192.168.1.64:8100;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Connection "";
+    proxy_http_version 1.1;
+    chunked_transfer_encoding off;
+    proxy_buffering off;
+    proxy_cache off;
+    add_header Access-Control-Allow-Origin * always;
+    add_header Access-Control-Expose-Headers "Content-Type" always;
+}

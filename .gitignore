@@ -45,6 +45,16 @@ mcpb/dist/
 mcpb/secrets.json
 secrets.json
 
+# Credentials
+*-cred.txt
+*-token.txt
+
+# Exports
+*.csv
+
+# Test files
+test_*.txt
+
 # OS
 .DS_Store
 Thumbs.db
