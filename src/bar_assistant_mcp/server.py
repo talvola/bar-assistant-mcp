@@ -1070,6 +1070,54 @@ def bar_uses_for_bottle(ingredient_id: int, top_n: int = 10) -> str:
     return "\n".join(lines)
 
 
+@mcp.tool()
+def bar_find_gaps(
+    cocktail_ids: list[int] | None = None,
+    threshold: float = 3.0,
+) -> str:
+    """Find recipe slots where the best in-stock bottle is a stretch — the shopping list.
+
+    Loads constrained slots (all by default, or the subset matching `cocktail_ids`),
+    pits them against in-stock bottles, and reports any slot whose best match is
+    hard-disqualified or accumulates penalty ≥ `threshold`. Sorted worst-gap-first.
+
+    Args:
+        cocktail_ids: restrict to these cocktails; None = every constrained slot.
+        threshold: penalty above which a slot counts as a gap (defaults to 3.0,
+                   roughly "two-axis miss or one hard-cap brush").
+    """
+    with fdb.connect() as conn:
+        all_slots = fdb.load_all_slots(conn)
+        bottles = fdb.load_bottles(conn, category=None)
+    if cocktail_ids is not None:
+        wanted = set(cocktail_ids)
+        slots = [s for s in all_slots if s.cocktail_id in wanted]
+    else:
+        slots = all_slots
+    if not slots:
+        return "No constrained slots to evaluate."
+
+    shelf = _shelf_ingredient_ids()
+    for b in bottles:
+        b.in_stock = b.id in shelf
+
+    gaps = fl.find_gaps(bottles, slots, threshold=threshold)
+    if not gaps:
+        return f"No gaps — every evaluated slot has an in-stock match under penalty {threshold}."
+
+    names: dict[int, str] = {}
+    def name_for(cid: int) -> str:
+        if cid not in names:
+            names[cid] = get_api().get_cocktail(cid).get("data", {}).get("name", f"#{cid}")
+        return names[cid]
+
+    lines = [f"**Gaps ({len(gaps)} slot(s) at threshold {threshold}):**"]
+    for slot, bottle, penalty, reason in gaps:
+        best = f"best: {bottle.name} (penalty={penalty:.1f})" if bottle else "best: nothing in stock"
+        lines.append(f"  {name_for(slot.cocktail_id)} (id={slot.cocktail_id}) sort {slot.sort} [{slot.category}]  {best}  — {reason}")
+    return "\n".join(lines)
+
+
 # ===== Server Startup =====
 
 
