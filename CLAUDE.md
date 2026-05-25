@@ -213,5 +213,13 @@ Always backfill `sort` on each ingredient before sending — the BA API's `Cockt
 ### Testing changes against the live BA API without redeploying
 `.venv/bin/python -c "from bar_assistant_mcp.api import BarAssistantAPI; ..."` — import the fixed code directly, hit production BA with the stdio token from `.mcp.json`, clean up after. Faster than rebuilding the container.
 
+FastMCP's `@mcp.tool()` is a passthrough — decorated functions remain plain callables. Test them as `server.bar_describe_slots(668)`, not `.fn(...)` (no wrapper attribute exists).
+
 ### Debugging deployed-server errors
 Laravel logs go to container stdout, not `storage/logs/laravel.log` (which is empty). Use the Portainer logs API on `bar-assistant-api` to read exceptions. Deploy/debug details in memory (`deployment_guide`, `ba_api_quirks`).
+
+### Picking up a rebuilt image
+Portainer's restart endpoint (and `docker restart`) does NOT re-pull — the container stays on its original image ID. After rebuilding `:latest`, PUT the stack YAML to force a recreate. See `deployment_guide` memory for the API call.
+
+### Parsing JSON from NAS-side curls
+The NAS `talvola` SSH user has no `python3` in PATH (Asustor stock). When hitting Portainer/etc. APIs over ssh, pipe the response back to the workstation: `ssh ... 'curl -sk -H "X-API-Key: ..." https://localhost:19943/api/...' | python3 -c '...'`. (Watch out for f-string + backslash inside `python3 -c` — use indexed access or move to a heredoc.)
