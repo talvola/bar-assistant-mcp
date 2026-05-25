@@ -1,0 +1,17 @@
+{
+  "_README": "LLM-derived 0–3 axis scores for aquavits not on TGII (axes: juniper, citrus, floral, heat, spice, herbal). Scoring grounded in BA descriptions + brand research, NOT in tasting. Re-score after personal tasting and bump confidence.",
+
+  "138": {
+    "name": "Batch 22 New American Aquavit",
+    "confidence": "low",
+    "reasoning": "Hawaii-based 'New American' aquavit, 40% ABV, 6x distilled (clean spirit, mellow heat). BA description names citrus + caraway + dill botanicals — the canonical caraway anchor + a herbal/dill emphasis + bright citrus. American aquavits typically run lighter on juniper than Scandinavian counterparts. No tasting notes available; scoring from botanical bill alone — re-score after tasting.",
+    "profile": {
+      "juniper": 1,
+      "citrus": 2,
+      "floral": 0,
+      "heat": 1,
+      "spice": 2,
+      "herbal": 2
+    }
+  }
+}

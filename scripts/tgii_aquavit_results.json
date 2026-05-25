@@ -1,0 +1,49 @@
+[
+  {
+    "ba_id": 138,
+    "ba_name": "Batch 22 New American Aquavit",
+    "ba_path": "363/403/",
+    "candidates": [
+      {
+        "score": 0.651,
+        "slug": "norden-aquavit-american-oak-reserve"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 1,
+      "citrus": 2,
+      "floral": 0,
+      "heat": 1,
+      "spice": 2,
+      "herbal": 2
+    },
+    "confidence": "low",
+    "reasoning": "Hawaii-based 'New American' aquavit, 40% ABV, 6x distilled (clean spirit, mellow heat). BA description names citrus + caraway + dill botanicals \u2014 the canonical caraway anchor + a herbal/dill emphasis + bright citrus. American aquavits typically run lighter on juniper than Scandinavian counterparts. No tasting notes available; scoring from botanical bill alone \u2014 re-score after tasting.",
+    "notes": "American botanical aquavit; TGII doesn't cover it."
+  },
+  {
+    "ba_id": 137,
+    "ba_name": "Linie Aquavit",
+    "ba_path": "363/403/",
+    "candidates": [
+      {
+        "score": 1.0,
+        "slug": "linie-aquavit"
+      }
+    ],
+    "matched_slug": "linie-aquavit",
+    "match_score": 1.0,
+    "source": "auto_fuzzy",
+    "status": "matched",
+    "profile": {
+      "juniper": 0,
+      "citrus": 0,
+      "floral": 0,
+      "heat": 2,
+      "spice": 3,
+      "herbal": 2
+    }
+  }
+]
