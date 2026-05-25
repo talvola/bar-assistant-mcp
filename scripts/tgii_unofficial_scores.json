@@ -1,0 +1,116 @@
+{
+  "_about": {
+    "schema": "7-axis 0-3 scale matching The Gin Is In: juniper, citrus, floral, heat, spice, herbal, fruited",
+    "source": "llm_from_description (Claude, scoring against BA ingredient.description)",
+    "scored_at": "2026-05-23",
+    "note": "Confidence reflects how much the description supports the scoring. Low-confidence entries should be re-scored by Erik against tasting notes when convenient."
+  },
+  "161": {
+    "name": "Jettywave Barrel-Aged Botanical Gin",
+    "profile": {"juniper": 1, "citrus": 2, "floral": 2, "heat": 1, "spice": 1, "herbal": 3, "fruited": 1},
+    "confidence": "low",
+    "reasoning": "Shiso + nasturtium + pistachios reads herbal-floral with citrus from Meyer lemon. Juniper not mentioned as foreground; corn base is neutral. 6 months in American oak adds mild fruited/vanilla but at 40% ABV the heat stays low. Short description — confidence low."
+  },
+  "162": {
+    "name": "Jettywave California Botanical Gin",
+    "profile": {"juniper": 1, "citrus": 2, "floral": 2, "heat": 2, "spice": 1, "herbal": 3, "fruited": 0},
+    "confidence": "low",
+    "reasoning": "Description is one sentence; scored as a sibling of #161 (same distillery, garden botanicals) without the barrel-aging. Almost no specifics — re-score from tasting note when possible."
+  },
+  "163": {
+    "name": "Kiss Cold Gin New York Style",
+    "profile": {"juniper": 2, "citrus": 2, "floral": 0, "heat": 1, "spice": 1, "herbal": 2, "fruited": 0},
+    "confidence": "low",
+    "reasoning": "'New York style' is loose marketing; 5x distilled implies clean neutral. Juniper + lemon + 'herbs' is all we have. Defaulted to balanced-low profile."
+  },
+  "164": {
+    "name": "Old World Spirits Rusty Blade Gin",
+    "profile": {"juniper": 2, "citrus": 1, "floral": 1, "heat": 3, "spice": 2, "herbal": 1, "fruited": 2},
+    "confidence": "low",
+    "reasoning": "Barrel-aged in French oak with a 12% grape eau de vie base reads as fruited + oak spice. No botanical bill in description. 47% ABV = heat 3. Treat as a barrel-aged gin archetype until better data."
+  },
+  "166": {
+    "name": "Seven Stills Wood Isle Dry Gin",
+    "profile": {"juniper": 2, "citrus": 2, "floral": 1, "heat": 2, "spice": 1, "herbal": 2, "fruited": 0},
+    "confidence": "low",
+    "reasoning": "61-char description — almost no signal beyond 'San Francisco Bay coastal botanicals.' Defaulted to a balanced San Francisco craft profile. Seven Stills is defunct; can't re-source."
+  },
+  "513": {
+    "name": "Quattro Gatti Gin Classico",
+    "profile": {"juniper": 2, "citrus": 2, "floral": 2, "heat": 2, "spice": 2, "herbal": 2, "fruited": 1},
+    "confidence": "high",
+    "reasoning": "Detailed botanical bill: Italian juniper, ginestra (Spanish broom — floral), peperoncino (chili — heat+spice), coriander, orange, olive leaf. Reads as balanced 2s with peperoncino bumping spice/heat. Mild fruited from orange."
+  },
+  "514": {
+    "name": "Quattro Gatti Olive Grove Gin",
+    "profile": {"juniper": 2, "citrus": 1, "floral": 0, "heat": 2, "spice": 1, "herbal": 3, "fruited": 0},
+    "confidence": "high",
+    "reasoning": "Savory olive-and-artichoke profile — described as 'earthy, forest floor, rain-soaked stone.' Olive leaf + artichoke + thyme = herbal 3. Lemon peel present but not foregrounded. No floral, no fruit — this is a savory martini gin."
+  },
+  "519": {
+    "name": "James Gin California Dreamgin'",
+    "profile": {"juniper": 1, "citrus": 1, "floral": 0, "heat": 1, "spice": 1, "herbal": 3, "fruited": 1},
+    "confidence": "high",
+    "reasoning": "Mushroom + patchouli + oregano = unmistakable herbal 3 (savory/earthy). Girolle mushroom adds peppery + apricot hint (fruited 1). Juniper not foregrounded — this is a 'gin' more by category than profile."
+  },
+  "520": {
+    "name": "James Gin American Mustard",
+    "profile": {"juniper": 1, "citrus": 1, "floral": 0, "heat": 2, "spice": 3, "herbal": 2, "fruited": 1},
+    "confidence": "high",
+    "reasoning": "Mustard seed + ginger + caraway + cubeb pepper + licorice = spice 3 (the dominant axis). 'Slight sensation of fire' = heat 2. Bay + rosemary = herbal 2. Dried tomato gives a fruited hint. Juniper buried in a long botanical list."
+  },
+  "554": {
+    "name": "High Mountain Desert Gin",
+    "profile": {"juniper": 2, "citrus": 1, "floral": 0, "heat": 2, "spice": 2, "herbal": 3, "fruited": 0},
+    "confidence": "high",
+    "reasoning": "Sage-forward, 'piney,' rosemary, white pepper. Mountain sage = herbal 3. Juniper present but secondary. White pepper = spice 2. No citrus emphasis. Earthy desert character."
+  },
+  "560": {
+    "name": "Renais Gin",
+    "profile": {"juniper": 2, "citrus": 3, "floral": 3, "heat": 1, "spice": 1, "herbal": 1, "fruited": 3},
+    "confidence": "high",
+    "reasoning": "Chablis grape-skin base is the distinguishing feature — fruited 3 (white wine character). Lemon + lime = citrus 3. Linden flowers + acacia honey = floral 3. 40% ABV = heat 1. Cubeb mild. Distinctive profile that explains why TGII passing didn't matter — Renais doesn't fit a conventional gin axis well."
+  },
+  "575": {
+    "name": "WildJune Western Style Gin",
+    "profile": {"juniper": 3, "citrus": 2, "floral": 1, "heat": 2, "spice": 2, "herbal": 2, "fruited": 1},
+    "confidence": "high",
+    "reasoning": "Double juniper bill (wild Red Berry + organic common) = juniper 3, 'bold.' Cinnamon + white pepper = spice 2. Centennial hops add floral 1. Lemon balm + hops = herbal 2. Red Berry juniper carries some fruit. 45% ABV = heat 2."
+  },
+  "576": {
+    "name": "WildBark West Texas Dry Gin",
+    "profile": {"juniper": 3, "citrus": 2, "floral": 0, "heat": 3, "spice": 1, "herbal": 1, "fruited": 0},
+    "confidence": "high",
+    "reasoning": "Double juniper bill (wild Alligator + organic common) with 'earthy juniper upfront' = juniper 3. 'Pop of citrus from orange peel' = citrus 2. 47% ABV = heat 3. Spare botanical bill — coriander only spice. Rye/malt base adds backbone but doesn't show as fruited."
+  },
+  "617": {
+    "name": "High Mountain Desert Barrel Rested Gin",
+    "profile": {"juniper": 2, "citrus": 0, "floral": 0, "heat": 2, "spice": 2, "herbal": 3, "fruited": 0},
+    "confidence": "high",
+    "reasoning": "Same base as #554 (sage-forward Utah gin) rested 8mo in rye barrels. Sage stays dominant (herbal 3). Allspice + white pepper + baking spice = spice 2. Vanilla/caramel from barrel — these read as warming, not fruited. No citrus mentioned. 44% ABV."
+  },
+  "621": {
+    "name": "James Gin London Drizzle",
+    "profile": {"juniper": 2, "citrus": 2, "floral": 0, "heat": 2, "spice": 2, "herbal": 3, "fruited": 1},
+    "confidence": "high",
+    "reasoning": "Petrichor concept: 'rich juniper and tangy orange up front, then earthy beetroot and rooty botanical spice, mineral petrichor, peppercorn warmth.' Beetroot + lovage + bay = herbal 3 (earthy/umami). Ginger + peppercorn = spice 2. Beetroot adds a sweet-earthy fruited hint."
+  },
+  "622": {
+    "name": "Pacific House Bay FC Poppy",
+    "profile": {"juniper": 2, "citrus": 3, "floral": 3, "heat": 2, "spice": 1, "herbal": 1, "fruited": 0},
+    "confidence": "high",
+    "reasoning": "'Citrus-forward brightness' + bright orange peel = citrus 3. California poppy is the signature — floral 3 ('gently floral' finish). Juniper present but supporting. 'Soft spice' + 'herbal lift' = 1 each. 43% ABV = heat 2."
+  },
+  "625": {
+    "name": "Wood's Mountain Hopped Gin",
+    "profile": {"juniper": 2, "citrus": 2, "floral": 2, "heat": 2, "spice": 1, "herbal": 2, "fruited": 0},
+    "confidence": "medium",
+    "reasoning": "'Medium juniper-forward.' Cascade hops contribute floral + citrus without bitterness — bumps citrus and floral to 2 each. Elderflower reinforces floral. Western-style frame puts herbal at 2. 45% ABV = heat 2. Distinct from IPA gins because hop bitterness is suppressed."
+  },
+  "636": {
+    "name": "Big Gin Peat Barreled",
+    "profile": {"juniper": 3, "citrus": 1, "floral": 1, "heat": 3, "spice": 3, "herbal": 1, "fruited": 0},
+    "confidence": "high",
+    "reasoning": "Big Gin's flagship is juniper-heavy LDG (juniper 3). 'Cask treatment dulls the citrus' = citrus 1. Cardamom + grains of paradise + Tasmanian pepperberry + cracked black pepper = spice 3. 47% / 94 proof = heat 3. Orris adds floral 1. NOTE: The peat/smoke character has no TGII gin axis — needs to be flagged separately if the matcher ever wants to surface it (could add a smoke axis to the schema later)."
+  }
+}

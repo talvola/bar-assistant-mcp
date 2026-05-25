@@ -1,0 +1,1025 @@
+[
+  {
+    "ba_id": 636,
+    "ba_name": "Big Gin Peat Barreled",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.823,
+        "slug": "bourbon-barreled-big-gin"
+      },
+      {
+        "score": 0.675,
+        "slug": "big-gin"
+      },
+      {
+        "score": 0.5,
+        "slug": "lockhouse-barreled-gin"
+      },
+      {
+        "score": 0.47,
+        "slug": "big-dipper-gin"
+      },
+      {
+        "score": 0.461,
+        "slug": "lee-spirits-barreled-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 3,
+      "citrus": 1,
+      "floral": 1,
+      "heat": 3,
+      "spice": 3,
+      "herbal": 1,
+      "fruited": 0
+    },
+    "confidence": "high",
+    "reasoning": "Big Gin's flagship is juniper-heavy LDG (juniper 3). 'Cask treatment dulls the citrus' = citrus 1. Cardamom + grains of paradise + Tasmanian pepperberry + cracked black pepper = spice 3. 47% / 94 proof = heat 3. Orris adds floral 1. NOTE: The peat/smoke character has no TGII gin axis \u2014 needs to be flagged separately if the matcher ever wants to surface it (could add a smoke axis to the schema later)."
+  },
+  {
+    "ba_id": 503,
+    "ba_name": "Devil's Grin Texas Gin",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.806,
+        "slug": "devils-grin-gin"
+      },
+      {
+        "score": 0.432,
+        "slug": "devils-bathtub-gin"
+      },
+      {
+        "score": 0.405,
+        "slug": "texas-longhorn-gin"
+      }
+    ],
+    "matched_slug": "devils-grin-gin",
+    "source": "manual_override",
+    "status": "matched",
+    "profile": {
+      "juniper": 2,
+      "citrus": 1,
+      "floral": 1,
+      "heat": 2,
+      "spice": 2,
+      "herbal": 1,
+      "fruited": 0
+    }
+  },
+  {
+    "ba_id": 159,
+    "ba_name": "Ford's London Dry Gin",
+    "ba_path": "363/383/384/",
+    "candidates": [
+      {
+        "score": 0.707,
+        "slug": "fords-gin"
+      },
+      {
+        "score": 0.527,
+        "slug": "haymans-london-dry-gin"
+      },
+      {
+        "score": 0.52,
+        "slug": "sipsmith-london-dry-gin"
+      },
+      {
+        "score": 0.517,
+        "slug": "hammer-london-dry-gin"
+      },
+      {
+        "score": 0.51,
+        "slug": "masters-london-dry-gin"
+      }
+    ],
+    "matched_slug": "fords-gin",
+    "source": "manual_override",
+    "status": "matched",
+    "profile": {
+      "juniper": 2,
+      "citrus": 2,
+      "floral": 2,
+      "heat": 2,
+      "spice": 2,
+      "herbal": 1,
+      "fruited": 0
+    }
+  },
+  {
+    "ba_id": 199,
+    "ba_name": "Four Pillars Rare Dry Gin",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 1.0,
+        "slug": "four-pillars-rare-dry-gin"
+      },
+      {
+        "score": 0.562,
+        "slug": "four-pillars-fresh-yuzu-gin"
+      },
+      {
+        "score": 0.235,
+        "slug": "bombay-dry-gin"
+      },
+      {
+        "score": 0.227,
+        "slug": "silver-dry-gin"
+      },
+      {
+        "score": 0.221,
+        "slug": "louisville-dry-gin"
+      }
+    ],
+    "matched_slug": "four-pillars-rare-dry-gin",
+    "match_score": 1.0,
+    "source": "auto_fuzzy",
+    "status": "matched",
+    "profile": {
+      "juniper": 1,
+      "citrus": 2,
+      "floral": 1,
+      "heat": 2,
+      "spice": 2,
+      "herbal": 2,
+      "fruited": 0
+    }
+  },
+  {
+    "ba_id": 624,
+    "ba_name": "Hayman's Old Tom Gin",
+    "ba_path": "363/383/385/",
+    "candidates": [
+      {
+        "score": 1.0,
+        "slug": "haymans-old-tom-gin"
+      },
+      {
+        "score": 0.585,
+        "slug": "tanqueray-old-tom"
+      },
+      {
+        "score": 0.567,
+        "slug": "counter-old-tom-gin"
+      },
+      {
+        "score": 0.567,
+        "slug": "very-old-tom"
+      },
+      {
+        "score": 0.563,
+        "slug": "minions-old-tom-gin"
+      }
+    ],
+    "matched_slug": "haymans-old-tom-gin",
+    "match_score": 1.0,
+    "source": "auto_fuzzy",
+    "status": "matched",
+    "profile": {
+      "juniper": 2,
+      "citrus": 3,
+      "floral": 1,
+      "heat": 1,
+      "spice": 2,
+      "herbal": 2,
+      "fruited": 0
+    }
+  },
+  {
+    "ba_id": 617,
+    "ba_name": "High Mountain Desert Barrel Rested Gin",
+    "ba_path": "363/383/462/",
+    "candidates": [
+      {
+        "score": 0.521,
+        "slug": "jocassee-gin-barrel-rested"
+      },
+      {
+        "score": 0.508,
+        "slug": "woodcut-barrel-rested-gin"
+      },
+      {
+        "score": 0.44,
+        "slug": "barrel-rested-ivy-city-gin"
+      },
+      {
+        "score": 0.437,
+        "slug": "woods-barrel-rested-treeline-gin"
+      },
+      {
+        "score": 0.358,
+        "slug": "white-mountain-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 2,
+      "citrus": 0,
+      "floral": 0,
+      "heat": 2,
+      "spice": 2,
+      "herbal": 3,
+      "fruited": 0
+    },
+    "confidence": "high",
+    "reasoning": "Same base as #554 (sage-forward Utah gin) rested 8mo in rye barrels. Sage stays dominant (herbal 3). Allspice + white pepper + baking spice = spice 2. Vanilla/caramel from barrel \u2014 these read as warming, not fruited. No citrus mentioned. 44% ABV."
+  },
+  {
+    "ba_id": 554,
+    "ba_name": "High Mountain Desert Gin",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.475,
+        "slug": "white-mountain-gin"
+      },
+      {
+        "score": 0.457,
+        "slug": "booths-high-and-dry-gin"
+      },
+      {
+        "score": 0.428,
+        "slug": "horse-mountain-dry-gin"
+      },
+      {
+        "score": 0.413,
+        "slug": "sourland-mountain-reserve-gin"
+      },
+      {
+        "score": 0.409,
+        "slug": "sourland-mountain-spirits-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 2,
+      "citrus": 1,
+      "floral": 0,
+      "heat": 2,
+      "spice": 2,
+      "herbal": 3,
+      "fruited": 0
+    },
+    "confidence": "high",
+    "reasoning": "Sage-forward, 'piney,' rosemary, white pepper. Mountain sage = herbal 3. Juniper present but secondary. White pepper = spice 2. No citrus emphasis. Earthy desert character."
+  },
+  {
+    "ba_id": 520,
+    "ba_name": "James Gin American Mustard",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.454,
+        "slug": "james-bay-distillers-navy-strength-gin"
+      },
+      {
+        "score": 0.435,
+        "slug": "few-american-gin"
+      },
+      {
+        "score": 0.39,
+        "slug": "conniption-american-dry-gin"
+      },
+      {
+        "score": 0.386,
+        "slug": "snowdrop-american-dry-gin"
+      },
+      {
+        "score": 0.362,
+        "slug": "tommyrotter-distillery-american-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 1,
+      "citrus": 1,
+      "floral": 0,
+      "heat": 2,
+      "spice": 3,
+      "herbal": 2,
+      "fruited": 1
+    },
+    "confidence": "high",
+    "reasoning": "Mustard seed + ginger + caraway + cubeb pepper + licorice = spice 3 (the dominant axis). 'Slight sensation of fire' = heat 2. Bay + rosemary = herbal 2. Dried tomato gives a fruited hint. Juniper buried in a long botanical list."
+  },
+  {
+    "ba_id": 160,
+    "ba_name": "James Gin Asian Parsnip JG.01",
+    "ba_path": "363/383/463/",
+    "candidates": [
+      {
+        "score": 0.802,
+        "slug": "asian-parsnip-gin"
+      },
+      {
+        "score": 0.318,
+        "slug": "james-bay-distillers-navy-strength-gin"
+      }
+    ],
+    "matched_slug": "asian-parsnip-gin",
+    "source": "manual_override",
+    "status": "matched",
+    "profile": {
+      "juniper": 1,
+      "citrus": 1,
+      "floral": 1,
+      "heat": 2,
+      "spice": 3,
+      "herbal": 2,
+      "fruited": 1
+    }
+  },
+  {
+    "ba_id": 519,
+    "ba_name": "James Gin California Dreamgin'",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.644,
+        "slug": "james-bay-distillers-navy-strength-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 1,
+      "citrus": 1,
+      "floral": 0,
+      "heat": 1,
+      "spice": 1,
+      "herbal": 3,
+      "fruited": 1
+    },
+    "confidence": "high",
+    "reasoning": "Mushroom + patchouli + oregano = unmistakable herbal 3 (savory/earthy). Girolle mushroom adds peppery + apricot hint (fruited 1). Juniper not foregrounded \u2014 this is a 'gin' more by category than profile."
+  },
+  {
+    "ba_id": 621,
+    "ba_name": "James Gin London Drizzle",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.413,
+        "slug": "sipsmith-lemon-drizzle-gin"
+      },
+      {
+        "score": 0.339,
+        "slug": "james-bay-distillers-navy-strength-gin"
+      },
+      {
+        "score": 0.311,
+        "slug": "haymans-london-dry-gin"
+      },
+      {
+        "score": 0.305,
+        "slug": "hammer-london-dry-gin"
+      },
+      {
+        "score": 0.297,
+        "slug": "masters-london-dry-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 2,
+      "citrus": 2,
+      "floral": 0,
+      "heat": 2,
+      "spice": 2,
+      "herbal": 3,
+      "fruited": 1
+    },
+    "confidence": "high",
+    "reasoning": "Petrichor concept: 'rich juniper and tangy orange up front, then earthy beetroot and rooty botanical spice, mineral petrichor, peppercorn warmth.' Beetroot + lovage + bay = herbal 3 (earthy/umami). Ginger + peppercorn = spice 2. Beetroot adds a sweet-earthy fruited hint."
+  },
+  {
+    "ba_id": 161,
+    "ba_name": "Jettywave Barrel-Aged Botanical Gin",
+    "ba_path": "363/383/462/",
+    "candidates": [
+      {
+        "score": 0.59,
+        "slug": "few-barrel-aged-gin"
+      },
+      {
+        "score": 0.581,
+        "slug": "corsair-barrel-aged-gin"
+      },
+      {
+        "score": 0.58,
+        "slug": "filliers-barrel-aged-gin"
+      },
+      {
+        "score": 0.579,
+        "slug": "vor-barrel-aged-gin"
+      },
+      {
+        "score": 0.569,
+        "slug": "patina-barrel-aged-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 1,
+      "citrus": 2,
+      "floral": 2,
+      "heat": 1,
+      "spice": 1,
+      "herbal": 3,
+      "fruited": 1
+    },
+    "confidence": "low",
+    "reasoning": "Shiso + nasturtium + pistachios reads herbal-floral with citrus from Meyer lemon. Juniper not mentioned as foreground; corn base is neutral. 6 months in American oak adds mild fruited/vanilla but at 40% ABV the heat stays low. Short description \u2014 confidence low."
+  },
+  {
+    "ba_id": 162,
+    "ba_name": "Jettywave California Botanical Gin",
+    "ba_path": "363/383/463/",
+    "candidates": [
+      {
+        "score": 0.701,
+        "slug": "botanical-democracy-gin"
+      },
+      {
+        "score": 0.678,
+        "slug": "uncle-vals-botanical-gin"
+      },
+      {
+        "score": 0.666,
+        "slug": "hat-trick-botanical-gin"
+      },
+      {
+        "score": 0.665,
+        "slug": "chase-single-botanical-gin"
+      },
+      {
+        "score": 0.663,
+        "slug": "glendalough-wild-botanical-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 1,
+      "citrus": 2,
+      "floral": 2,
+      "heat": 2,
+      "spice": 1,
+      "herbal": 3,
+      "fruited": 0
+    },
+    "confidence": "low",
+    "reasoning": "Description is one sentence; scored as a sibling of #161 (same distillery, garden botanicals) without the barrel-aging. Almost no specifics \u2014 re-score from tasting note when possible."
+  },
+  {
+    "ba_id": 163,
+    "ba_name": "Kiss Cold Gin New York Style",
+    "ba_path": "363/383/384/",
+    "candidates": [
+      {
+        "score": 0.453,
+        "slug": "cold-river-gin"
+      },
+      {
+        "score": 0.361,
+        "slug": "new-amsterdam"
+      },
+      {
+        "score": 0.341,
+        "slug": "merrylegs-genever-style-gin"
+      },
+      {
+        "score": 0.311,
+        "slug": "new-deal-gin-no-1"
+      },
+      {
+        "score": 0.304,
+        "slug": "herbit-gin-new-black"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 2,
+      "citrus": 2,
+      "floral": 0,
+      "heat": 1,
+      "spice": 1,
+      "herbal": 2,
+      "fruited": 0
+    },
+    "confidence": "low",
+    "reasoning": "'New York style' is loose marketing; 5x distilled implies clean neutral. Juniper + lemon + 'herbs' is all we have. Defaulted to balanced-low profile."
+  },
+  {
+    "ba_id": 164,
+    "ba_name": "Old World Spirits Rusty Blade Gin",
+    "ba_path": "363/383/462/",
+    "candidates": [
+      {
+        "score": 0.597,
+        "slug": "blade-gin"
+      },
+      {
+        "score": 0.391,
+        "slug": "sounds-spirits-old-tom-gin"
+      },
+      {
+        "score": 0.29,
+        "slug": "freeland-spirits-gin"
+      },
+      {
+        "score": 0.283,
+        "slug": "st-augustine-new-world-gin"
+      },
+      {
+        "score": 0.278,
+        "slug": "world-gin-day-gin-2017-7-continents-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 2,
+      "citrus": 1,
+      "floral": 1,
+      "heat": 3,
+      "spice": 2,
+      "herbal": 1,
+      "fruited": 2
+    },
+    "confidence": "low",
+    "reasoning": "Barrel-aged in French oak with a 12% grape eau de vie base reads as fruited + oak spice. No botanical bill in description. 47% ABV = heat 3. Treat as a barrel-aged gin archetype until better data."
+  },
+  {
+    "ba_id": 622,
+    "ba_name": "Pacific House Bay FC Poppy",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.352,
+        "slug": "aitil-house-gin"
+      },
+      {
+        "score": 0.331,
+        "slug": "mr-pickles-pacific-northwest-gin"
+      },
+      {
+        "score": 0.305,
+        "slug": "lyme-bay-winery-sloe-gin"
+      },
+      {
+        "score": 0.295,
+        "slug": "james-bay-distillers-navy-strength-gin"
+      },
+      {
+        "score": 0.277,
+        "slug": "wheel-house-american-dry-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 2,
+      "citrus": 3,
+      "floral": 3,
+      "heat": 2,
+      "spice": 1,
+      "herbal": 1,
+      "fruited": 0
+    },
+    "confidence": "high",
+    "reasoning": "'Citrus-forward brightness' + bright orange peel = citrus 3. California poppy is the signature \u2014 floral 3 ('gently floral' finish). Juniper present but supporting. 'Soft spice' + 'herbal lift' = 1 each. 43% ABV = heat 2."
+  },
+  {
+    "ba_id": 620,
+    "ba_name": "Plymouth Navy Strength Gin",
+    "ba_path": "363/383/387/",
+    "candidates": [
+      {
+        "score": 1.0,
+        "slug": "plymouth-navy-strength-gin"
+      },
+      {
+        "score": 0.659,
+        "slug": "plymouth"
+      },
+      {
+        "score": 0.615,
+        "slug": "herno-navy-strength-gin"
+      },
+      {
+        "score": 0.604,
+        "slug": "ampleforths-navy-strength"
+      },
+      {
+        "score": 0.602,
+        "slug": "leopolds-navy-strength-gin"
+      }
+    ],
+    "matched_slug": "plymouth-navy-strength-gin",
+    "match_score": 1.0,
+    "source": "auto_fuzzy",
+    "status": "matched",
+    "profile": {
+      "juniper": 3,
+      "citrus": 2,
+      "floral": 0,
+      "heat": 3,
+      "spice": 2,
+      "herbal": 0,
+      "fruited": 0
+    }
+  },
+  {
+    "ba_id": 165,
+    "ba_name": "Procera Blue Dot Gin",
+    "ba_path": "363/383/463/",
+    "candidates": [
+      {
+        "score": 1.0,
+        "slug": "procera-gin-blue-dot"
+      },
+      {
+        "score": 0.352,
+        "slug": "karner-blue-gin"
+      },
+      {
+        "score": 0.344,
+        "slug": "blue-line-gin"
+      },
+      {
+        "score": 0.299,
+        "slug": "ginbrew-blue-ruin"
+      },
+      {
+        "score": 0.295,
+        "slug": "herbit-gin-blue-dragon"
+      }
+    ],
+    "matched_slug": "procera-gin-blue-dot",
+    "match_score": 1.0,
+    "source": "auto_fuzzy",
+    "status": "matched",
+    "profile": {
+      "juniper": 3,
+      "citrus": 1,
+      "floral": 1,
+      "heat": 3,
+      "spice": 3,
+      "herbal": 1,
+      "fruited": 0
+    }
+  },
+  {
+    "ba_id": 513,
+    "ba_name": "Quattro Gatti Gin Classico",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 2,
+      "citrus": 2,
+      "floral": 2,
+      "heat": 2,
+      "spice": 2,
+      "herbal": 2,
+      "fruited": 1
+    },
+    "confidence": "high",
+    "reasoning": "Detailed botanical bill: Italian juniper, ginestra (Spanish broom \u2014 floral), peperoncino (chili \u2014 heat+spice), coriander, orange, olive leaf. Reads as balanced 2s with peperoncino bumping spice/heat. Mild fruited from orange."
+  },
+  {
+    "ba_id": 514,
+    "ba_name": "Quattro Gatti Olive Grove Gin",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 2,
+      "citrus": 1,
+      "floral": 0,
+      "heat": 2,
+      "spice": 1,
+      "herbal": 3,
+      "fruited": 0
+    },
+    "confidence": "high",
+    "reasoning": "Savory olive-and-artichoke profile \u2014 described as 'earthy, forest floor, rain-soaked stone.' Olive leaf + artichoke + thyme = herbal 3. Lemon peel present but not foregrounded. No floral, no fruit \u2014 this is a savory martini gin."
+  },
+  {
+    "ba_id": 560,
+    "ba_name": "Renais Gin",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 2,
+      "citrus": 3,
+      "floral": 3,
+      "heat": 1,
+      "spice": 1,
+      "herbal": 1,
+      "fruited": 3
+    },
+    "confidence": "high",
+    "reasoning": "Chablis grape-skin base is the distinguishing feature \u2014 fruited 3 (white wine character). Lemon + lime = citrus 3. Linden flowers + acacia honey = floral 3. 40% ABV = heat 1. Cubeb mild. Distinctive profile that explains why TGII passing didn't matter \u2014 Renais doesn't fit a conventional gin axis well."
+  },
+  {
+    "ba_id": 166,
+    "ba_name": "Seven Stills Wood Isle Dry Gin",
+    "ba_path": "363/383/384/",
+    "candidates": [
+      {
+        "score": 0.736,
+        "slug": "seven-hills-italian-dry-gin"
+      },
+      {
+        "score": 0.3,
+        "slug": "bombay-dry-gin"
+      },
+      {
+        "score": 0.297,
+        "slug": "silver-dry-gin"
+      },
+      {
+        "score": 0.294,
+        "slug": "liverpool-dry-gin"
+      },
+      {
+        "score": 0.294,
+        "slug": "cotswolds-dry-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 2,
+      "citrus": 2,
+      "floral": 1,
+      "heat": 2,
+      "spice": 1,
+      "herbal": 2,
+      "fruited": 0
+    },
+    "confidence": "low",
+    "reasoning": "61-char description \u2014 almost no signal beyond 'San Francisco Bay coastal botanicals.' Defaulted to a balanced San Francisco craft profile. Seven Stills is defunct; can't re-source."
+  },
+  {
+    "ba_id": 631,
+    "ba_name": "StilL 630 Confluence American Gin",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.651,
+        "slug": "confluence-gin"
+      },
+      {
+        "score": 0.608,
+        "slug": "still-g-i-n"
+      },
+      {
+        "score": 0.395,
+        "slug": "still-austin-gin"
+      },
+      {
+        "score": 0.363,
+        "slug": "few-american-gin"
+      },
+      {
+        "score": 0.325,
+        "slug": "conniption-american-dry-gin"
+      }
+    ],
+    "matched_slug": "confluence-gin",
+    "source": "manual_override",
+    "status": "matched",
+    "profile": {
+      "juniper": 1,
+      "citrus": 0,
+      "floral": 0,
+      "heat": 2,
+      "spice": 3,
+      "herbal": 1,
+      "fruited": 0
+    }
+  },
+  {
+    "ba_id": 633,
+    "ba_name": "StilL 630 Volstead's Folly American Gin",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.747,
+        "slug": "volsteads-folly"
+      },
+      {
+        "score": 0.56,
+        "slug": "still-g-i-n"
+      },
+      {
+        "score": 0.356,
+        "slug": "still-austin-gin"
+      },
+      {
+        "score": 0.315,
+        "slug": "few-american-gin"
+      },
+      {
+        "score": 0.279,
+        "slug": "conniption-american-dry-gin"
+      }
+    ],
+    "matched_slug": "volsteads-folly",
+    "source": "manual_override",
+    "status": "matched",
+    "profile": {
+      "juniper": 2,
+      "citrus": 1,
+      "floral": 2,
+      "heat": 1,
+      "spice": 1,
+      "herbal": 3,
+      "fruited": 0
+    }
+  },
+  {
+    "ba_id": 451,
+    "ba_name": "Uncle Val's Zested Gin",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 1.0,
+        "slug": "uncle-vals-zested-gin"
+      },
+      {
+        "score": 0.651,
+        "slug": "uncle-vals-botanical-gin"
+      },
+      {
+        "score": 0.631,
+        "slug": "uncle-vals-peppered-gin"
+      },
+      {
+        "score": 0.63,
+        "slug": "uncle-vals-restorative-gin"
+      }
+    ],
+    "matched_slug": "uncle-vals-zested-gin",
+    "match_score": 1.0,
+    "source": "auto_fuzzy",
+    "status": "matched",
+    "profile": {
+      "juniper": 1,
+      "citrus": 3,
+      "floral": 1,
+      "heat": 1,
+      "spice": 2,
+      "herbal": 1,
+      "fruited": 0
+    }
+  },
+  {
+    "ba_id": 576,
+    "ba_name": "WildBark West Texas Dry Gin",
+    "ba_path": "363/383/384/",
+    "candidates": [
+      {
+        "score": 0.45,
+        "slug": "texas-longhorn-gin"
+      },
+      {
+        "score": 0.359,
+        "slug": "the-west-winds-gin-the-broadside"
+      },
+      {
+        "score": 0.252,
+        "slug": "bombay-dry-gin"
+      },
+      {
+        "score": 0.244,
+        "slug": "silver-dry-gin"
+      },
+      {
+        "score": 0.236,
+        "slug": "cotswolds-dry-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 3,
+      "citrus": 2,
+      "floral": 0,
+      "heat": 3,
+      "spice": 1,
+      "herbal": 1,
+      "fruited": 0
+    },
+    "confidence": "high",
+    "reasoning": "Double juniper bill (wild Alligator + organic common) with 'earthy juniper upfront' = juniper 3. 'Pop of citrus from orange peel' = citrus 2. 47% ABV = heat 3. Spare botanical bill \u2014 coriander only spice. Rye/malt base adds backbone but doesn't show as fruited."
+  },
+  {
+    "ba_id": 575,
+    "ba_name": "WildJune Western Style Gin",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.503,
+        "slug": "wheelers-western-dry-gin"
+      },
+      {
+        "score": 0.408,
+        "slug": "merrylegs-genever-style-gin"
+      },
+      {
+        "score": 0.348,
+        "slug": "five-saints-savory-tuscan-style-gin"
+      },
+      {
+        "score": 0.335,
+        "slug": "tenth-ward-distilling-company-genever-style-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 3,
+      "citrus": 2,
+      "floral": 1,
+      "heat": 2,
+      "spice": 2,
+      "herbal": 2,
+      "fruited": 1
+    },
+    "confidence": "high",
+    "reasoning": "Double juniper bill (wild Red Berry + organic common) = juniper 3, 'bold.' Cinnamon + white pepper = spice 2. Centennial hops add floral 1. Lemon balm + hops = herbal 2. Red Berry juniper carries some fruit. 45% ABV = heat 2."
+  },
+  {
+    "ba_id": 625,
+    "ba_name": "Wood's Mountain Hopped Gin",
+    "ba_path": "363/383/461/",
+    "candidates": [
+      {
+        "score": 0.386,
+        "slug": "smugglers-notch-hopped-gin"
+      },
+      {
+        "score": 0.383,
+        "slug": "white-mountain-gin"
+      },
+      {
+        "score": 0.341,
+        "slug": "horse-mountain-dry-gin"
+      },
+      {
+        "score": 0.326,
+        "slug": "woods-barrel-rested-treeline-gin"
+      },
+      {
+        "score": 0.323,
+        "slug": "sourland-mountain-spirits-gin"
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "juniper": 2,
+      "citrus": 2,
+      "floral": 2,
+      "heat": 2,
+      "spice": 1,
+      "herbal": 2,
+      "fruited": 0
+    },
+    "confidence": "medium",
+    "reasoning": "'Medium juniper-forward.' Cascade hops contribute floral + citrus without bitterness \u2014 bumps citrus and floral to 2 each. Elderflower reinforces floral. Western-style frame puts herbal at 2. 45% ABV = heat 2. Distinct from IPA gins because hop bitterness is suppressed."
+  }
+]
