@@ -11,6 +11,8 @@ from typing import Any
 from mcp.server.fastmcp import FastMCP
 
 from .api import BarAssistantAPI
+from . import flavor as fl
+from . import flavor_db as fdb
 
 # Initialize FastMCP server (auth wired in main() for HTTP mode)
 mcp = FastMCP(
@@ -491,10 +493,16 @@ def bar_create_cocktail(
 ) -> str:
     """Create a new cocktail recipe with ingredients, instructions, and optional image."""
     client = get_api()
+    # BA API's CocktailIngredientRequest::fromArray reads $source['sort'] without a
+    # default, so omitting it produces a 500. Backfill positionally.
+    normalized_ingredients = [
+        {**ing, "sort": ing.get("sort", idx + 1)}
+        for idx, ing in enumerate(ingredients)
+    ]
     cocktail_data: dict[str, Any] = {
         "name": name,
         "instructions": instructions,
-        "ingredients": ingredients,
+        "ingredients": normalized_ingredients,
     }
     if description:
         cocktail_data["description"] = description
@@ -613,7 +621,10 @@ def bar_update_cocktail(
     if tags is not None:
         updates["tags"] = tags
     if ingredients is not None:
-        updates["ingredients"] = ingredients
+        updates["ingredients"] = [
+            {**ing, "sort": ing.get("sort", idx + 1)}
+            for idx, ing in enumerate(ingredients)
+        ]
     if images is not None:
         updates["images"] = images
     if parent_cocktail_id is not None:
@@ -707,6 +718,358 @@ def bar_delete_ingredient(id: str) -> str:
     return f"Deleted ingredient: {id}"
 
 
+# ===== Flavor Matching =====
+#
+# These tools layer a per-category flavor-axis system on top of BA's ingredient
+# and cocktail data. Profiles + slot constraints live in a sidecar SQLite (see
+# flavor_db.py); the engine is in flavor.py. Bootstrap data and design notes
+# are in scripts/ and the project memory ("bar_assistant_roadmap").
+
+
+_GIN_AXES_HELP = (
+    "TGII gin axes (0–3 integer scale): juniper, citrus, floral, heat, spice, herbal, fruited."
+)
+
+
+def _ensure_ingredient_meta(ingredient_id: int) -> tuple[str, str, float | None]:
+    """Ensure ingredient_meta has a row for this BA ingredient; return (name, category, proof)."""
+    with fdb.connect() as conn:
+        row = conn.execute(
+            "SELECT name, category, proof FROM ingredient_meta WHERE ingredient_id=?",
+            (ingredient_id,),
+        ).fetchone()
+        if row and row["name"]:
+            return row["name"], row["category"] or "", row["proof"]
+
+    ing = get_api().get_ingredient(ingredient_id).get("data", {})
+    name = ing.get("name", f"#{ingredient_id}")
+    # Category inference from BA's materialized_path
+    path = (ing.get("materialized_path") or "").strip("/")
+    category = ""
+    if path.startswith("363/383"):
+        category = "gin"
+    proof = (ing.get("strength") * 2) if ing.get("strength") else None
+    with fdb.connect() as conn:
+        fdb.upsert_ingredient_meta(conn, ingredient_id, name=name, category=category, proof=proof)
+    return name, category, proof
+
+
+@mcp.tool()
+def bar_list_flavor_axes(category: str = "gin") -> str:
+    """List the flavor axes defined for a category (e.g. 'gin').
+
+    Axes are per-category and integer-scored. Gin uses The Gin Is In's 7-axis
+    0–3 system. Use this to discover valid axis names before setting profiles
+    or slot constraints.
+    """
+    with fdb.connect() as conn:
+        axes = fdb.get_axes(conn, category)
+    if not axes:
+        return f"No axes defined for category '{category}'. Configure with bar_set_flavor_axes."
+    return f"**{category}** axes (0–3): " + ", ".join(axes)
+
+
+@mcp.tool()
+def bar_get_flavor_profile(ingredient_id: int) -> str:
+    """Return the flavor profile recorded for an ingredient (specific bottle).
+
+    Profiles are per-axis integer scores on the category's scale (gin: 0–3 on
+    juniper/citrus/floral/heat/spice/herbal/fruited). Returns provenance too
+    (source = tgii / llm_from_description / manual; confidence; notes).
+    """
+    with fdb.connect() as conn:
+        data = fdb.get_profile(conn, ingredient_id)
+    if not data:
+        return f"No flavor profile recorded for ingredient {ingredient_id}."
+    lines = [f"**Profile for ingredient {ingredient_id}**"]
+    lines.append("  " + " ".join(f"{a}={v}" for a, v in data["profile"].items()))
+    lines.append(f"  source: {data['source']}   confidence: {data['confidence'] or '-'}   scored: {data['scored_at']}")
+    if data["notes"]:
+        lines.append(f"  notes: {data['notes']}")
+    return "\n".join(lines)
+
+
+@mcp.tool()
+def bar_set_flavor_profile(
+    ingredient_id: int,
+    profile: dict[str, int],
+    source: str = "manual",
+    confidence: str | None = None,
+    notes: str | None = None,
+) -> str:
+    """Set or update the flavor profile for an ingredient (partial updates allowed).
+
+    Args:
+        ingredient_id: BA ingredient_id of the specific bottle.
+        profile: dict of axis → integer score. Unspecified axes are left as-is.
+                 For gin: any of juniper, citrus, floral, heat, spice, herbal,
+                 fruited; values 0–3. See bar_list_flavor_axes.
+        source: provenance — "tgii", "llm_from_description", "manual", etc.
+        confidence: "high" | "medium" | "low" | None.
+        notes: free-text reasoning (e.g. tasting note that justifies the scoring).
+
+    Used when re-scoring a bottle after tasting, correcting a stale LLM guess,
+    or initially scoring a bottle that wasn't in the TGII bootstrap.
+    """
+    _ensure_ingredient_meta(ingredient_id)
+    with fdb.connect() as conn:
+        fdb.set_profile(conn, ingredient_id, profile, source=source, confidence=confidence, notes=notes)
+    changed = ", ".join(f"{k}={v}" for k, v in profile.items())
+    return f"Updated profile for ingredient {ingredient_id}: {changed}  (source={source})"
+
+
+@mcp.tool()
+def bar_describe_slots(cocktail_id: int) -> str:
+    """List a cocktail's ingredient slots with their `sort` index and current ingredient.
+
+    Each line shows the sort index (the canonical slot identifier), the
+    ingredient currently in the slot, and whether the slot has flavor
+    constraints declared in the flavor DB. Use this to find the right
+    `slot_sort` before calling `bar_alternatives_for_slot` or constraint setters.
+    """
+    cocktail = get_api().get_cocktail(cocktail_id).get("data", {})
+    if not cocktail:
+        return f"Cocktail {cocktail_id} not found."
+
+    with fdb.connect() as conn:
+        existing_slots = {
+            r["sort"] for r in conn.execute(
+                "SELECT sort FROM slot_meta WHERE cocktail_id=?", (cocktail_id,)
+            ).fetchall()
+        }
+        constrained = {
+            r["sort"] for r in conn.execute(
+                "SELECT DISTINCT sort FROM slot_constraint WHERE cocktail_id=?", (cocktail_id,)
+            ).fetchall()
+        }
+
+    lines = [f"**{cocktail.get('name', '?')}** (id={cocktail_id}) slots:"]
+    for ing in cocktail.get("ingredients", []):
+        sort = ing.get("sort")
+        name = ing.get("ingredient", {}).get("name", ing.get("name", "?"))
+        amt = f"{ing.get('amount', '')} {ing.get('units', '')}".strip()
+        flags = []
+        if sort in existing_slots:
+            flags.append("slot_meta✓")
+        if sort in constrained:
+            flags.append("constraints✓")
+        tag = f"  [{', '.join(flags)}]" if flags else ""
+        lines.append(f"  sort={sort}  {amt}  {name}{tag}")
+    return "\n".join(lines)
+
+
+@mcp.tool()
+def bar_set_slot_meta(
+    cocktail_id: int,
+    sort: int,
+    category: str,
+    tolerance: str = "style",
+    exact_ingredient_id: int | None = None,
+    also_accept_categories: list[str] | None = None,
+    proof_min: float | None = None,
+    proof_max: float | None = None,
+) -> str:
+    """Declare the category + tolerance for a recipe slot.
+
+    Required before setting axis constraints. `sort` is the 1-based BA sort
+    index of the ingredient in the recipe (see bar_describe_slots).
+
+    Args:
+        cocktail_id: BA cocktail_id.
+        sort: BA `sort` index of the slot (1-based).
+        category: e.g. "gin", "rum", "whiskey".
+        tolerance: "exact" (named bottle required) | "style" (match by vector)
+                   | "any" (any in-category bottle works).
+        exact_ingredient_id: required when tolerance="exact".
+        also_accept_categories: list of other categories that can sub here
+                   (e.g. ["bourbon"] on a rye slot). Cross-category subs get
+                   a small flat penalty so in-category ranks first.
+        proof_min / proof_max: enforce a proof range (US proof).
+    """
+    with fdb.connect() as conn:
+        fdb.upsert_slot_meta(
+            conn, cocktail_id, sort,
+            category=category, tolerance=tolerance,
+            exact_ingredient_id=exact_ingredient_id,
+            also_accept_categories=also_accept_categories,
+            proof_min=proof_min, proof_max=proof_max,
+        )
+    return f"Slot meta set for cocktail {cocktail_id} sort {sort}: category={category}, tolerance={tolerance}"
+
+
+@mcp.tool()
+def bar_set_band_constraint(
+    cocktail_id: int,
+    sort: int,
+    axis: str,
+    lo: int,
+    hi: int,
+    out_weight: float = 1.0,
+    hard: bool = False,
+) -> str:
+    """Set a Band constraint on one axis of a recipe slot.
+
+    Band = "acceptable range; zero penalty inside, graded penalty outside."
+    Use Band for the *forgiving* axes of a slot — most slots are wide on most
+    axes. Set `hard=True` for the one or two axes that *truly disqualify* a
+    candidate (e.g. Negroni gin → floral Band(0,2,hard=True): aggressive floral
+    fights Campari).
+
+    For gin axes are 0–3; lo/hi are inclusive integer bounds.
+    """
+    with fdb.connect() as conn:
+        fdb.set_constraint(conn, cocktail_id, sort, axis, "band",
+                           band_lo=lo, band_hi=hi, out_weight=out_weight, hard=hard)
+    h = " (hard)" if hard else ""
+    return f"Band constraint set: cocktail {cocktail_id} sort {sort} {axis}=[{lo},{hi}] out_weight={out_weight}{h}"
+
+
+@mcp.tool()
+def bar_set_point_constraint(
+    cocktail_id: int,
+    sort: int,
+    axis: str,
+    value: int,
+    weight: float = 1.0,
+) -> str:
+    """Set a Point constraint on one axis of a recipe slot.
+
+    Point = "exact-ish target; penalty grows with distance." Use Point for the
+    *exposed* axes of a slot — where the spirit's level on that axis genuinely
+    matters (e.g. Martinez gin → juniper Point(2): we want a moderately
+    juniper-forward but not over-the-top gin).
+
+    For gin axes are 0–3; value is an integer.
+    """
+    with fdb.connect() as conn:
+        fdb.set_constraint(conn, cocktail_id, sort, axis, "point",
+                           point_value=value, weight=weight)
+    return f"Point constraint set: cocktail {cocktail_id} sort {sort} {axis}={value} weight={weight}"
+
+
+@mcp.tool()
+def bar_delete_slot_constraint(cocktail_id: int, sort: int, axis: str) -> str:
+    """Remove a single axis constraint from a recipe slot."""
+    with fdb.connect() as conn:
+        n = fdb.delete_constraint(conn, cocktail_id, sort, axis)
+    return f"Deleted {n} constraint(s) for cocktail {cocktail_id} sort {sort} axis {axis}"
+
+
+@mcp.tool()
+def bar_get_slot_constraints(cocktail_id: int) -> str:
+    """List all flavor constraints declared for a cocktail's slots."""
+    with fdb.connect() as conn:
+        slots = fdb.load_slots_for_cocktail(conn, cocktail_id)
+    if not slots:
+        return f"No slot constraints declared for cocktail {cocktail_id}."
+    lines = [f"**Slot constraints for cocktail {cocktail_id}**"]
+    for s in slots:
+        also = f" (also_accept: {','.join(s.also_accept_categories)})" if s.also_accept_categories else ""
+        lines.append(f"  sort={s.sort}  category={s.category}  tolerance={s.tolerance}{also}")
+        for axis, c in s.constraints.items():
+            if isinstance(c, fl.Point):
+                lines.append(f"    {axis}: Point({c.value}) weight={c.weight}")
+            else:
+                h = ", hard" if c.hard else ""
+                lines.append(f"    {axis}: Band({c.lo}–{c.hi}, out_weight={c.out_weight}{h})")
+    return "\n".join(lines)
+
+
+def _shelf_ingredient_ids() -> set[int]:
+    out: set[int] = set()
+    page = 1
+    while True:
+        resp = get_api().list_ingredients(filter_on_shelf=True, limit=200, page=page)
+        for ing in resp.get("data", []):
+            out.add(ing["id"])
+        meta = resp.get("meta", {})
+        if page >= meta.get("last_page", 1):
+            break
+        page += 1
+    return out
+
+
+@mcp.tool()
+def bar_alternatives_for_slot(
+    cocktail_id: int,
+    sort: int,
+    on_shelf_only: bool = True,
+    include_strays: bool = False,
+    top_n: int = 10,
+) -> str:
+    """Rank bottles by fit for a recipe's slot.
+
+    The killer feature: given a recipe slot (declared via bar_set_slot_meta +
+    bar_set_band_constraint / bar_set_point_constraint), rank in-stock bottles
+    of the appropriate category by how well their flavor profiles match the
+    slot's constraints. Includes "off-pattern" picks (disqualified by hard
+    bands) when include_strays=True, with explanations.
+
+    Args:
+        cocktail_id: BA cocktail_id.
+        sort: 1-based slot index (see bar_describe_slots).
+        on_shelf_only: if true, restrict to bottles currently on shelf.
+        include_strays: surface hard-disqualified picks too, with reasons.
+        top_n: max bottles to return.
+    """
+    with fdb.connect() as conn:
+        slot = fdb.load_slot(conn, cocktail_id, sort)
+        if slot is None:
+            return (f"No slot_meta declared for cocktail {cocktail_id} sort {sort}. "
+                    "Call bar_set_slot_meta first.")
+        bottles = fdb.load_bottles(conn, category=None)
+
+    if on_shelf_only:
+        shelf = _shelf_ingredient_ids()
+        for b in bottles:
+            b.in_stock = b.id in shelf
+    else:
+        for b in bottles:
+            b.in_stock = True
+
+    results = fl.alternatives_for_slot(bottles, slot, top_n=top_n, include_strays=include_strays)
+    if not results:
+        return f"No matches for cocktail {cocktail_id} slot {sort} (category={slot.category})."
+
+    lines = [f"**Alternatives for cocktail {cocktail_id}, slot {sort} ({slot.category}):**"]
+    for i, (b, a) in enumerate(results, 1):
+        flags = f"  — {'; '.join(a.flags)}" if a.flags else ""
+        conf = f" [{b.confidence}]" if b.confidence else ""
+        lines.append(f"  {i}. {b.name}  penalty={a.penalty:.1f}  [{a.verdict}]{conf}{flags}")
+    return "\n".join(lines)
+
+
+@mcp.tool()
+def bar_uses_for_bottle(ingredient_id: int, top_n: int = 10) -> str:
+    """Given a bottle, list recipes (with declared slot constraints) that welcome it.
+
+    Useful when a new bottle arrives — find which existing constrained recipes
+    welcome it before adding the bottle to your shelf.
+    """
+    name, category, proof = _ensure_ingredient_meta(ingredient_id)
+    with fdb.connect() as conn:
+        prof = fdb.get_profile(conn, ingredient_id)
+        slots = fdb.load_all_slots(conn)
+    if not prof:
+        return f"Ingredient {ingredient_id} ({name}) has no flavor profile yet."
+    if not slots:
+        return "No recipes have slot constraints declared yet."
+
+    bottle = fl.Bottle(
+        id=ingredient_id, name=name, category=category, profile=prof["profile"],
+        proof=proof, source=prof.get("source") or "", confidence=prof.get("confidence") or "",
+    )
+    matches = fl.uses_for_bottle(bottle, slots, top_n=top_n)
+    if not matches:
+        return f"No constrained recipes accept category={category} for {name}."
+
+    lines = [f"**Recipes welcoming {name}:**"]
+    for slot, a in matches:
+        flags = f"  — {'; '.join(a.flags)}" if a.flags else ""
+        lines.append(f"  cocktail {slot.cocktail_id} sort {slot.sort}  penalty={a.penalty:.1f}  [{a.verdict}]{flags}")
+    return "\n".join(lines)
+
+
 # ===== Server Startup =====
 
 
@@ -796,6 +1159,11 @@ def _setup_http_auth():
     # Monkey-patch build_metadata to include "none" in token auth methods
     # (needed for public clients like Claude.ai)
     import mcp.server.auth.routes as _auth_routes
+
+    # Namespace the dynamic client registration endpoint under /oauth/ so it
+    # doesn't collide with the Salt Rim frontend's /register page served behind
+    # the same hostname. Must run before create_auth_routes / build_metadata.
+    _auth_routes.REGISTRATION_PATH = "/oauth/register"
 
     _orig_build_metadata = _auth_routes.build_metadata
 

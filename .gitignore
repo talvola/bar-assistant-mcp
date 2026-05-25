@@ -52,6 +52,10 @@ secrets.json
 # Exports
 *.csv
 
+# Flavor SQLite — regenerable from scripts/tgii_bootstrap_results.json
+# via scripts/seed_flavor_db.py (slot constraints set via MCP tools)
+data/flavor.sqlite
+
 # Test files
 test_*.txt
 

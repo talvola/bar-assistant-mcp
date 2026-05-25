@@ -58,7 +58,7 @@ Use `bar_create_cocktail` with:
 - **source**: Creator, bar, location, year if known
 - **garnish**: Garnish description
 - **glass_id**: Look up with `bar_list_glasses`
-- **ingredients**: Array with ingredient_id, amount, units, sort order
+- **ingredients**: Array of `{ingredient_id, amount, units, sort}` (sort is 1-based, required by the API; tools backfill if omitted)
 - **tags**: Relevant tags (Stirred, Shaken, Rye, Bourbon, Tiki, etc.)
 - **images**: Array of uploaded image IDs
 - **parent_cocktail_id**: If this is a variant/riff of another cocktail
@@ -134,3 +134,47 @@ For trusted sources where review isn't needed:
 5. Create cocktail
 
 All in rapid succession without presenting a plan for approval.
+
+## Flavor Matching (Phase A)
+
+Per-category integer flavor axes (gin: 7 axes, 0–3, sourced from The Gin Is In), per-recipe-slot Point/Band constraints, and three use cases on top: ranked alternatives for a slot, recipes welcoming a bottle, and stock-gap finding. Storage in SQLite sidecar at `data/flavor.sqlite` (overridable via `BAR_ASSISTANT_FLAVOR_DB`).
+
+**Modules:**
+- `flavor.py` — pure engine (Bottle, RecipeSlot, Point, Band, assess, alternatives_for_slot, uses_for_bottle, find_gaps)
+- `flavor_db.py` — SQLite layer (category_axes, ingredient_meta, flavor_profile, slot_meta, slot_constraint)
+
+**MCP tools (in `server.py`):**
+- `bar_list_flavor_axes(category="gin")`
+- `bar_get_flavor_profile(ingredient_id)`
+- `bar_set_flavor_profile(ingredient_id, profile, source, confidence, notes)`
+- `bar_describe_slots(cocktail_id)` — list slots with `sort` indices and constraint status
+- `bar_set_slot_meta(cocktail_id, sort, category, tolerance, also_accept_categories, proof_min, proof_max)`
+- `bar_set_band_constraint(cocktail_id, sort, axis, lo, hi, out_weight, hard)`
+- `bar_set_point_constraint(cocktail_id, sort, axis, value, weight)`
+- `bar_delete_slot_constraint(cocktail_id, sort, axis)`
+- `bar_get_slot_constraints(cocktail_id)`
+- `bar_alternatives_for_slot(cocktail_id, sort, on_shelf_only, include_strays, top_n)`
+- `bar_uses_for_bottle(ingredient_id, top_n)`
+
+**Workflow to encode a recipe:**
+1. `bar_describe_slots(cocktail_id)` → find the `sort` index of the slot to constrain.
+2. `bar_set_slot_meta(cocktail_id, sort, category="gin")` — declare what category fills it.
+3. One `bar_set_band_constraint` (or `bar_set_point_constraint`) per axis you care about — wide bands everywhere, hard caps on the one or two axes that *truly* disqualify a wrong pick.
+4. `bar_alternatives_for_slot(cocktail_id, sort)` → ranked picks from your shelf.
+
+**Bootstrap pipeline** (`scripts/`):
+- `tgii_bootstrap.py` → fetches BA shelf gins, fuzzy-matches against TGII reviews sitemap, fetches/parses SVGs, merges LLM-scored entries for bottles not on TGII. Re-runnable; preserves `tgii_overrides.json` and `tgii_unofficial_scores.json`.
+- `seed_flavor_db.py` → imports `tgii_bootstrap_results.json` into the SQLite. Idempotent.
+
+To extend to other categories: define axes (`set_axes(conn, 'rum', [...])`), then bootstrap as for gin (find or build a published axis-scored corpus, then LLM-fill from descriptions for the long tail). Roadmap in memory `bar_assistant_roadmap`.
+
+## Engineering Notes
+
+### Ingredient payloads (cocktail create/update)
+Always backfill `sort` on each ingredient before sending — the BA API's `CocktailIngredientRequest::fromArray` requires it with no default, returns 500 if missing. Pattern used in `server.py`: `{**ing, "sort": ing.get("sort", idx + 1)}`. Apply to any new write tool that accepts ingredients.
+
+### Testing changes against the live BA API without redeploying
+`.venv/bin/python -c "from bar_assistant_mcp.api import BarAssistantAPI; ..."` — import the fixed code directly, hit production BA with the stdio token from `.mcp.json`, clean up after. Faster than rebuilding the container.
+
+### Debugging deployed-server errors
+Laravel logs go to container stdout, not `storage/logs/laravel.log` (which is empty). Use the Portainer logs API on `bar-assistant-api` to read exceptions. Deploy/debug details in memory (`deployment_guide`, `ba_api_quirks`).
