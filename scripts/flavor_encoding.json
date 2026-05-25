@@ -70,6 +70,116 @@
       ]
     },
     {
+      "cocktail_id": 54,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "gin",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "juniper",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 56,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "gin",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "juniper",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 68,
+      "slots": [
+        {
+          "sort": 4,
+          "category": "gin",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5
+            },
+            {
+              "axis": "juniper",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 70,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "gin",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2,
+              "out_weight": 1.5
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "juniper",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "cocktail_id": 71,
       "slots": [
         {
@@ -83,6 +193,36 @@
               "lo": 0,
               "hi": 1,
               "out_weight": 1.5
+            },
+            {
+              "axis": "juniper",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 74,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "gin",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
             },
             {
               "axis": "juniper",
