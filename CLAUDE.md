@@ -173,6 +173,7 @@ Per-category integer flavor axes (gin: 7 axes, 0–3, sourced from The Gin Is In
 - `bar_get_slot_constraints(cocktail_id)`
 - `bar_alternatives_for_slot(cocktail_id, sort, on_shelf_only, include_strays, top_n)`
 - `bar_uses_for_bottle(ingredient_id, top_n)`
+- `bar_find_gaps(cocktail_ids=None, threshold=3.0)` — shopping list: slots whose best in-stock match is a stretch
 
 **Workflow to encode a recipe:**
 1. `bar_describe_slots(cocktail_id)` → find the `sort` index of the slot to constrain.
