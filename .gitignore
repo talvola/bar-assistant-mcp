@@ -52,8 +52,10 @@ secrets.json
 # Exports
 *.csv
 
-# Flavor SQLite — regenerable from scripts/tgii_bootstrap_results.json
-# via scripts/seed_flavor_db.py (slot constraints set via MCP tools)
+# Flavor SQLite — regenerable. Restore recipe:
+#   tgii_bootstrap.py --category gin && seed_flavor_db.py --category gin
+#   tgii_bootstrap.py --category aquavit && seed_flavor_db.py --category aquavit
+#   import_flavor_encoding.py     # slot constraints + manual profile edits
 data/flavor.sqlite
 
 # Test files

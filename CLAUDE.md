@@ -184,6 +184,18 @@ Per-category integer flavor axes (gin: 7 axes, 0–3, sourced from The Gin Is In
 **Bootstrap pipeline** (`scripts/`):
 - `tgii_bootstrap.py --category {gin,aquavit}` → fetches BA shelf bottles for the category, fuzzy-matches against TGII's category sitemap, fetches/parses SVGs, merges LLM-scored entries for bottles not on TGII. Re-runnable; preserves `tgii_{cat}_overrides.json` and `tgii_{cat}_unofficial_scores.json`. Per-category outputs go to `tgii_{cat}_results.json`.
 - `seed_flavor_db.py --category {gin,aquavit}` → imports results into the SQLite. Idempotent.
+- `export_flavor_encoding.py` / `import_flavor_encoding.py` → dump/restore slot meta + slot constraints + any manual profile edits (`source='manual'`) to `scripts/flavor_encoding.json`. SQLite stays gitignored; manual encoding work lives in this JSON. **Run `export_flavor_encoding.py` after any session that adds slot constraints or hand-corrects a profile** — otherwise the changes only exist on the workstation.
+
+**SQLite restore from scratch** (e.g., volume blown away on the NAS):
+```bash
+# Per category: bootstrap + seed (one round-trip to BA + TGII per category)
+.venv/bin/python scripts/tgii_bootstrap.py --category gin
+.venv/bin/python scripts/seed_flavor_db.py --category gin
+.venv/bin/python scripts/tgii_bootstrap.py --category aquavit
+.venv/bin/python scripts/seed_flavor_db.py --category aquavit
+# Manual work
+.venv/bin/python scripts/import_flavor_encoding.py
+```
 
 To extend to a new category that TGII covers (look at `https://theginisin.com/sitemap_index.xml` for available sitemaps):
 1. Add an entry to `CATEGORIES` in `tgii_bootstrap.py` (BA path, min_path_depth, sitemap URL, slug regex, axes, SVG parser — see aquavit for a 6-axis flat-layout example).

@@ -1,0 +1,148 @@
+{
+  "_README": "Manual flavor-encoding work \u2014 slot constraints and any source='manual' profile edits. Regenerable from tgii_{cat}_*.json artifacts via tgii_bootstrap.py + seed_flavor_db.py, then this file via import_flavor_encoding.py. See CLAUDE.md.",
+  "cocktails": [
+    {
+      "cocktail_id": 43,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "gin",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2,
+              "out_weight": 2.0,
+              "hard": true
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5
+            },
+            {
+              "axis": "juniper",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 641,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "gin",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5
+            },
+            {
+              "axis": "juniper",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 668,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "gin",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "citrus",
+              "kind": "band",
+              "lo": 0,
+              "hi": 3
+            },
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 2.0,
+              "hard": true
+            },
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 0,
+              "hi": 3
+            },
+            {
+              "axis": "juniper",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 686,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "gin",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "juniper",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2,
+              "out_weight": 2.0,
+              "hard": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "manual_profiles": []
+}
