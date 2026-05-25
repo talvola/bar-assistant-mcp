@@ -79,6 +79,24 @@ Mergers & Acquisitions
   └── The Linguist (swaps rye/aquavit proportions)
 ```
 
+## Spirits Inventory Sync (Google Sheets)
+
+**Trigger:** After any successful `bar_create_ingredient` for a real bottled product (specific brand expression: Fernet-Branca, Bittermens Xocolatl Mole, StilL 630 RallyPoint, etc.). Skip generic categories (Bourbon Whiskey, Sweet Vermouth) and non-spirit items (syrups, juices, garnishes).
+
+**Why:** Erik tracks physical bottle inventory in a separate sheet — ABV, origin, producer, tasting/usage notes for the bottle on the shelf. Bar Assistant tracks the recipe side. The two drift apart when new bottles get added to BA without a matching sheet row, and Erik sometimes forgets to ask — surface this proactively without waiting for the prompt.
+
+**Sheet:** `https://docs.google.com/spreadsheets/d/10AOLpeJ2PpT-MskyOhVADhCctxWDxphwsjZWmpNjDBM/edit` — tab `Sheet1`. Columns: A=Product Name, B=Category, C=Notes, D=ABV %, E=Origin, F=Distillery/Producer, G=Description, H=Status.
+
+**Process:**
+1. After creating the BA ingredient, search Sheet1 for the brand+expression name.
+2. **Placeholder row exists** (A,B filled; D–G blank): enrich D–G. Don't touch A, B, C, H.
+3. **Row already enriched** (D–G filled): no-op — just mention it.
+4. **No row exists**: append a new row at the bottom of the active list with A–G filled in. Leave H blank to match the recent-enrichment pattern.
+
+**Description voice:** match existing rows (see rows ~180–204 to calibrate) — em-dash-heavy, includes process specifics (mash bill / botanicals / distillation / aging), tasting notes in nose / palate / finish format when documented, and one sentence on cocktail role. No marketing fluff. Use real research (producer pages, Difford's, Drinkhacker, retailer copy), not fabricated detail.
+
+Don't ask permission to do the sync — do it after each qualifying ingredient creation and report what changed.
+
 ## Common Ingredient IDs (Reference)
 
 **Base Spirits:**
