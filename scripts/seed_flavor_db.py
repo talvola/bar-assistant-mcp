@@ -2,13 +2,15 @@
 """
 seed_flavor_db.py — import bootstrap results into the flavor SQLite.
 
-Reads `scripts/tgii_bootstrap_results.json` (28 gins with 7-axis profiles) and
-upserts each into the database. Also pulls ingredient name + proof from BA so
-we don't have to hit BA again at query time. Idempotent.
+Reads `scripts/tgii_{category}_results.json` and upserts each into the database.
+Also pulls ingredient name + proof from BA so we don't have to hit BA again at
+query time. Idempotent.
 
 Usage:
-    .venv/bin/python scripts/seed_flavor_db.py
+    .venv/bin/python scripts/seed_flavor_db.py                  # gin (default)
+    .venv/bin/python scripts/seed_flavor_db.py --category aquavit
 """
+import argparse
 import json
 import os
 import sys
@@ -31,9 +33,14 @@ def ba_token() -> str:
 
 
 def main() -> None:
-    results_path = ROOT / "scripts" / "tgii_bootstrap_results.json"
+    p = argparse.ArgumentParser()
+    p.add_argument("--category", default="gin")
+    args = p.parse_args()
+    cat = args.category
+
+    results_path = ROOT / "scripts" / f"tgii_{cat}_results.json"
     if not results_path.exists():
-        sys.exit(f"Missing {results_path} — run tgii_bootstrap.py first.")
+        sys.exit(f"Missing {results_path} — run tgii_bootstrap.py --category {cat} first.")
     results = json.loads(results_path.read_text())
 
     ba_url = os.environ.get("BAR_ASSISTANT_URL", "https://erikbarapi.duckdns.org")
@@ -54,7 +61,7 @@ def main() -> None:
                 conn,
                 ingredient_id=r["ba_id"],
                 name=r["ba_name"],
-                category="gin",
+                category=cat,
                 proof=(ing.get("strength") * 2) if ing.get("strength") else None,  # ABV % → US proof
             )
 
@@ -74,7 +81,7 @@ def main() -> None:
             print(f"  + {r['ba_name']:<45}  source={source} conf={confidence or '-'}")
 
     api.close()
-    print(f"\nSeeded {inserted} ingredients ({skipped} skipped with no profile).")
+    print(f"\nSeeded {inserted} {cat} ingredients ({skipped} skipped with no profile).")
     print(f"Database: scripts/../data/flavor.sqlite")
 
 

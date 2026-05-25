@@ -21,6 +21,7 @@ from .flavor import Band, Bottle, Constraint, Point, RecipeSlot
 
 DEFAULT_AXES = {
     "gin": ["juniper", "citrus", "floral", "heat", "spice", "herbal", "fruited"],
+    "aquavit": ["juniper", "citrus", "floral", "heat", "spice", "herbal"],
 }
 
 
@@ -84,10 +85,11 @@ def _init_schema(conn: sqlite3.Connection) -> None:
         );
         """
     )
-    # Seed default axes if empty
-    cur = conn.execute("SELECT COUNT(*) FROM category_axes")
-    if cur.fetchone()[0] == 0:
-        for cat, axes in DEFAULT_AXES.items():
+    # Seed any default-category axes that aren't already present. Lets new
+    # categories added to DEFAULT_AXES propagate to existing DBs on next connect.
+    existing = {r[0] for r in conn.execute("SELECT category FROM category_axes")}
+    for cat, axes in DEFAULT_AXES.items():
+        if cat not in existing:
             conn.execute(
                 "INSERT INTO category_axes(category, axes_json) VALUES (?, ?)",
                 (cat, json.dumps(axes)),

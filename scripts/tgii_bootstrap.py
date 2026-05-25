@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
 """
-tgii_bootstrap.py — Match BA gin shelf to The Gin Is In flavor diagrams.
+tgii_bootstrap.py — Match BA shelf entries to The Gin Is In flavor diagrams.
 
-Pulls every gin on shelf from Bar Assistant, fuzzy-matches each name against
-TGII's reviews sitemap, downloads + parses each match's flavor SVG, and writes
-a JSON report classifying each as matched / ambiguous / no_match / no_svg.
+Pulls every bottle on shelf for a given category from Bar Assistant, fuzzy-matches
+each name against TGII's category sitemap, downloads + parses each match's flavor
+SVG, and writes a JSON report classifying each as matched / ambiguous / no_match /
+no_svg.
 
 Usage:
-    .venv/bin/python scripts/tgii_bootstrap.py
+    .venv/bin/python scripts/tgii_bootstrap.py                  # gin (default)
+    .venv/bin/python scripts/tgii_bootstrap.py --category aquavit
 
 Reads BAR_ASSISTANT_TOKEN from env, falling back to .mcp.json.
 
-Output:
-    scripts/tgii_bootstrap_results.json     full report with profiles
-    stderr                                  progress and summary
+Per-category output (under scripts/):
+    tgii_{cat}_results.json                  full report with profiles
+    tgii_{cat}_overrides.json                user-edited slug overrides + unofficial flags
+    tgii_{cat}_unofficial_scores.json        LLM-derived 0-3 axis scores
 """
+import argparse
 import json
 import math
 import os
@@ -32,19 +36,93 @@ sys.path.insert(0, str(ROOT / "src"))
 from bar_assistant_mcp.api import BarAssistantAPI
 
 BA_URL = os.environ.get("BAR_ASSISTANT_URL", "https://erikbarapi.duckdns.org")
-GIN_ANCESTOR_PATH = "363/383/"
-TGII_SITEMAP = "https://theginisin.com/reviews-sitemap.xml"
 TGII_SVG_TPL = "https://theginisin.com/wp-content/uploads/flavor-diagrams/{slug}.svg"
 NS = {"svg": "http://www.w3.org/2000/svg"}
-UA = "Mozilla/5.0 (bar-assistant-mcp tgii-bootstrap/0.1)"
+UA = "Mozilla/5.0 (bar-assistant-mcp tgii-bootstrap/0.2)"
 TIMEOUT = 20
 TOP_N = 5
 AUTO_THRESHOLD = 0.85
 SEPARATION = 0.08
 
-OUT = ROOT / "scripts" / "tgii_bootstrap_results.json"
-OVERRIDES = ROOT / "scripts" / "tgii_overrides.json"
-UNOFFICIAL_SCORES = ROOT / "scripts" / "tgii_unofficial_scores.json"
+
+def parse_tgii_svg_grouped(svg_bytes):
+    """Gin layout: each axis is a <g> containing 1 <text> label + 3 <polygon>."""
+    root = ET.fromstring(svg_bytes)
+    axes = {}
+    for g in root.findall("svg:g", NS):
+        label_el = g.find("svg:text", NS)
+        polys = g.findall("svg:polygon", NS)
+        if label_el is None or len(polys) != 3:
+            continue
+        label = label_el.text.strip().lower()
+        score = _count_filled(polys)
+        axes[label] = score
+    return axes
+
+
+def parse_tgii_svg_flat(svg_bytes, expected_axes):
+    """Aquavit layout: flat children, sequence of 3 <polygon> + 1 <text> repeats.
+
+    No <g> grouping. We walk children in order, batching every 3 polygons; the
+    next text element is the axis label. Stop when we have all expected_axes.
+    """
+    root = ET.fromstring(svg_bytes)
+    axes = {}
+    pending_polys = []
+    expected_lc = {a.lower() for a in expected_axes}
+    for el in root:
+        tag = el.tag.split("}")[-1]
+        if tag == "polygon":
+            pending_polys.append(el)
+        elif tag == "text" and len(pending_polys) == 3:
+            label = (el.text or "").strip().lower()
+            if label in expected_lc:
+                axes[label] = _count_filled(pending_polys)
+            pending_polys = []
+            if len(axes) == len(expected_axes):
+                break
+        elif tag == "text":
+            # Stray text (title, watermark) without 3 preceding polys — reset.
+            pending_polys = []
+    return axes
+
+
+def _count_filled(polys):
+    return sum(
+        1 for p in polys
+        if (p.get("fill") or "").upper() not in ("#FFFFFF", "#FFF", "", "WHITE", "NONE")
+    )
+
+
+# --- Per-category configuration ---------------------------------------------
+
+CATEGORIES = {
+    "gin": {
+        "ba_ancestor_path": "363/383/",
+        # min path depth to count as a bottle (vs subtype placeholder). Gin in BA:
+        # 363/ = spirits, 363/383/ = Gin category, 363/383/<style>/ = style root
+        # (London Dry, Old Tom — also on shelf as placeholders), 363/383/<style>/<brand>/
+        # = real bottle (depth 4 when ancestor includes brand parent).
+        # In practice brand-bottles' materialized_path is 363/383/<style>/, depth 3.
+        "min_path_depth": 3,
+        "sitemap_url": "https://theginisin.com/reviews-sitemap.xml",
+        "slug_re": re.compile(r"<loc>https://theginisin\.com/gin-reviews/([^/]+)/</loc>"),
+        "category_word_re": re.compile(r"\bgin\b"),
+        "axes": ("juniper", "citrus", "floral", "heat", "spice", "herbal", "fruited"),
+        "svg_parser": lambda b, _axes: parse_tgii_svg_grouped(b),
+    },
+    "aquavit": {
+        "ba_ancestor_path": "363/403/",
+        # BA doesn't model aquavit subtypes, so brand bottles live directly under
+        # the Aquavit category (depth 2: 363/403/).
+        "min_path_depth": 2,
+        "sitemap_url": "https://theginisin.com/aquavit-sitemap.xml",
+        "slug_re": re.compile(r"<loc>https://theginisin\.com/aquavit/([^/]+)/</loc>"),
+        "category_word_re": re.compile(r"\baquavit\b"),
+        "axes": ("juniper", "citrus", "floral", "heat", "spice", "herbal"),
+        "svg_parser": parse_tgii_svg_flat,
+    },
+}
 
 
 def ba_token():
@@ -63,26 +141,25 @@ def http_get(url):
     ).read()
 
 
-def load_tgii_slugs():
-    xml = http_get(TGII_SITEMAP).decode()
-    return re.findall(r"<loc>https://theginisin\.com/gin-reviews/([^/]+)/</loc>", xml)
+def load_tgii_slugs(cfg):
+    xml = http_get(cfg["sitemap_url"]).decode()
+    return cfg["slug_re"].findall(xml)
 
 
-def normalize(s):
+def normalize(s, cfg):
     s = s.lower()
     s = re.sub(r"[‘’'`]", "", s)
-    s = re.sub(r"\bgin\b", "", s)           # drop "gin" — present in nearly every name
+    s = cfg["category_word_re"].sub("", s)   # drop the category word — present in nearly every name
     s = re.sub(r"[^a-z0-9\s]", " ", s)
     return re.sub(r"\s+", " ", s).strip()
 
 
-def tokenize(s):
-    return set(t for t in normalize(s).split() if len(t) > 1)
+def tokenize(s, cfg):
+    return set(t for t in normalize(s, cfg).split() if len(t) > 1)
 
 
-def build_slug_index(slugs):
-    """Per-slug token set plus IDF weights from the slug corpus."""
-    per_slug = {s: tokenize(s.replace("-", " ")) for s in slugs}
+def build_slug_index(slugs, cfg):
+    per_slug = {s: tokenize(s.replace("-", " "), cfg) for s in slugs}
     df = Counter()
     for tokens in per_slug.values():
         for t in tokens:
@@ -92,19 +169,13 @@ def build_slug_index(slugs):
     return per_slug, idf
 
 
-def fuzzy_match(name, slugs, per_slug, idf, top_n=TOP_N):
-    """IDF-weighted token overlap, with SequenceMatcher as tiebreak.
-
-    score = 0.5 * weighted_recall + 0.4 * weighted_precision + 0.1 * char_ratio
-      weighted_recall:    overlap weight / bottle-token weight (penalizes missing brand words)
-      weighted_precision: overlap weight / slug-token weight  (penalizes extra unrelated words)
-      char_ratio:         SequenceMatcher on the normalized strings (smooth tiebreak)
-    """
-    bottle_tokens = tokenize(name)
+def fuzzy_match(name, slugs, per_slug, idf, cfg, top_n=TOP_N):
+    """IDF-weighted token overlap, with SequenceMatcher as tiebreak."""
+    bottle_tokens = tokenize(name, cfg)
     if not bottle_tokens:
         return [(0.0, "")]
     bottle_weight = sum(idf.get(t, 0) for t in bottle_tokens) or 1.0
-    name_n = normalize(name)
+    name_n = normalize(name, cfg)
 
     scored = []
     for s, slug_tokens in per_slug.items():
@@ -117,7 +188,7 @@ def fuzzy_match(name, slugs, per_slug, idf, top_n=TOP_N):
         slug_w = sum(idf.get(t, 0) for t in slug_tokens) or 1.0
         recall = overlap_w / bottle_weight
         precision = overlap_w / slug_w
-        char = SequenceMatcher(None, name_n, normalize(s.replace("-", " "))).ratio()
+        char = SequenceMatcher(None, name_n, normalize(s.replace("-", " "), cfg)).ratio()
         score = 0.5 * recall + 0.4 * precision + 0.1 * char
         scored.append((score, s))
 
@@ -125,66 +196,34 @@ def fuzzy_match(name, slugs, per_slug, idf, top_n=TOP_N):
     return scored[:top_n] or [(0.0, "")]
 
 
-def parse_tgii_svg(svg_bytes):
-    root = ET.fromstring(svg_bytes)
-    axes = {}
-    for g in root.findall("svg:g", NS):
-        label_el = g.find("svg:text", NS)
-        polys = g.findall("svg:polygon", NS)
-        if label_el is None or len(polys) != 3:
-            continue
-        label = label_el.text.strip().lower()
-        score = sum(
-            1
-            for p in polys
-            if (p.get("fill") or "").upper() not in ("#FFFFFF", "#FFF", "", "WHITE", "NONE")
-        )
-        axes[label] = score
-    return axes
-
-
-def load_overrides():
-    if not OVERRIDES.exists():
-        return {}
-    return json.loads(OVERRIDES.read_text())
-
-
-def load_unofficial_scores():
-    if not UNOFFICIAL_SCORES.exists():
-        return {}
-    raw = json.loads(UNOFFICIAL_SCORES.read_text())
-    return {k: v for k, v in raw.items() if not k.startswith("_")}
-
-
-def write_overrides(overrides):
-    OVERRIDES.write_text(json.dumps(overrides, indent=2, sort_keys=True))
-
-
-def list_shelf_gins(api):
-    """Shelf entries whose path starts with the Gin ancestor AND are bottles
-    (depth > 2 — excludes subtype categories like 'Old Tom Gin' that are on
-    shelf as placeholders rather than specific bottles)."""
-    gins, page = [], 1
+def list_shelf_bottles(api, cfg):
+    """Shelf entries whose path starts with the category ancestor AND are at
+    least cfg['min_path_depth'] deep (excludes subtype placeholders for
+    categories like gin that model styles)."""
+    bottles, page = [], 1
+    ancestor = cfg["ba_ancestor_path"].strip("/")
+    min_depth = cfg["min_path_depth"]
     while True:
         resp = api.list_ingredients(filter_on_shelf=True, limit=200, page=page)
         for ing in resp.get("data", []):
             path = (ing.get("materialized_path") or "").strip("/")
-            if not path.startswith(GIN_ANCESTOR_PATH.strip("/")):
+            if not path.startswith(ancestor):
                 continue
-            if len(path.split("/")) <= 2:           # 363/383 = subtype category
+            if len(path.split("/")) < min_depth:
                 continue
-            gins.append(ing)
+            bottles.append(ing)
         meta = resp.get("meta", {})
         if page >= meta.get("last_page", 1):
             break
         page += 1
-    return gins
+    return bottles
 
 
-def fetch_profile(slug):
+def fetch_profile(slug, cfg):
     """Fetch + parse a TGII SVG. Returns (profile, error_status, error_msg)."""
     try:
-        return parse_tgii_svg(http_get(TGII_SVG_TPL.format(slug=slug))), None, None
+        svg = http_get(TGII_SVG_TPL.format(slug=slug))
+        return cfg["svg_parser"](svg, cfg["axes"]), None, None
     except urllib.error.HTTPError as e:
         return None, ("no_svg" if e.code == 404 else "svg_error"), f"HTTP {e.code}"
     except Exception as e:
@@ -192,28 +231,40 @@ def fetch_profile(slug):
 
 
 def main():
-    print("Loading TGII reviews sitemap...", file=sys.stderr)
-    slugs = load_tgii_slugs()
-    per_slug, idf = build_slug_index(slugs)
-    print(f"  {len(slugs)} gin reviews indexed", file=sys.stderr)
+    p = argparse.ArgumentParser()
+    p.add_argument("--category", choices=list(CATEGORIES), default="gin")
+    args = p.parse_args()
+    cat = args.category
+    cfg = CATEGORIES[cat]
 
-    overrides = load_overrides()
+    out_results = ROOT / "scripts" / f"tgii_{cat}_results.json"
+    out_overrides = ROOT / "scripts" / f"tgii_{cat}_overrides.json"
+    out_unofficial = ROOT / "scripts" / f"tgii_{cat}_unofficial_scores.json"
+
+    print(f"Loading TGII {cat} sitemap...", file=sys.stderr)
+    slugs = load_tgii_slugs(cfg)
+    per_slug, idf = build_slug_index(slugs, cfg)
+    print(f"  {len(slugs)} {cat} reviews indexed", file=sys.stderr)
+
+    overrides = json.loads(out_overrides.read_text()) if out_overrides.exists() else {}
     if overrides:
-        print(f"  {len(overrides)} override entries loaded from {OVERRIDES.name}", file=sys.stderr)
-    unofficial_scores = load_unofficial_scores()
-    if unofficial_scores:
-        print(f"  {len(unofficial_scores)} LLM-derived scores loaded from {UNOFFICIAL_SCORES.name}", file=sys.stderr)
+        print(f"  {len(overrides)} override entries loaded from {out_overrides.name}", file=sys.stderr)
+    unofficial_scores = {}
+    if out_unofficial.exists():
+        raw = json.loads(out_unofficial.read_text())
+        unofficial_scores = {k: v for k, v in raw.items() if not k.startswith("_")}
+        print(f"  {len(unofficial_scores)} LLM-derived scores loaded from {out_unofficial.name}", file=sys.stderr)
 
-    print("Pulling shelf gins from Bar Assistant...", file=sys.stderr)
+    print(f"Pulling shelf {cat}s from Bar Assistant...", file=sys.stderr)
     api = BarAssistantAPI(BA_URL, ba_token(), bar_id=1)
-    gins = list_shelf_gins(api)
-    print(f"  {len(gins)} bottle-level gins on shelf\n", file=sys.stderr)
+    bottles = list_shelf_bottles(api, cfg)
+    print(f"  {len(bottles)} bottle-level {cat}s on shelf\n", file=sys.stderr)
 
     results = []
-    for ing in sorted(gins, key=lambda x: x["name"].lower()):
+    for ing in sorted(bottles, key=lambda x: x["name"].lower()):
         name = ing["name"]
         key = str(ing["id"])
-        candidates = fuzzy_match(name, slugs, per_slug, idf)
+        candidates = fuzzy_match(name, slugs, per_slug, idf, cfg)
         best = candidates[0]
         second = candidates[1] if len(candidates) > 1 else (0.0, "")
         result = {
@@ -241,7 +292,7 @@ def main():
                 result["notes"] = note
         elif ov and ov.get("slug"):
             slug = ov["slug"]
-            profile, err_status, err_msg = fetch_profile(slug)
+            profile, err_status, err_msg = fetch_profile(slug, cfg)
             result["matched_slug"] = slug
             result["source"] = "manual_override"
             if profile is not None:
@@ -252,7 +303,7 @@ def main():
                 result["error"] = err_msg
         elif best[0] >= AUTO_THRESHOLD and (best[0] - second[0]) >= SEPARATION:
             slug = best[1]
-            profile, err_status, err_msg = fetch_profile(slug)
+            profile, err_status, err_msg = fetch_profile(slug, cfg)
             result["matched_slug"] = slug
             result["match_score"] = round(best[0], 3)
             result["source"] = "auto_fuzzy"
@@ -276,8 +327,7 @@ def main():
             src = result.get("source", "")
             if src == "llm_from_description":
                 p = result["profile"]
-                pstr = " ".join(f"{a[:3]}={p.get(a, '-')}" for a in
-                                ("juniper", "citrus", "floral", "heat", "spice", "herbal", "fruited"))
+                pstr = " ".join(f"{a[:3]}={p.get(a, '-')}" for a in cfg["axes"])
                 conf = result.get("confidence", "")
                 print(f"                 -> LLM-scored ({conf})  {pstr}", file=sys.stderr)
             else:
@@ -286,9 +336,6 @@ def main():
         elif result["status"] == "unofficial":
             print(f"                 (marked unofficial — needs LLM fallback)", file=sys.stderr)
 
-    # Update overrides file with any rows still needing user input. Existing
-    # entries are preserved (we never overwrite a slug the user has filled in);
-    # only the suggestions list is refreshed.
     needs_input_statuses = {"ambiguous", "no_match", "no_svg", "svg_error"}
     new_overrides = dict(overrides)
     for r in results:
@@ -302,27 +349,27 @@ def main():
         else:
             new_overrides[key] = {
                 "name": r["ba_name"],
-                "slug": None,        # fill in the correct TGII slug, OR…
-                "unofficial": False, #   set this true if not on TGII (LLM fallback)
+                "slug": None,
+                "unofficial": False,
                 "suggestions": suggestions,
                 "notes": "",
                 "status_seen": r["status"],
             }
-    write_overrides(new_overrides)
+    out_overrides.write_text(json.dumps(new_overrides, indent=2, sort_keys=True))
 
     by_status = {}
     for r in results:
         by_status.setdefault(r["status"], []).append(r)
-    print(f"\n--- Summary of {len(results)} gins ---", file=sys.stderr)
+    print(f"\n--- Summary of {len(results)} {cat}s ---", file=sys.stderr)
     for st in ("matched", "unofficial", "ambiguous", "no_match", "no_svg", "svg_error"):
         n = len(by_status.get(st, []))
         if n:
             print(f"  {st:11}: {n}", file=sys.stderr)
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(results, indent=2))
-    print(f"\nFull report   -> {OUT.relative_to(ROOT)}", file=sys.stderr)
-    print(f"Overrides file -> {OVERRIDES.relative_to(ROOT)}  (edit, then re-run)", file=sys.stderr)
+    out_results.parent.mkdir(parents=True, exist_ok=True)
+    out_results.write_text(json.dumps(results, indent=2))
+    print(f"\nFull report   -> {out_results.relative_to(ROOT)}", file=sys.stderr)
+    print(f"Overrides file -> {out_overrides.relative_to(ROOT)}  (edit, then re-run)", file=sys.stderr)
     api.close()
 
 
