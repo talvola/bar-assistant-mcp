@@ -182,10 +182,16 @@ Per-category integer flavor axes (gin: 7 axes, 0–3, sourced from The Gin Is In
 4. `bar_alternatives_for_slot(cocktail_id, sort)` → ranked picks from your shelf.
 
 **Bootstrap pipeline** (`scripts/`):
-- `tgii_bootstrap.py` → fetches BA shelf gins, fuzzy-matches against TGII reviews sitemap, fetches/parses SVGs, merges LLM-scored entries for bottles not on TGII. Re-runnable; preserves `tgii_overrides.json` and `tgii_unofficial_scores.json`.
-- `seed_flavor_db.py` → imports `tgii_bootstrap_results.json` into the SQLite. Idempotent.
+- `tgii_bootstrap.py --category {gin,aquavit}` → fetches BA shelf bottles for the category, fuzzy-matches against TGII's category sitemap, fetches/parses SVGs, merges LLM-scored entries for bottles not on TGII. Re-runnable; preserves `tgii_{cat}_overrides.json` and `tgii_{cat}_unofficial_scores.json`. Per-category outputs go to `tgii_{cat}_results.json`.
+- `seed_flavor_db.py --category {gin,aquavit}` → imports results into the SQLite. Idempotent.
 
-To extend to other categories: define axes (`set_axes(conn, 'rum', [...])`), then bootstrap as for gin (find or build a published axis-scored corpus, then LLM-fill from descriptions for the long tail). Roadmap in memory `bar_assistant_roadmap`.
+To extend to a new category that TGII covers (look at `https://theginisin.com/sitemap_index.xml` for available sitemaps):
+1. Add an entry to `CATEGORIES` in `tgii_bootstrap.py` (BA path, min_path_depth, sitemap URL, slug regex, axes, SVG parser — see aquavit for a 6-axis flat-layout example).
+2. Add axes to `DEFAULT_AXES` in `flavor_db.py` (auto-seeds on next DB connect).
+3. Extend `_ensure_ingredient_meta` in `server.py` to infer the category from BA's materialized_path.
+4. Run bootstrap → curate `tgii_{cat}_overrides.json` (slug fixes + `unofficial: true` for off-TGII bottles) → LLM-fill `tgii_{cat}_unofficial_scores.json` → re-run → seed.
+
+For categories TGII doesn't cover (rum, whiskey, etc.), skip the SVG path entirely and LLM-from-description for the whole shelf.
 
 ## Engineering Notes
 
