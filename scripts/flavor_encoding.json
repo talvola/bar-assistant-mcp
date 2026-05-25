@@ -36,6 +36,113 @@
       ]
     },
     {
+      "cocktail_id": 44,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "gin",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 2.0,
+              "hard": true
+            },
+            {
+              "axis": "juniper",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 71,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "gin",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5
+            },
+            {
+              "axis": "juniper",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 135,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "aquavit",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 236,
+      "slots": [
+        {
+          "sort": 2,
+          "category": "aquavit",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "cocktail_id": 641,
       "slots": [
         {
