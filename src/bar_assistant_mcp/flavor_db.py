@@ -22,6 +22,11 @@ from .flavor import Band, Bottle, Constraint, Point, RecipeSlot
 DEFAULT_AXES = {
     "gin": ["juniper", "citrus", "floral", "heat", "spice", "herbal", "fruited"],
     "aquavit": ["juniper", "citrus", "floral", "heat", "spice", "herbal"],
+    # Bourbon and rye share axes; rye expresses higher on `spice` typically.
+    "bourbon": ["spice", "sweet", "oak", "vanilla", "fruit", "body"],
+    "rye": ["spice", "sweet", "oak", "vanilla", "fruit", "body"],
+    # Scotch swaps `spice` for `smoke` — peat is the defining axis.
+    "scotch": ["smoke", "sweet", "oak", "vanilla", "fruit", "body"],
 }
 
 

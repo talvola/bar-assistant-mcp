@@ -1,0 +1,163 @@
+[
+  {
+    "ba_id": 230,
+    "ba_name": "Bear Fight Kentucky Reserve Bourbon",
+    "ba_path": "363/370/371/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "spice": 2,
+      "sweet": 2,
+      "oak": 1,
+      "vanilla": 2,
+      "fruit": 2,
+      "body": 1
+    },
+    "confidence": "medium",
+    "reasoning": "Kentucky straight, 70/21/9 corn/rye/malted barley. 21% rye is mid-high but not a 'high-rye' bourbon. Reposado tequila cask finish adds agave-fruit notes. 45% ABV, 3+ yr \u2014 youngish, lighter body."
+  },
+  {
+    "ba_id": 551,
+    "ba_name": "Distilled Data Straight Bourbon Whiskey",
+    "ba_path": "363/370/371/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "spice": 3,
+      "sweet": 1,
+      "oak": 3,
+      "vanilla": 2,
+      "fruit": 2,
+      "body": 2
+    },
+    "confidence": "medium",
+    "reasoning": "Blend dominated by a 60/36/4 Kentucky 10.7-yr bourbon \u2014 36% rye is HIGH-rye, putting spice at 3. Long aging gives heavy oak and developed esters. Lower corn percentage means less candy-sweet. 47% ABV."
+  },
+  {
+    "ba_id": 579,
+    "ba_name": "Freeland Wheated Bourbon",
+    "ba_path": "363/370/371/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "spice": 0,
+      "sweet": 3,
+      "oak": 2,
+      "vanilla": 2,
+      "fruit": 3,
+      "body": 2
+    },
+    "confidence": "high",
+    "reasoning": "Wheated bourbon (51/45/4 corn/wheat/barley) \u2014 zero rye means zero rye-spice. Bauman's Cider barrel finish + explicit apple/toffee/brown sugar tasting notes push sweet and fruit to 3. 100 proof = full body."
+  },
+  {
+    "ba_id": 616,
+    "ba_name": "Mountain Summit Single Barrel Straight Bourbon",
+    "ba_path": "363/370/371/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "spice": 2,
+      "sweet": 3,
+      "oak": 3,
+      "vanilla": 3,
+      "fruit": 2,
+      "body": 2
+    },
+    "confidence": "high",
+    "reasoning": "68/18/8/6 corn/rye/wheat/barley. Detailed tasting notes (caramel, butterscotch, vanilla, molasses, tobacco, leather, cherry, stewed fruit). Utah climate extreme wood extraction = high oak. 47% ABV."
+  },
+  {
+    "ba_id": 559,
+    "ba_name": "Savage & Cooke Burning Chair Bourbon",
+    "ba_path": "363/370/371/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "spice": 2,
+      "sweet": 3,
+      "oak": 2,
+      "vanilla": 2,
+      "fruit": 3,
+      "body": 1
+    },
+    "confidence": "high",
+    "reasoning": "75/21/4 mash, 4 yr new charred oak, Napa Cabernet finish. Tasting notes: brown sugar, caramel, pink flowers, milk chocolate, hazelnut, baked apple, sugared berries, oak. Wine finish drives fruit to 3. 44% ABV is on the lighter side."
+  },
+  {
+    "ba_id": 231,
+    "ba_name": "Stiefel's Select Single Barrel Four Grain Bourbon",
+    "ba_path": "363/370/371/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "spice": 1,
+      "sweet": 2,
+      "oak": 3,
+      "vanilla": 2,
+      "fruit": 1,
+      "body": 2
+    },
+    "confidence": "low",
+    "reasoning": "Four-grain (corn/wheat/rye/barley) Washington bourbon, single barrel, 4 yr heavy char. No tasting notes available \u2014 scored from mash construction alone. Wheat softens, heavy char drives oak up. Re-score after tasting."
+  },
+  {
+    "ba_id": 511,
+    "ba_name": "Tamworth Crab Trapper Green Crab Flavored Whiskey",
+    "ba_path": "363/370/371/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "spice": 2,
+      "sweet": 1,
+      "oak": 1,
+      "vanilla": 1,
+      "fruit": 0,
+      "body": 2
+    },
+    "confidence": "high",
+    "reasoning": "4-yr bourbon steeped with green crab stock and a low-country-boil spice blend. NOT a substitution candidate for classic bourbon cocktails \u2014 the brininess and savory spice dominate over the underlying bourbon. Scored as the actual flavor experience, not the base bourbon: heavy on spice (boil seasoning), low on sweet/oak/vanilla/fruit (overridden by brine)."
+  }
+]

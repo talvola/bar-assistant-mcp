@@ -2,6 +2,42 @@
   "_README": "Manual flavor-encoding work \u2014 slot constraints and any source='manual' profile edits. Regenerable from tgii_{cat}_*.json artifacts via tgii_bootstrap.py + seed_flavor_db.py, then this file via import_flavor_encoding.py. See CLAUDE.md.",
   "cocktails": [
     {
+      "cocktail_id": 40,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "bourbon",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "oak",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "vanilla",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "cocktail_id": 43,
       "slots": [
         {
@@ -142,6 +178,42 @@
       ]
     },
     {
+      "cocktail_id": 59,
+      "slots": [
+        {
+          "sort": 2,
+          "category": "bourbon",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "fruit",
+              "kind": "band",
+              "lo": 0,
+              "hi": 3
+            },
+            {
+              "axis": "oak",
+              "kind": "band",
+              "lo": 1,
+              "hi": 2
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "cocktail_id": 68,
       "slots": [
         {
@@ -252,6 +324,42 @@
               "axis": "juniper",
               "kind": "band",
               "lo": 2,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 73,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "bourbon",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "body",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "oak",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
               "hi": 3
             }
           ]

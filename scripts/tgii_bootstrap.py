@@ -122,6 +122,36 @@ CATEGORIES = {
         "axes": ("juniper", "citrus", "floral", "heat", "spice", "herbal"),
         "svg_parser": parse_tgii_svg_flat,
     },
+    # ----- LLM-only categories (no TGII corpus) -----
+    # `skip_tgii: True` short-circuits the sitemap fetch + fuzzy match — every
+    # bottle goes straight to the override file as `unofficial: true` so we
+    # LLM-score it from BA description + spirits-sheet research.
+    #
+    # Bourbon and rye share axes: spice (rye-grain pepper / baking spice),
+    # sweet (corn/grain sweetness), oak (wood weight), vanilla (sweet wood),
+    # fruit (esters/dried fruit), body (proof + viscosity). Same scale 0–3.
+    "bourbon": {
+        "ba_ancestor_path": "363/370/371/",
+        "min_path_depth": 3,
+        "skip_tgii": True,
+        "category_word_re": re.compile(r"\b(bourbon|whiskey|whisky)\b"),
+        "axes": ("spice", "sweet", "oak", "vanilla", "fruit", "body"),
+    },
+    "rye": {
+        "ba_ancestor_path": "363/370/347/",
+        "min_path_depth": 3,
+        "skip_tgii": True,
+        "category_word_re": re.compile(r"\b(rye|whiskey|whisky)\b"),
+        "axes": ("spice", "sweet", "oak", "vanilla", "fruit", "body"),
+    },
+    # Scotch swaps `spice` for `smoke` — peat is the defining axis for scotch.
+    "scotch": {
+        "ba_ancestor_path": "363/370/372/",
+        "min_path_depth": 3,
+        "skip_tgii": True,
+        "category_word_re": re.compile(r"\b(scotch|whisky|whiskey|malt)\b"),
+        "axes": ("smoke", "sweet", "oak", "vanilla", "fruit", "body"),
+    },
 }
 
 
@@ -241,10 +271,14 @@ def main():
     out_overrides = ROOT / "scripts" / f"tgii_{cat}_overrides.json"
     out_unofficial = ROOT / "scripts" / f"tgii_{cat}_unofficial_scores.json"
 
-    print(f"Loading TGII {cat} sitemap...", file=sys.stderr)
-    slugs = load_tgii_slugs(cfg)
-    per_slug, idf = build_slug_index(slugs, cfg)
-    print(f"  {len(slugs)} {cat} reviews indexed", file=sys.stderr)
+    if cfg.get("skip_tgii"):
+        print(f"LLM-only category '{cat}' — skipping TGII sitemap fetch", file=sys.stderr)
+        slugs, per_slug, idf = [], {}, {}
+    else:
+        print(f"Loading TGII {cat} sitemap...", file=sys.stderr)
+        slugs = load_tgii_slugs(cfg)
+        per_slug, idf = build_slug_index(slugs, cfg)
+        print(f"  {len(slugs)} {cat} reviews indexed", file=sys.stderr)
 
     overrides = json.loads(out_overrides.read_text()) if out_overrides.exists() else {}
     if overrides:
@@ -338,6 +372,7 @@ def main():
 
     needs_input_statuses = {"ambiguous", "no_match", "no_svg", "svg_error"}
     new_overrides = dict(overrides)
+    default_unofficial = cfg.get("skip_tgii", False)
     for r in results:
         if r["status"] not in needs_input_statuses:
             continue
@@ -350,7 +385,7 @@ def main():
             new_overrides[key] = {
                 "name": r["ba_name"],
                 "slug": None,
-                "unofficial": False,
+                "unofficial": default_unofficial,
                 "suggestions": suggestions,
                 "notes": "",
                 "status_seen": r["status"],
