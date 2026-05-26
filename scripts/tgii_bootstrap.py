@@ -226,6 +226,54 @@ CATEGORIES = {
         "category_word_re": re.compile(r"\b(rum|rhum|cachaca|cachaça)\b"),
         "axes": ("funk", "sweet", "oak", "vanilla", "molasses", "grassy"),
     },
+    # Vermouth + aperitif wines. Vermouth proper lives under 365/418/; the
+    # quinquina-family aperitif wines (Lillet, Byrrh, Dubonnet, Cocchi) live
+    # at 365/435/ but functionally interchange in many recipes (Vesper uses
+    # Lillet but accepts dry vermouth, etc.), so they're folded in via extras.
+    # The BroVo vermouth collection has NULL paths — also via extras.
+    "vermouth": {
+        "ba_ancestor_path": "365/418/",
+        "extra_bottle_ids": (
+            600,  # BroVo Witty Dry Vermouth (NULL path)
+            601,  # BroVo Pretty Blanc Vermouth (NULL path)
+            602,  # BroVo Jammy Sweet Vermouth (NULL path)
+            603,  # BroVo Pink Rosé Vermouth (NULL path)
+            352,  # Lillet Blanc (365/435/ — aperitif wine)
+            572,  # Lillet Rosé (365/435/)
+            541,  # Byrrh Grand Quinquina (365/435/)
+            548,  # Dubonnet Rouge (365/435/)
+            527,  # Cocchi Americano (NULL path — quinquina-style)
+        ),
+        # Punt e Mes lives at 365/418/ (depth 2) alongside the Sweet/Dry/Blanc
+        # subtype roots, so we can't use depth=3. Placeholders just don't get
+        # scored and so don't seed.
+        "min_path_depth": 2,
+        "skip_tgii": True,
+        "category_word_re": re.compile(r"\b(vermouth|quinquina|americano|rosé|rose|blanc|dry|sweet|bianco)\b"),
+        "axes": ("sweet", "bitter", "citrus", "herbal", "floral", "fruited"),
+    },
+    # Fruit liqueurs — cherry/apricot/orange/violette/cassis/elderflower/etc.
+    # The axis space tracks dominant flavor families: `orchard` covers tree
+    # fruits (cherry, apricot, peach, apple, pear, sloe — all collapse here);
+    # `berry` covers cassis/strawberry; `tropical` covers passion/melon;
+    # `floral` covers violet/elderflower/hibiscus; `citrus` covers orange/
+    # lemon-peel liqueurs (Cointreau, Triple Sec); `spice` distinguishes
+    # complex cordials like BroVo Boomerang (cinnamon/pepper) from pure
+    # single-fruit liqueurs like Luxardo Maraschino.
+    "fruit_liqueur": {
+        "ba_ancestor_path": "364/408/",
+        "extra_bottle_ids": (
+            488,  # St-Germain Elderflower (NULL path)
+            196,  # Cointreau (413/566/ — Orange Liqueur path)
+            566,  # Triple Sec (413/ — placeholder, may not have score)
+            499,  # Kijafa Danish Cherry Wine (NULL path)
+            136,  # Skunk Brothers Sweet Apple Pie (364/437/ — Apple Liqueurs)
+        ),
+        "min_path_depth": 2,
+        "skip_tgii": True,
+        "category_word_re": re.compile(r"\b(liqueur|cordial|schnapps|cassis|maraschino)\b"),
+        "axes": ("sweet", "citrus", "orchard", "berry", "floral", "tropical", "spice"),
+    },
 }
 
 

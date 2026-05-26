@@ -1,0 +1,386 @@
+[
+  {
+    "ba_id": 421,
+    "ba_name": "Blanc Vermouth",
+    "ba_path": "365/418/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "unofficial",
+    "source": "manual_override"
+  },
+  {
+    "ba_id": 602,
+    "ba_name": "BroVo Jammy Sweet Vermouth",
+    "ba_path": null,
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 3,
+      "bitter": 1,
+      "citrus": 1,
+      "herbal": 1,
+      "floral": 0,
+      "fruited": 3
+    },
+    "confidence": "medium",
+    "reasoning": "BroVo's sweet red \u2014 'Jammy' name signals fruit-forward register vs Carpano's vanilla-spice register. Platinum 96 pts BTI."
+  },
+  {
+    "ba_id": 603,
+    "ba_name": "BroVo Pink Ros\u00e9 Vermouth",
+    "ba_path": null,
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 2,
+      "bitter": 1,
+      "citrus": 2,
+      "herbal": 1,
+      "floral": 3,
+      "fruited": 2
+    },
+    "confidence": "medium",
+    "reasoning": "BroVo's ros\u00e9 vermouth, 17% ABV, Gold 93 pts BTI. Floral + light-fruit profile typical of ros\u00e9 vermouths."
+  },
+  {
+    "ba_id": 601,
+    "ba_name": "BroVo Pretty Blanc Vermouth",
+    "ba_path": null,
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 2,
+      "bitter": 1,
+      "citrus": 2,
+      "herbal": 2,
+      "floral": 3,
+      "fruited": 1
+    },
+    "confidence": "medium",
+    "reasoning": "BroVo's 'blanc floral vermouth' \u2014 name + product family signals floral-forward blanc. 17% ABV."
+  },
+  {
+    "ba_id": 600,
+    "ba_name": "BroVo Witty Dry Vermouth",
+    "ba_path": null,
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 1,
+      "bitter": 1,
+      "citrus": 2,
+      "herbal": 2,
+      "floral": 1,
+      "fruited": 0
+    },
+    "confidence": "medium",
+    "reasoning": "BroVo's dry vermouth (Woodinville, WA), 17% ABV, 90 pts Wine Enthusiast. Thin description; scored as a high-quality American dry vermouth \u2014 crisp, herbal-citrus, low-sweet."
+  },
+  {
+    "ba_id": 541,
+    "ba_name": "Byrrh Grand Quinquina",
+    "ba_path": "365/435/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 3,
+      "bitter": 2,
+      "citrus": 1,
+      "herbal": 1,
+      "floral": 0,
+      "fruited": 2
+    },
+    "confidence": "high",
+    "reasoning": "French aromatized wine, 18% ABV. Producer notes: 'quinine, coffee, cocoa, bitter orange. Rich, bittersweet, wine-forward.' Heavier and more bittersweet than Dubonnet; coffee/cocoa register is distinctive."
+  },
+  {
+    "ba_id": 239,
+    "ba_name": "Carpano Antica Formula Vermouth",
+    "ba_path": "365/418/420/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 3,
+      "bitter": 2,
+      "citrus": 1,
+      "herbal": 2,
+      "floral": 0,
+      "fruited": 2
+    },
+    "confidence": "high",
+    "reasoning": "Italian sweet (1786, the original). Alpine wormwood + Madagascar vanilla + saffron. Big-bodied vanilla/spice character; clearly sweeter and more complex than Dolin Rouge. 16.5% ABV."
+  },
+  {
+    "ba_id": 582,
+    "ba_name": "Cinzano Bianco",
+    "ba_path": "365/418/421/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 3,
+      "bitter": 1,
+      "citrus": 1,
+      "herbal": 1,
+      "floral": 3,
+      "fruited": 1
+    },
+    "confidence": "high",
+    "reasoning": "Italian bianco (Turin, 1757). Producer notes: 'floral and vanilla notes.' Italian-style bianco is sweeter and more floral than the French blanc."
+  },
+  {
+    "ba_id": 527,
+    "ba_name": "Cocchi Americano",
+    "ba_path": null,
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 2,
+      "bitter": 2,
+      "citrus": 3,
+      "herbal": 2,
+      "floral": 1,
+      "fruited": 1
+    },
+    "confidence": "high",
+    "reasoning": "Italian aperitif wine (Asti) \u2014 Moscato d'Asti + herbs + cinchona (quinine). Canonical Kina Lillet substitute for Vespers. Mid-bitter (cinchona is real), bright Moscato citrus, herbal complexity."
+  },
+  {
+    "ba_id": 240,
+    "ba_name": "Dolin Blanc Vermouth",
+    "ba_path": "365/418/421/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 2,
+      "bitter": 1,
+      "citrus": 2,
+      "herbal": 2,
+      "floral": 2,
+      "fruited": 1
+    },
+    "confidence": "high",
+    "reasoning": "French blanc (Chamb\u00e9ry AOC) with 32-33 botanicals. Lighter sweet with citrus + floral character. The French blanc style is brighter than Italian bianco."
+  },
+  {
+    "ba_id": 156,
+    "ba_name": "Dolin Dry Vermouth",
+    "ba_path": "365/418/419/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 1,
+      "bitter": 1,
+      "citrus": 2,
+      "herbal": 2,
+      "floral": 1,
+      "fruited": 0
+    },
+    "confidence": "high",
+    "reasoning": "French dry (Chamb\u00e9ry AOC), 30+ Alpine herbs, 17.5% ABV. The benchmark dry: crisp, low-sweet, herbal-citrus."
+  },
+  {
+    "ba_id": 508,
+    "ba_name": "Dolin Rouge Vermouth",
+    "ba_path": "365/418/420/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 2,
+      "bitter": 1,
+      "citrus": 1,
+      "herbal": 2,
+      "floral": 2,
+      "fruited": 1
+    },
+    "confidence": "high",
+    "reasoning": "French sweet vermouth (Savoie). Producer notes: 'lighter and more delicate than many Italian sweet vermouths, with herbal and floral notes, gentle sweetness, clean finish.' Notably less heavy than Carpano."
+  },
+  {
+    "ba_id": 419,
+    "ba_name": "Dry Vermouth",
+    "ba_path": "365/418/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "unofficial",
+    "source": "manual_override"
+  },
+  {
+    "ba_id": 548,
+    "ba_name": "Dubonnet Rouge",
+    "ba_path": "365/435/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 3,
+      "bitter": 1,
+      "citrus": 0,
+      "herbal": 1,
+      "floral": 0,
+      "fruited": 2
+    },
+    "confidence": "high",
+    "reasoning": "French aromatized wine, 14.8% ABV. Producer notes: 'sweet, fruity, gently bitter.' Sweeter and less bitter than Byrrh; softer profile."
+  },
+  {
+    "ba_id": 352,
+    "ba_name": "Lillet Blanc",
+    "ba_path": "365/435/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 2,
+      "bitter": 1,
+      "citrus": 3,
+      "herbal": 1,
+      "floral": 2,
+      "fruited": 2
+    },
+    "confidence": "high",
+    "reasoning": "French quinquina-style aperitif wine (Bordeaux). Description is auto-stub so scored from canonical knowledge: bright citrus (orange peel, candied grapefruit), light honey, modest floral, low bitter (the modern Lillet Blanc lost much of its quinine vs the original Kina Lillet)."
+  },
+  {
+    "ba_id": 572,
+    "ba_name": "Lillet Ros\u00e9",
+    "ba_path": "365/435/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 2,
+      "bitter": 1,
+      "citrus": 2,
+      "herbal": 1,
+      "floral": 3,
+      "fruited": 2
+    },
+    "confidence": "high",
+    "reasoning": "French ros\u00e9 aperitif. Producer notes: 'delicate fruit and floral notes.' Ros\u00e9 expression of Lillet \u2014 softer citrus than blanc, more floral and fruit."
+  },
+  {
+    "ba_id": 135,
+    "ba_name": "Punt e Mes",
+    "ba_path": "365/418/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "sweet": 3,
+      "bitter": 3,
+      "citrus": 0,
+      "herbal": 2,
+      "floral": 0,
+      "fruited": 2
+    },
+    "confidence": "high",
+    "reasoning": "Italian vermouth-bitter hybrid (1870, Piedmont). Name = 'one and a half points' (sweet + half bitter). The benchmark for high-bitter vermouth \u2014 sits between sweet vermouth and amaro."
+  },
+  {
+    "ba_id": 420,
+    "ba_name": "Sweet Vermouth",
+    "ba_path": "365/418/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "unofficial",
+    "source": "manual_override"
+  }
+]

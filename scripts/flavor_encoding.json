@@ -41,6 +41,31 @@
       "cocktail_id": 42,
       "slots": [
         {
+          "sort": 1,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
+        },
+        {
           "sort": 2,
           "category": "bourbon",
           "tolerance": "style",
@@ -146,6 +171,31 @@
               "hi": 3
             }
           ]
+        },
+        {
+          "sort": 3,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -176,6 +226,33 @@
               "kind": "band",
               "lo": 2,
               "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            }
+          ]
+        },
+        {
+          "sort": 2,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "citrus",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
               "out_weight": 1.5,
               "hard": true
             }
@@ -297,6 +374,39 @@
               "hi": 3,
               "out_weight": 1.5,
               "hard": true
+            }
+          ]
+        },
+        {
+          "sort": 3,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "citrus",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
             }
           ]
         }
@@ -484,6 +594,33 @@
           ]
         },
         {
+          "sort": 2,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
+        },
+        {
           "sort": 4,
           "category": "gin",
           "tolerance": "style",
@@ -589,6 +726,39 @@
               "hi": 3
             }
           ]
+        },
+        {
+          "sort": 2,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "citrus",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -611,6 +781,33 @@
               "axis": "juniper",
               "kind": "band",
               "lo": 2,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 3,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
               "hi": 3
             }
           ]
@@ -776,6 +973,33 @@
               "hi": 1
             }
           ]
+        },
+        {
+          "sort": 4,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -808,6 +1032,31 @@
               "hi": 3,
               "out_weight": 1.5,
               "hard": true
+            }
+          ]
+        },
+        {
+          "sort": 2,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
             }
           ]
         }
@@ -843,6 +1092,31 @@
               "axis": "vanilla",
               "kind": "band",
               "lo": 1,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 3,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
               "hi": 3
             }
           ]
@@ -908,6 +1182,31 @@
               "hi": 3
             }
           ]
+        },
+        {
+          "sort": 2,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -938,6 +1237,33 @@
               "kind": "band",
               "lo": 0,
               "hi": 2
+            }
+          ]
+        },
+        {
+          "sort": 3,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "citrus",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5,
+              "hard": true
             }
           ]
         }
@@ -1015,6 +1341,31 @@
               "hi": 2
             }
           ]
+        },
+        {
+          "sort": 3,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -1036,6 +1387,31 @@
               "axis": "juniper",
               "kind": "band",
               "lo": 2,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 2,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
               "hi": 3
             }
           ]
@@ -1071,6 +1447,58 @@
               "out_weight": 1.5
             }
           ]
+        },
+        {
+          "sort": 2,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 3,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -1103,6 +1531,58 @@
               "out_weight": 1.5
             }
           ]
+        },
+        {
+          "sort": 2,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "citrus",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 3,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -1129,6 +1609,31 @@
             },
             {
               "axis": "juniper",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 2,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
               "kind": "band",
               "lo": 2,
               "hi": 3
@@ -1190,6 +1695,31 @@
               "axis": "spice",
               "kind": "band",
               "lo": 1,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 3,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
               "hi": 3
             }
           ]
@@ -1306,6 +1836,66 @@
               "hi": 3
             }
           ]
+        },
+        {
+          "sort": 2,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 3,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "citrus",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -1339,6 +1929,58 @@
               "hi": 3
             }
           ]
+        },
+        {
+          "sort": 2,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 3,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -1367,6 +2009,39 @@
               "axis": "juniper",
               "kind": "band",
               "lo": 2,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 2,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "citrus",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
               "hi": 3
             }
           ]
@@ -1440,6 +2115,31 @@
               "hi": 3
             }
           ]
+        },
+        {
+          "sort": 3,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -1470,6 +2170,33 @@
               "lo": 2,
               "hi": 3,
               "out_weight": 1.5
+            }
+          ]
+        },
+        {
+          "sort": 2,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "citrus",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5,
+              "hard": true
             }
           ]
         }
@@ -1517,6 +2244,31 @@
               "axis": "spice",
               "kind": "band",
               "lo": 2,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 3,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "citrus",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
               "hi": 3
             }
           ]
@@ -1580,6 +2332,27 @@
               "hi": 2
             }
           ]
+        },
+        {
+          "sort": 2,
+          "category": "vermouth",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "floral",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "fruited",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -1641,6 +2414,33 @@
               "axis": "sweet",
               "kind": "band",
               "lo": 2,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 3,
+          "category": "fruit_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "orchard",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
               "hi": 3
             }
           ]

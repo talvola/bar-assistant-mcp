@@ -1,0 +1,73 @@
+{
+  "_README": "LLM-derived 0–3 axis scores for fruit liqueurs (axes: sweet, citrus, orchard, berry, floral, tropical, spice). `orchard` covers tree fruits (cherry, apricot, apple, pear, sloe). `spice` is the critical axis distinguishing complex spiced cordials (BroVo Boomerang) from pure single-fruit liqueurs (Luxardo Maraschino). Re-score after tasting.",
+
+  "_design_notes": "Note the key Maraschino comparison: Luxardo Maraschino is a pure marasca cherry distillate (orchard=3, spice=0), while BroVo Boomerang adds cinnamon, walnut, orange, peppercorn (orchard=3, spice=3, citrus=1). They're not substitutes; the matcher will surface this when a recipe expects one vs the other.",
+
+  "182": {"name": "Luxardo Maraschino", "confidence": "high",
+    "reasoning": "Marasca cherries infused 3 yr, copper-pot distilled, ash-wood aged since 1821. Pure marasca character — bitter cherry pit + nuttiness. The benchmark single-fruit liqueur. NO spice, NO citrus.",
+    "profile": {"sweet": 2, "citrus": 0, "orchard": 3, "berry": 0, "floral": 0, "tropical": 0, "spice": 0}},
+
+  "172": {"name": "broVo Boomerang", "confidence": "high",
+    "reasoning": "Spiced cherry cordial by Micah Melton (The Aviary, Chicago). Cherry + apricot + walnut + cinnamon + orange + vanilla + peppercorn. Functionally distinct from Maraschino — orchard + spice + slight citrus. Not a Maraschino substitute despite the shared shelf position.",
+    "profile": {"sweet": 2, "citrus": 1, "orchard": 3, "berry": 0, "floral": 0, "tropical": 0, "spice": 3}},
+
+  "510": {"name": "Cherry Heering", "confidence": "high",
+    "reasoning": "Danish cherry liqueur (1818) — Stevens cherries + spice blend, oak-aged. Sweeter and more spice-touched than Maraschino, fuller body. Used in Singapore Sling, Blood and Sand, Remember the Maine.",
+    "profile": {"sweet": 3, "citrus": 0, "orchard": 3, "berry": 0, "floral": 0, "tropical": 0, "spice": 1}},
+
+  "562": {"name": "Crème de Violette", "confidence": "high",
+    "reasoning": "Pure violet floral liqueur. The Aviation cocktail's defining ingredient. Sweet + floral, nothing else.",
+    "profile": {"sweet": 3, "citrus": 0, "orchard": 0, "berry": 0, "floral": 3, "tropical": 0, "spice": 0}},
+
+  "155": {"name": "Gabriel Boudier Crème de Cassis", "confidence": "high",
+    "reasoning": "PGI-certified Crème de Cassis from Noir de Bourgogne blackcurrants (1874). Cold-macerated. Pure blackcurrant — the berry axis archetype.",
+    "profile": {"sweet": 3, "citrus": 0, "orchard": 0, "berry": 3, "floral": 0, "tropical": 0, "spice": 0}},
+
+  "177": {"name": "Greenbar Distillery Hibiscus Liqueur", "confidence": "high",
+    "reasoning": "Organic hibiscus + California lemon zest, 96 pts Wine Enthusiast. Hibiscus is floral with tart berry undertones; lemon zest adds citrus.",
+    "profile": {"sweet": 2, "citrus": 2, "orchard": 0, "berry": 1, "floral": 3, "tropical": 0, "spice": 0}},
+
+  "180": {"name": "La Grande Passion", "confidence": "high",
+    "reasoning": "Passion fruit liqueur with XO Armagnac (10yr) base — discontinued 1994 so a rarity. Passion fruit's bright tropical character with slight citrus brightness.",
+    "profile": {"sweet": 2, "citrus": 1, "orchard": 0, "berry": 0, "floral": 0, "tropical": 3, "spice": 0}},
+
+  "181": {"name": "Luxardo Apricot Albicocca", "confidence": "high",
+    "reasoning": "Apricot pulp infusion since 1935. The apricot equivalent of Maraschino — pure single-fruit liqueur, no spice complexity.",
+    "profile": {"sweet": 2, "citrus": 0, "orchard": 3, "berry": 0, "floral": 0, "tropical": 0, "spice": 0}},
+
+  "512": {"name": "Midori Melon Liqueur", "confidence": "high",
+    "reasoning": "Japanese honeydew melon liqueur. Sweet + bright tropical, nothing else. The bright green color is unmistakable.",
+    "profile": {"sweet": 3, "citrus": 0, "orchard": 0, "berry": 0, "floral": 0, "tropical": 3, "spice": 0}},
+
+  "232": {"name": "Nouvelle Wild Harvest Strawberry Schnapps", "confidence": "high",
+    "reasoning": "American-style strawberry schnapps. Sweet + strawberry-forward. Strawberry sits in the berry axis.",
+    "profile": {"sweet": 3, "citrus": 0, "orchard": 0, "berry": 3, "floral": 0, "tropical": 0, "spice": 0}},
+
+  "186": {"name": "Skunk Brothers Sweet 45 Cherry Cordial", "confidence": "high",
+    "reasoning": "Washington cherry cordial by veteran-owned craft distillery. Cherry-forward, sweet, less complex than Cherry Heering.",
+    "profile": {"sweet": 3, "citrus": 0, "orchard": 3, "berry": 0, "floral": 0, "tropical": 0, "spice": 0}},
+
+  "220": {"name": "Ford's Sloe Gin", "confidence": "high",
+    "reasoning": "Higher-proof sloe gin (29% ABV) made with Ford's base gin + French/English sloe fruit steeped 12 weeks. Sloe is small blackthorn fruit — plum/cherry adjacent + tart berry character. Cleaner and more juniper-tinged than typical sloe gins.",
+    "profile": {"sweet": 2, "citrus": 0, "orchard": 2, "berry": 2, "floral": 0, "tropical": 0, "spice": 0}},
+
+  "488": {"name": "St-Germain Elderflower Liqueur", "confidence": "high",
+    "reasoning": "French elderflower liqueur, fresh elderflower blossoms hand-picked once a year. Tasting: delicate floral with notes of pear, citrus, tropical fruit. Elderflower is the dominant character (floral); pear hint goes to orchard; mild citrus and tropical bring complexity.",
+    "profile": {"sweet": 3, "citrus": 1, "orchard": 1, "berry": 0, "floral": 3, "tropical": 1, "spice": 0}},
+
+  "196": {"name": "Cointreau", "confidence": "high",
+    "reasoning": "Premium French triple sec (40% ABV) from sweet + bitter orange peels since 1875. Drier and more refined than generic triple sec — concentrated orange oil. The benchmark citrus liqueur.",
+    "profile": {"sweet": 2, "citrus": 3, "orchard": 0, "berry": 0, "floral": 0, "tropical": 0, "spice": 0}},
+
+  "566": {"name": "Triple Sec", "confidence": "high",
+    "reasoning": "Generic triple sec (15-25% ABV) — sweeter and less concentrated than Cointreau. BA description: 'most common style of curaçao... typically 15-25% ABV and sweeter than premium versions like Cointreau.'",
+    "profile": {"sweet": 3, "citrus": 3, "orchard": 0, "berry": 0, "floral": 0, "tropical": 0, "spice": 0}},
+
+  "499": {"name": "Kijafa Danish Cherry Wine", "confidence": "high",
+    "reasoning": "Danish cherry wine (16% ABV — fortified-wine strength, not spirit-strength). Sweet cherry with spice notes — softer body than a cherry liqueur but in the same flavor neighborhood.",
+    "profile": {"sweet": 3, "citrus": 0, "orchard": 3, "berry": 0, "floral": 0, "tropical": 0, "spice": 1}},
+
+  "136": {"name": "Skunk Brothers Sweet Apple Pie", "confidence": "high",
+    "reasoning": "Apple brandy + brown sugar + honey + cinnamon + cloves + pie spices, with a cinnamon stick in each bottle. 42.5% ABV — high-proof spiced apple cordial. Apple → orchard 3; the spice load is the defining feature (cinnamon-cloves-spices) → spice 3.",
+    "profile": {"sweet": 3, "citrus": 0, "orchard": 3, "berry": 0, "floral": 0, "tropical": 0, "spice": 3}}
+}

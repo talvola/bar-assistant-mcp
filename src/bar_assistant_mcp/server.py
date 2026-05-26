@@ -775,6 +775,19 @@ def _ensure_ingredient_meta(ingredient_id: int) -> tuple[str, str, float | None]
     elif ingredient_id == 203:
         # Cruzan Black Strap Rum — broken path ("468/") in BA. Hard-coded.
         category = "rum"
+    elif path.startswith("365/418") or path.startswith("365/435"):
+        # Vermouth (365/418/) + quinquina-family aperitif wines (365/435/).
+        # Bonal (id=543, also at 365/435/) is amaro and caught earlier.
+        category = "vermouth"
+    elif ingredient_id in (600, 601, 602, 603, 527):
+        # BroVo vermouth collection + Cocchi Americano — all NULL paths.
+        category = "vermouth"
+    elif path.startswith("364/408"):
+        category = "fruit_liqueur"
+    elif ingredient_id in (488, 196, 566, 499, 136):
+        # Cross-path fruit liqueurs: St-Germain (NULL), Cointreau (413/566/),
+        # Triple Sec (413/), Kijafa (NULL), Skunk Brothers Apple Pie (364/437/).
+        category = "fruit_liqueur"
     proof = (ing.get("strength") * 2) if ing.get("strength") else None
     with fdb.connect() as conn:
         fdb.upsert_ingredient_meta(conn, ingredient_id, name=name, category=category, proof=proof)

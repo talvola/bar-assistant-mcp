@@ -42,6 +42,16 @@ DEFAULT_AXES = {
     # Jamaican ester axis; `grassy` distinguishes cane-juice (agricole/cachaça)
     # from molasses-based rum; `molasses` captures Demerara/black-strap weight.
     "rum": ["funk", "sweet", "oak", "vanilla", "molasses", "grassy"],
+    # Vermouth + quinquina-family aperitif wines (Lillet, Byrrh, Dubonnet,
+    # Cocchi Americano). `bitter` distinguishes Punt e Mes (3) from regular
+    # sweet vermouth (1); `floral` distinguishes Lillet Rosé / Pink Rosé;
+    # `citrus` distinguishes Lillet Blanc / Cocchi Americano.
+    "vermouth": ["sweet", "bitter", "citrus", "herbal", "floral", "fruited"],
+    # Fruit liqueurs — flavor-family axes. `orchard` lumps tree fruits
+    # (cherry, apricot, apple, pear, sloe). `spice` differentiates complex
+    # cordials (BroVo Boomerang's cinnamon/pepper) from pure single-fruit
+    # liqueurs (Luxardo Maraschino).
+    "fruit_liqueur": ["sweet", "citrus", "orchard", "berry", "floral", "tropical", "spice"],
 }
 
 
