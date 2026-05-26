@@ -151,6 +151,29 @@
     "reasoning": "German digestif since 1934, 35% ABV, 56 herbs: citrus, licorice, anise, ginger, juniper, ginseng. Herbal-anise-spice-forward sweetened liqueur. Sits between amaro and herbal liqueur; placed here since it lacks the bitter-defining character of amaro proper."
   },
   {
+    "ba_id": 125,
+    "ba_name": "La F\u00e9e French Recipe Absinthe",
+    "ba_path": "364/436/402/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 3,
+      "sweet": 0,
+      "anise": 3,
+      "honey": 0,
+      "spice": 1,
+      "cooling": 2
+    },
+    "confidence": "high",
+    "reasoning": "Traditional French absinthe (68% ABV) with 9 herbs including Grande Wormwood. Complex herbal-anise with wormwood bitterness. Distinct from pastis (sweet, simpler)."
+  },
+  {
     "ba_id": 521,
     "ba_name": "Licor 43",
     "ba_path": "364/409/",
@@ -195,6 +218,29 @@
     },
     "confidence": "high",
     "reasoning": "Piedmontese mountain-pine liqueur from Quaglia (1890), 35% ABV. Pine resin + cones + mountain-pine buds cold-infused and distilled. Producer notes: 'clean, resinous, lightly spicy conifer profile.' Pine = signature cooling axis."
+  },
+  {
+    "ba_id": 338,
+    "ba_name": "Ricard",
+    "ba_path": "364/436/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 2,
+      "sweet": 2,
+      "anise": 3,
+      "honey": 0,
+      "spice": 0,
+      "cooling": 1
+    },
+    "confidence": "high",
+    "reasoning": "French pastis \u2014 anise + licorice + Proven\u00e7al herbs, 45% ABV typical. Sweeter and less complex than absinthe; no wormwood. Used as a substitute when an absinthe-style flavor is wanted without the bitter intensity."
   },
   {
     "ba_id": 540,

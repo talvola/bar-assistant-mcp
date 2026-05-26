@@ -1,4 +1,14 @@
 {
+  "125": {
+    "name": "La F\u00e9e French Recipe Absinthe",
+    "notes": "",
+    "slug": null,
+    "status_seen": "no_match",
+    "suggestions": [
+      ""
+    ],
+    "unofficial": true
+  },
   "157": {
     "name": "Farigoule Thyme Liqueur",
     "notes": "",
@@ -61,6 +71,16 @@
   },
   "189": {
     "name": "Yellow Chartreuse",
+    "notes": "",
+    "slug": null,
+    "status_seen": "no_match",
+    "suggestions": [
+      ""
+    ],
+    "unofficial": true
+  },
+  "338": {
+    "name": "Ricard",
     "notes": "",
     "slug": null,
     "status_seen": "no_match",

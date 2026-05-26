@@ -770,6 +770,10 @@ def _ensure_ingredient_meta(ingredient_id: int) -> tuple[str, str, float | None]
         # Herbal Liqueurs — but only after the amaro cross-path check above
         # (Suze + Salers live here too but are bitter aperitifs, not herbal lq).
         category = "herbal_liqueur"
+    elif path.startswith("364/436") or ingredient_id in (125, 338):
+        # Anise family (absinthe, pastis) folded into herbal_liqueur — the
+        # existing axes already include anise; no separate category needed.
+        category = "herbal_liqueur"
     elif path.startswith("363/378"):
         category = "rum"
     elif ingredient_id == 203:

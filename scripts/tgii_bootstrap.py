@@ -204,9 +204,13 @@ CATEGORIES = {
     # Benedictine vs Green Chartreuse vs Agwa).
     "herbal_liqueur": {
         "ba_ancestor_path": "364/409/",
+        "extra_bottle_ids": (
+            125,  # La Fée French Recipe Absinthe (path 364/436/402/)
+            338,  # Ricard (path 364/436/)
+        ),
         "min_path_depth": 2,
         "skip_tgii": True,
-        "category_word_re": re.compile(r"\b(liqueur|herbal|amaro|aperitif)\b"),
+        "category_word_re": re.compile(r"\b(liqueur|herbal|amaro|aperitif|absinthe|pastis)\b"),
         "axes": ("herbal", "sweet", "anise", "honey", "spice", "cooling"),
     },
     # Rum covers white/aged/Jamaican/Demerara/agricole/cachaça/spiced. Six

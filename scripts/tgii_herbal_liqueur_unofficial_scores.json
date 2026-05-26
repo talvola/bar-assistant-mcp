@@ -43,5 +43,13 @@
 
   "178": {"name": "Jagermeister", "confidence": "high",
     "reasoning": "German digestif since 1934, 35% ABV, 56 herbs: citrus, licorice, anise, ginger, juniper, ginseng. Herbal-anise-spice-forward sweetened liqueur. Sits between amaro and herbal liqueur; placed here since it lacks the bitter-defining character of amaro proper.",
-    "profile": {"herbal": 3, "sweet": 2, "anise": 2, "honey": 1, "spice": 2, "cooling": 1}}
+    "profile": {"herbal": 3, "sweet": 2, "anise": 2, "honey": 1, "spice": 2, "cooling": 1}},
+
+  "125": {"name": "La Fée French Recipe Absinthe", "confidence": "high",
+    "reasoning": "Traditional French absinthe (68% ABV) with 9 herbs including Grande Wormwood. Complex herbal-anise with wormwood bitterness. Distinct from pastis (sweet, simpler).",
+    "profile": {"herbal": 3, "sweet": 0, "anise": 3, "honey": 0, "spice": 1, "cooling": 2}},
+
+  "338": {"name": "Ricard", "confidence": "high",
+    "reasoning": "French pastis — anise + licorice + Provençal herbs, 45% ABV typical. Sweeter and less complex than absinthe; no wormwood. Used as a substitute when an absinthe-style flavor is wanted without the bitter intensity.",
+    "profile": {"herbal": 2, "sweet": 2, "anise": 3, "honey": 0, "spice": 0, "cooling": 1}}
 }
