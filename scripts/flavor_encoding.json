@@ -330,6 +330,41 @@
       "cocktail_id": 68,
       "slots": [
         {
+          "sort": 1,
+          "category": "herbal_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "cooling",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5
+            },
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 3,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "honey",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            }
+          ]
+        },
+        {
           "sort": 4,
           "category": "gin",
           "tolerance": "style",
@@ -626,6 +661,44 @@
               "hi": 3
             }
           ]
+        },
+        {
+          "sort": 4,
+          "category": "herbal_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "cooling",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "honey",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -845,6 +918,41 @@
               "hi": 3
             }
           ]
+        },
+        {
+          "sort": 3,
+          "category": "herbal_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "cooling",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5
+            },
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 3,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "honey",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1,
+              "out_weight": 1.5
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            }
+          ]
         }
       ]
     },
@@ -866,6 +974,44 @@
               "axis": "spice",
               "kind": "band",
               "lo": 1,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 4,
+          "category": "herbal_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "cooling",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "honey",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
               "hi": 3
             }
           ]
@@ -1249,6 +1395,39 @@
               "hi": 2
             }
           ]
+        },
+        {
+          "sort": 2,
+          "category": "herbal_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "cooling",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "honey",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -1379,6 +1558,39 @@
               "hi": 2,
               "out_weight": 2.0,
               "hard": true
+            }
+          ]
+        },
+        {
+          "sort": 2,
+          "category": "herbal_liqueur",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "cooling",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "honey",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
             }
           ]
         }

@@ -760,11 +760,16 @@ def _ensure_ingredient_meta(ingredient_id: int) -> tuple[str, str, float | None]
         category = "american_single_malt"
     elif path.startswith("364/407"):
         category = "amaro"
-    elif ingredient_id in (174, 341, 187, 543, 487):
-        # Cross-path amari: Campari/Aperol (364/414/), Suze (364/409/),
+    elif ingredient_id in (174, 341, 187, 543, 487, 540):
+        # Cross-path amari: Campari/Aperol (364/414/), Suze + Salers (364/409/),
         # Bonal (365/435/), Brucato Chaparral (NULL path). See tgii_bootstrap.py
-        # CATEGORIES['amaro']['extra_bottle_ids'].
+        # CATEGORIES['amaro']['extra_bottle_ids']. Suze/Salers are gentian-bitter
+        # so they're amaro despite living under BA's Herbal Liqueurs path.
         category = "amaro"
+    elif path.startswith("364/409"):
+        # Herbal Liqueurs — but only after the amaro cross-path check above
+        # (Suze + Salers live here too but are bitter aperitifs, not herbal lq).
+        category = "herbal_liqueur"
     proof = (ing.get("strength") * 2) if ing.get("strength") else None
     with fdb.connect() as conn:
         fdb.upsert_ingredient_meta(conn, ingredient_id, name=name, category=category, proof=proof)

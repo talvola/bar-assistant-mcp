@@ -185,6 +185,7 @@ CATEGORIES = {
             187,  # Suze Saveur d'Autrefois — under 364/409/ (Herbal Liqueurs)
             543,  # Bonal Gentiane-Quina — under 365/435/ (Vermouth-adjacent quina)
             487,  # Brucato Amaro Chaparral — NULL path
+            540,  # Salers Gentiane — under 364/409/, sweeter cousin of Suze
         ),
         # BA has both depth-2 brand bottles (Cappelletti Pasubio, BroVo collection,
         # Mödr, etc. — direct children of the Amaro category) AND depth-3 bottles
@@ -196,6 +197,17 @@ CATEGORIES = {
         "skip_tgii": True,
         "category_word_re": re.compile(r"\b(amaro|amari|fernet|liqueur|aperitif)\b"),
         "axes": ("bitter", "sweet", "citrus", "herbal", "dark", "mint", "root"),
+    },
+    # Herbal liqueurs — sweet/aromatic, NOT bitter. Chartreuse family,
+    # Benedictine, Agwa, Strega, etc. Distinct from amaro (no `bitter` axis;
+    # `honey` + `cooling` distinguish the family-defining characters of
+    # Benedictine vs Green Chartreuse vs Agwa).
+    "herbal_liqueur": {
+        "ba_ancestor_path": "364/409/",
+        "min_path_depth": 2,
+        "skip_tgii": True,
+        "category_word_re": re.compile(r"\b(liqueur|herbal|amaro|aperitif)\b"),
+        "axes": ("herbal", "sweet", "anise", "honey", "spice", "cooling"),
     },
 }
 

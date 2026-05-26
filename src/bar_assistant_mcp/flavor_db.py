@@ -33,6 +33,11 @@ DEFAULT_AXES = {
     # (Fernet = bitter+mint, Cynar = root, Averna = dark, Aperol = citrus+sweet,
     # Suze = bitter+root, etc.).
     "amaro": ["bitter", "sweet", "citrus", "herbal", "dark", "mint", "root"],
+    # Herbal liqueurs — sweet aromatic liqueurs (Chartreuse, Benedictine, Agwa,
+    # Strega). NOT bitter — that's the key distinction from amaro. `honey`
+    # captures the Benedictine/Yellow Chartreuse/Drambuie signature; `cooling`
+    # captures the menthol/alpine character of Green Chartreuse and Agwa.
+    "herbal_liqueur": ["herbal", "sweet", "anise", "honey", "spice", "cooling"],
 }
 
 

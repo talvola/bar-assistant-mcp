@@ -833,6 +833,30 @@
     "reasoning": "Traditional Latvian bitters (1752). 24 ingredients, 30-day oak aging, 45% ABV \u2014 high-intensity. Herbal-forward with dark/earthy register; subtle mint cooling."
   },
   {
+    "ba_id": 540,
+    "ba_name": "Salers Gentiane",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "bitter": 3,
+      "sweet": 0,
+      "citrus": 0,
+      "herbal": 1,
+      "dark": 0,
+      "mint": 0,
+      "root": 3
+    },
+    "confidence": "high",
+    "reasoning": "French gentian aperitif from Auvergne, 16% ABV (low \u2014 closer to vermouth strength). Earthy, bitter, vegetal, rustic. Producer/canonical comparison: 'similar to Suze but drier.' So slightly less bitter intensity at the lower proof, even drier than Suze."
+  },
+  {
     "ba_id": 634,
     "ba_name": "See the Elephant Amaro di Rucola",
     "ba_path": "364/407/",

@@ -1,0 +1,294 @@
+[
+  {
+    "ba_id": 630,
+    "ba_name": "Agwa de Bolivia",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 2,
+      "sweet": 2,
+      "anise": 1,
+      "honey": 0,
+      "spice": 1,
+      "cooling": 3
+    },
+    "confidence": "high",
+    "reasoning": "30% ABV. Pure coca leaf distillate (alkaloids removed) + 36 botanicals: green tea, African mint, guarana, yerba mate, ginseng, lavender, juniper, bitter orange. Cool/fresh coca-leaf-and-mint character is defining \u2014 high cooling, moderate herbal, no honey."
+  },
+  {
+    "ba_id": 171,
+    "ba_name": "Benedictine D.O.M.",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 3,
+      "sweet": 3,
+      "anise": 1,
+      "honey": 3,
+      "spice": 2,
+      "cooling": 0
+    },
+    "confidence": "high",
+    "reasoning": "40% ABV, 27 plants/spices, beetroot spirit base + honey + saffron + spices. The honey signature is defining \u2014 sweetest of the classical herbal liqueurs, warm spice register. Pairs with whiskey (Vieux Carr\u00e9, Bobby Burns, Singapore Sling)."
+  },
+  {
+    "ba_id": 416,
+    "ba_name": "Chartreuse",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "unofficial",
+    "source": "manual_override"
+  },
+  {
+    "ba_id": 157,
+    "ba_name": "Farigoule Thyme Liqueur",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 3,
+      "sweet": 2,
+      "anise": 0,
+      "honey": 1,
+      "spice": 0,
+      "cooling": 1
+    },
+    "confidence": "high",
+    "reasoning": "Proven\u00e7al thyme liqueur (1898), 40% ABV. Wild thyme harvested in May + sage + lemon verbena + angelica. Single-herb-led with supporting botanicals \u2014 herbal-forward, low everything else, mild thyme cooling."
+  },
+  {
+    "ba_id": 176,
+    "ba_name": "Green Chartreuse",
+    "ba_path": "364/409/416/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 3,
+      "sweet": 1,
+      "anise": 0,
+      "honey": 0,
+      "spice": 2,
+      "cooling": 3
+    },
+    "confidence": "high",
+    "reasoning": "55% ABV, 130 herbs since 1737, secret monk recipe. Defining herbal liqueur \u2014 maximum herbal, dry rather than sweet, no honey/anise, signature menthol-cooling finish from peppermint and alpine herbs."
+  },
+  {
+    "ba_id": 638,
+    "ba_name": "Jade Perique Liqueur de Tabac",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 2,
+      "sweet": 1,
+      "anise": 0,
+      "honey": 1,
+      "spice": 2,
+      "cooling": 0
+    },
+    "confidence": "high",
+    "reasoning": "Tobacco liqueur (Ted Breaux/Jade/Lucid absinthe), 31% ABV, Louisiana Perique tobacco. Described as 'cigar-box and dried-leaf rather than smoke \u2014 dry, spicy modifier. Best used in tiny amounts.' Not really herbal \u2014 more spice-tobacco. Low everything else; spice and herbal are the carriers."
+  },
+  {
+    "ba_id": 178,
+    "ba_name": "Jagermeister",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 3,
+      "sweet": 2,
+      "anise": 2,
+      "honey": 1,
+      "spice": 2,
+      "cooling": 1
+    },
+    "confidence": "high",
+    "reasoning": "German digestif since 1934, 35% ABV, 56 herbs: citrus, licorice, anise, ginger, juniper, ginseng. Herbal-anise-spice-forward sweetened liqueur. Sits between amaro and herbal liqueur; placed here since it lacks the bitter-defining character of amaro proper."
+  },
+  {
+    "ba_id": 521,
+    "ba_name": "Licor 43",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 1,
+      "sweet": 3,
+      "anise": 0,
+      "honey": 1,
+      "spice": 1,
+      "cooling": 0
+    },
+    "confidence": "high",
+    "reasoning": "Spanish vanilla-citrus liqueur (Cuarenta y Tres), 31% ABV, 43 botanicals \u2014 but the dominant flavors are vanilla and citrus, not herbal. Sits more in the dessert-liqueur space; lower herbal than other entries."
+  },
+  {
+    "ba_id": 639,
+    "ba_name": "Quaglia Liquore di Pino Mugo",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 3,
+      "sweet": 1,
+      "anise": 0,
+      "honey": 0,
+      "spice": 1,
+      "cooling": 3
+    },
+    "confidence": "high",
+    "reasoning": "Piedmontese mountain-pine liqueur from Quaglia (1890), 35% ABV. Pine resin + cones + mountain-pine buds cold-infused and distilled. Producer notes: 'clean, resinous, lightly spicy conifer profile.' Pine = signature cooling axis."
+  },
+  {
+    "ba_id": 540,
+    "ba_name": "Salers Gentiane",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "unofficial",
+    "source": "manual_override"
+  },
+  {
+    "ba_id": 584,
+    "ba_name": "Strega",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 3,
+      "sweet": 3,
+      "anise": 3,
+      "honey": 1,
+      "spice": 1,
+      "cooling": 1
+    },
+    "confidence": "high",
+    "reasoning": "Italian herbal liqueur since 1860, 40% ABV, ~70 botanicals including saffron (yellow color). Anise-forward sweetened herbal \u2014 distinctive from Chartreuse by the anise punch and the saffron-driven yellow palate."
+  },
+  {
+    "ba_id": 187,
+    "ba_name": "Suze Saveur d'Autrefois",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "unofficial",
+    "source": "manual_override"
+  },
+  {
+    "ba_id": 188,
+    "ba_name": "Vicario Olive Leaf Liqueur",
+    "ba_path": "364/409/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 3,
+      "sweet": 1,
+      "anise": 0,
+      "honey": 0,
+      "spice": 0,
+      "cooling": 0
+    },
+    "confidence": "high",
+    "reasoning": "Italian olive leaves harvested in spring + lemon finishing. 38% ABV. Savory/herbal, NOT sweet, NO honey/anise/spice/cooling. A unique near-savory herbal liqueur."
+  },
+  {
+    "ba_id": 189,
+    "ba_name": "Yellow Chartreuse",
+    "ba_path": "364/409/416/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "herbal": 3,
+      "sweet": 2,
+      "anise": 1,
+      "honey": 2,
+      "spice": 1,
+      "cooling": 2
+    },
+    "confidence": "high",
+    "reasoning": "40% ABV, same 130 botanicals as Green but honey-sweetened, lower-proof, mellower. Tasting notes: honey, saffron, anise. The honey-mellowed version of Green \u2014 less cooling, more honeyed."
+  }
+]

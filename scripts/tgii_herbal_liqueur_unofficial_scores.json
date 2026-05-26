@@ -1,0 +1,47 @@
+{
+  "_README": "LLM-derived 0–3 axis scores for herbal liqueurs (axes: herbal, sweet, anise, honey, spice, cooling). NOT bitter — that's the key distinction from amaro. `honey` captures Benedictine/Yellow Chartreuse/Drambuie signature; `cooling` captures menthol/alpine/pine freshness (Green Chartreuse, Agwa, Quaglia Pino Mugo). Suze, Salers excluded from this category — they're bitter gentian-amari, scored under amaro instead.",
+
+  "176": {"name": "Green Chartreuse", "confidence": "high",
+    "reasoning": "55% ABV, 130 herbs since 1737, secret monk recipe. Defining herbal liqueur — maximum herbal, dry rather than sweet, no honey/anise, signature menthol-cooling finish from peppermint and alpine herbs.",
+    "profile": {"herbal": 3, "sweet": 1, "anise": 0, "honey": 0, "spice": 2, "cooling": 3}},
+
+  "189": {"name": "Yellow Chartreuse", "confidence": "high",
+    "reasoning": "40% ABV, same 130 botanicals as Green but honey-sweetened, lower-proof, mellower. Tasting notes: honey, saffron, anise. The honey-mellowed version of Green — less cooling, more honeyed.",
+    "profile": {"herbal": 3, "sweet": 2, "anise": 1, "honey": 2, "spice": 1, "cooling": 2}},
+
+  "171": {"name": "Benedictine D.O.M.", "confidence": "high",
+    "reasoning": "40% ABV, 27 plants/spices, beetroot spirit base + honey + saffron + spices. The honey signature is defining — sweetest of the classical herbal liqueurs, warm spice register. Pairs with whiskey (Vieux Carré, Bobby Burns, Singapore Sling).",
+    "profile": {"herbal": 3, "sweet": 3, "anise": 1, "honey": 3, "spice": 2, "cooling": 0}},
+
+  "630": {"name": "Agwa de Bolivia", "confidence": "high",
+    "reasoning": "30% ABV. Pure coca leaf distillate (alkaloids removed) + 36 botanicals: green tea, African mint, guarana, yerba mate, ginseng, lavender, juniper, bitter orange. Cool/fresh coca-leaf-and-mint character is defining — high cooling, moderate herbal, no honey.",
+    "profile": {"herbal": 2, "sweet": 2, "anise": 1, "honey": 0, "spice": 1, "cooling": 3}},
+
+  "584": {"name": "Strega", "confidence": "high",
+    "reasoning": "Italian herbal liqueur since 1860, 40% ABV, ~70 botanicals including saffron (yellow color). Anise-forward sweetened herbal — distinctive from Chartreuse by the anise punch and the saffron-driven yellow palate.",
+    "profile": {"herbal": 3, "sweet": 3, "anise": 3, "honey": 1, "spice": 1, "cooling": 1}},
+
+  "521": {"name": "Licor 43", "confidence": "high",
+    "reasoning": "Spanish vanilla-citrus liqueur (Cuarenta y Tres), 31% ABV, 43 botanicals — but the dominant flavors are vanilla and citrus, not herbal. Sits more in the dessert-liqueur space; lower herbal than other entries.",
+    "profile": {"herbal": 1, "sweet": 3, "anise": 0, "honey": 1, "spice": 1, "cooling": 0}},
+
+  "157": {"name": "Farigoule Thyme Liqueur", "confidence": "high",
+    "reasoning": "Provençal thyme liqueur (1898), 40% ABV. Wild thyme harvested in May + sage + lemon verbena + angelica. Single-herb-led with supporting botanicals — herbal-forward, low everything else, mild thyme cooling.",
+    "profile": {"herbal": 3, "sweet": 2, "anise": 0, "honey": 1, "spice": 0, "cooling": 1}},
+
+  "639": {"name": "Quaglia Liquore di Pino Mugo", "confidence": "high",
+    "reasoning": "Piedmontese mountain-pine liqueur from Quaglia (1890), 35% ABV. Pine resin + cones + mountain-pine buds cold-infused and distilled. Producer notes: 'clean, resinous, lightly spicy conifer profile.' Pine = signature cooling axis.",
+    "profile": {"herbal": 3, "sweet": 1, "anise": 0, "honey": 0, "spice": 1, "cooling": 3}},
+
+  "188": {"name": "Vicario Olive Leaf Liqueur", "confidence": "high",
+    "reasoning": "Italian olive leaves harvested in spring + lemon finishing. 38% ABV. Savory/herbal, NOT sweet, NO honey/anise/spice/cooling. A unique near-savory herbal liqueur.",
+    "profile": {"herbal": 3, "sweet": 1, "anise": 0, "honey": 0, "spice": 0, "cooling": 0}},
+
+  "638": {"name": "Jade Perique Liqueur de Tabac", "confidence": "high",
+    "reasoning": "Tobacco liqueur (Ted Breaux/Jade/Lucid absinthe), 31% ABV, Louisiana Perique tobacco. Described as 'cigar-box and dried-leaf rather than smoke — dry, spicy modifier. Best used in tiny amounts.' Not really herbal — more spice-tobacco. Low everything else; spice and herbal are the carriers.",
+    "profile": {"herbal": 2, "sweet": 1, "anise": 0, "honey": 1, "spice": 2, "cooling": 0}},
+
+  "178": {"name": "Jagermeister", "confidence": "high",
+    "reasoning": "German digestif since 1934, 35% ABV, 56 herbs: citrus, licorice, anise, ginger, juniper, ginseng. Herbal-anise-spice-forward sweetened liqueur. Sits between amaro and herbal liqueur; placed here since it lacks the bitter-defining character of amaro proper.",
+    "profile": {"herbal": 3, "sweet": 2, "anise": 2, "honey": 1, "spice": 2, "cooling": 1}}
+}

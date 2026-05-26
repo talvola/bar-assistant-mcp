@@ -67,6 +67,10 @@
     "reasoning": "French pure-gentian aperitif. Maximum bitter, maximum root (gentian IS the root axis), low sweet. The benchmark for gentian-forward bitter.",
     "profile": {"bitter": 3, "sweet": 1, "citrus": 0, "herbal": 1, "dark": 0, "mint": 0, "root": 3}},
 
+  "540": {"name": "Salers Gentiane", "confidence": "high",
+    "reasoning": "French gentian aperitif from Auvergne, 16% ABV (low — closer to vermouth strength). Earthy, bitter, vegetal, rustic. Producer/canonical comparison: 'similar to Suze but drier.' So slightly less bitter intensity at the lower proof, even drier than Suze.",
+    "profile": {"bitter": 3, "sweet": 0, "citrus": 0, "herbal": 1, "dark": 0, "mint": 0, "root": 3}},
+
   "543": {"name": "Bonal Gentiane-Quina", "confidence": "high",
     "reasoning": "French quinquina-style aperitif: wine base + gentian + cinchona. Lighter and sweeter than Suze; structurally closer to a sweet vermouth than a spirit-based amaro.",
     "profile": {"bitter": 2, "sweet": 2, "citrus": 0, "herbal": 1, "dark": 0, "mint": 0, "root": 3}},
