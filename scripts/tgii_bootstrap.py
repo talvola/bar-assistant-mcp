@@ -209,6 +209,23 @@ CATEGORIES = {
         "category_word_re": re.compile(r"\b(liqueur|herbal|amaro|aperitif)\b"),
         "axes": ("herbal", "sweet", "anise", "honey", "spice", "cooling"),
     },
+    # Rum covers white/aged/Jamaican/Demerara/agricole/cachaça/spiced. Six
+    # axes capture the family variation: `funk` is the defining axis for
+    # Jamaican esters (Smith & Cross 3, Bacardi 0); `grassy` distinguishes
+    # agricole/cachaça (cane-juice base) from molasses-based rum; `molasses`
+    # captures the heavy/dark Demerara/black-strap register; oak + vanilla
+    # capture aging; sweet captures added-sugar variation (Diplomatico /
+    # El Dorado 15 = max).
+    "rum": {
+        "ba_ancestor_path": "363/378/",
+        "extra_bottle_ids": (
+            203,  # Cruzan Estate Diamond Black Strap Rum — path is "468/" (broken)
+        ),
+        "min_path_depth": 3,
+        "skip_tgii": True,
+        "category_word_re": re.compile(r"\b(rum|rhum|cachaca|cachaça)\b"),
+        "axes": ("funk", "sweet", "oak", "vanilla", "molasses", "grassy"),
+    },
 }
 
 

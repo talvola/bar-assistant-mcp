@@ -38,6 +38,10 @@ DEFAULT_AXES = {
     # captures the Benedictine/Yellow Chartreuse/Drambuie signature; `cooling`
     # captures the menthol/alpine character of Green Chartreuse and Agwa.
     "herbal_liqueur": ["herbal", "sweet", "anise", "honey", "spice", "cooling"],
+    # Rum: white/aged/Jamaican/Demerara/agricole/cachaça/spiced. `funk` is the
+    # Jamaican ester axis; `grassy` distinguishes cane-juice (agricole/cachaça)
+    # from molasses-based rum; `molasses` captures Demerara/black-strap weight.
+    "rum": ["funk", "sweet", "oak", "vanilla", "molasses", "grassy"],
 }
 
 

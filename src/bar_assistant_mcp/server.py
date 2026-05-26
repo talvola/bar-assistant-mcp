@@ -770,6 +770,11 @@ def _ensure_ingredient_meta(ingredient_id: int) -> tuple[str, str, float | None]
         # Herbal Liqueurs — but only after the amaro cross-path check above
         # (Suze + Salers live here too but are bitter aperitifs, not herbal lq).
         category = "herbal_liqueur"
+    elif path.startswith("363/378"):
+        category = "rum"
+    elif ingredient_id == 203:
+        # Cruzan Black Strap Rum — broken path ("468/") in BA. Hard-coded.
+        category = "rum"
     proof = (ing.get("strength") * 2) if ing.get("strength") else None
     with fdb.connect() as conn:
         fdb.upsert_ingredient_meta(conn, ingredient_id, name=name, category=category, proof=proof)

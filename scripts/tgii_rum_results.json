@@ -1,0 +1,353 @@
+[
+  {
+    "ba_id": 202,
+    "ba_name": "Appleton Estate 8 Reserve Rum",
+    "ba_path": "363/378/466/534/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 2,
+      "sweet": 1,
+      "oak": 2,
+      "vanilla": 2,
+      "molasses": 1,
+      "grassy": 0
+    },
+    "confidence": "high",
+    "reasoning": "Jamaican aged 8 yr, pot + column blend, ex-bourbon barrels, 43% ABV. Tasting: banana, coconut, toffee. Funk moderate (Appleton is balanced \u2014 pot-still ester present but not Wray-style aggressive). Bourbon-barrel vanilla."
+  },
+  {
+    "ba_id": 606,
+    "ba_name": "Avu\u00e1 Amburana Cacha\u00e7a",
+    "ba_path": "363/378/404/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 0,
+      "sweet": 1,
+      "oak": 1,
+      "vanilla": 3,
+      "molasses": 0,
+      "grassy": 2
+    },
+    "confidence": "high",
+    "reasoning": "Brazilian fresh-cane cacha\u00e7a aged in amburana wood \u2014 native Brazilian hardwood giving 'cinnamon, clove, vanilla, tonka.' Producer notes describe it as effectively its own category. Vanilla driven by amburana, grassy from the cane-juice base (somewhat masked by aging)."
+  },
+  {
+    "ba_id": 556,
+    "ba_name": "Capi Cacha\u00e7a",
+    "ba_path": "363/378/404/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 0,
+      "sweet": 1,
+      "oak": 0,
+      "vanilla": 0,
+      "molasses": 0,
+      "grassy": 3
+    },
+    "confidence": "medium",
+    "reasoning": "Artisanal Brazilian cacha\u00e7a, copper-alembic single-distilled from cane juice, no aging mentioned. 'Smooth and sweet with natural sugarcane aromas.' Pure cane-juice grassy character, low everything else."
+  },
+  {
+    "ba_id": 224,
+    "ba_name": "Clear Water Lorenz Cinnamon Rum",
+    "ba_path": "363/378/469/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 0,
+      "sweet": 2,
+      "oak": 1,
+      "vanilla": 2,
+      "molasses": 2,
+      "grassy": 0
+    },
+    "confidence": "high",
+    "reasoning": "Triple-distilled cinnamon rum with organic cinnamon, vanilla bean, sweet table molasses. Spiced-rum style \u2014 added molasses pushes molasses + sweet up; explicit vanilla bean \u2192 vanilla 2. Cinnamon character isn't captured by these axes (no spice axis for rum)."
+  },
+  {
+    "ba_id": 200,
+    "ba_name": "Clement 10 Year Rhum Agricole",
+    "ba_path": "363/378/380/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 1,
+      "sweet": 1,
+      "oak": 3,
+      "vanilla": 2,
+      "molasses": 0,
+      "grassy": 2
+    },
+    "confidence": "high",
+    "reasoning": "AOC Martinique agricole, 10 yr in virgin/re-charred oak, 44% ABV, 97pts Wine Enthusiast. The long aging adds significant oak/vanilla and mellows the grassy character somewhat \u2014 still clearly agricole but less raw than blanc agricole."
+  },
+  {
+    "ba_id": 203,
+    "ba_name": "Cruzan Estate Diamond Black Strap Rum",
+    "ba_path": "468/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 0,
+      "sweet": 2,
+      "oak": 1,
+      "vanilla": 1,
+      "molasses": 3,
+      "grassy": 0
+    },
+    "confidence": "high",
+    "reasoning": "Black strap molasses rum, 1-2 yr ex-bourbon, column-distilled since 1760. 'Rich molasses and ginger snap.' Defining the molasses=3 register. Modest oak/vanilla; not funky."
+  },
+  {
+    "ba_id": 204,
+    "ba_name": "Denizen Merchant's Reserve 8 Year Rum",
+    "ba_path": "363/378/467/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 3,
+      "sweet": 1,
+      "oak": 2,
+      "vanilla": 2,
+      "molasses": 1,
+      "grassy": 1
+    },
+    "confidence": "high",
+    "reasoning": "Reverse-engineered Mai Tai rum: 8 yr blend of Jamaican pot still (Worthy Park, Hampden \u2014 high ester) + Martinique Grande Arome agricole. High funk from the Jamaican component, some grassy from the agricole side."
+  },
+  {
+    "ba_id": 610,
+    "ba_name": "Doctor Bird Private Barrel Cask Strength Madeira Finish Rum (B&B Exclusive)",
+    "ba_path": "363/378/466/534/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 3,
+      "sweet": 2,
+      "oak": 2,
+      "vanilla": 2,
+      "molasses": 1,
+      "grassy": 0
+    },
+    "confidence": "high",
+    "reasoning": "B&B exclusive: Worthy Park unaged high-ester + aged medium-ester pot still rums, Madeira-cask finished, 59.5% ABV cask strength. Tasting: tropical fruit + Jamaican funk + Madeira-driven dried fruit/caramel/nuts. Max funk; Madeira adds sweet+vanilla."
+  },
+  {
+    "ba_id": 557,
+    "ba_name": "El Dorado 15 Year Old Rum",
+    "ba_path": "363/378/467/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 1,
+      "sweet": 3,
+      "oak": 3,
+      "vanilla": 3,
+      "molasses": 2,
+      "grassy": 0
+    },
+    "confidence": "high",
+    "reasoning": "Guyanese Demerara, min 15 yr. Blend from EHP Wooden Coffey, Metal Coffey, Port Mourant Double Wooden Pot Still, Versailles Single Wooden Pot Still. Nose: dark coffee, candied orange, almonds, dark chocolate, pepper, vanilla. Notoriously heavily added-sugar (sweet=3); long aging + dark Demerara character \u2192 max oak + vanilla."
+  },
+  {
+    "ba_id": 534,
+    "ba_name": "Jamaican Rum",
+    "ba_path": "363/378/466/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "unofficial",
+    "source": "manual_override"
+  },
+  {
+    "ba_id": 591,
+    "ba_name": "Kuleana Agricole Rum",
+    "ba_path": "363/378/380/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 1,
+      "sweet": 1,
+      "oak": 0,
+      "vanilla": 0,
+      "molasses": 0,
+      "grassy": 3
+    },
+    "confidence": "high",
+    "reasoning": "Hawaiian fresh-cane-juice agricole-style. Producer notes: 'Grassy, vegetal, funky character distinct from Jamaican or Guyanese rums. Fills the agricole style gap.' Slight funk from fermentation but not Jamaican-style; unaged/lightly aged so low oak/vanilla."
+  },
+  {
+    "ba_id": 313,
+    "ba_name": "Light rum",
+    "ba_path": "363/378/464/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "unofficial",
+    "source": "manual_override"
+  },
+  {
+    "ba_id": 205,
+    "ba_name": "Roaming Road Thailand 11 Year Rum",
+    "ba_path": "363/378/465/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 1,
+      "sweet": 1,
+      "oak": 3,
+      "vanilla": 2,
+      "molasses": 2,
+      "grassy": 0
+    },
+    "confidence": "medium",
+    "reasoning": "Thai column-still single-cask, 11 yr, 100% molasses, 59.5% ABV cask strength. <190 bottles. Limited info on tasting notes; scored from build: column-still = less funk, long aging = high oak/vanilla, molasses base = moderate molasses register."
+  },
+  {
+    "ba_id": 615,
+    "ba_name": "Saint Benevolence Clairin",
+    "ba_path": "363/378/380/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 2,
+      "sweet": 0,
+      "oak": 0,
+      "vanilla": 0,
+      "molasses": 0,
+      "grassy": 3
+    },
+    "confidence": "high",
+    "reasoning": "Haitian clairin (artisanal cane juice spirit) at 50% ABV. Field blend of indigenous cane clones, wild-yeast fermented 5-7 days. Wild fermentation adds funky/rustic character distinct from agricole; pure cane juice = high grassy, no molasses. Unaged so no oak/vanilla."
+  },
+  {
+    "ba_id": 206,
+    "ba_name": "Smith & Cross Traditional Jamaica Rum",
+    "ba_path": "363/378/466/534/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "funk": 3,
+      "sweet": 0,
+      "oak": 1,
+      "vanilla": 1,
+      "molasses": 2,
+      "grassy": 0
+    },
+    "confidence": "high",
+    "reasoning": "Traditional Jamaican pot still, Navy Strength (57%), Wedderburn + Plummer distillates (the two highest-ester categories in the Jamaican classification system). No added sugar, no chill filtration. The benchmark for funk=3 + sweet=0. Heavy pot-still register pushes molasses up."
+  },
+  {
+    "ba_id": 533,
+    "ba_name": "Spiced Rum",
+    "ba_path": "363/378/467/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "unofficial",
+    "source": "manual_override"
+  },
+  {
+    "ba_id": 358,
+    "ba_name": "White Rum",
+    "ba_path": "363/378/464/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "unofficial",
+    "source": "manual_override"
+  }
+]

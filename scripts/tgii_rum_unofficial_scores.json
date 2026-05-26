@@ -1,0 +1,55 @@
+{
+  "_README": "LLM-derived 0–3 axis scores for rums (axes: funk, sweet, oak, vanilla, molasses, grassy). `funk` = Jamaican ester intensity (Smith & Cross / Hampden 3, Bacardi 0). `grassy` = agricole/cachaça cane-juice signature (Clement, Capi). `molasses` = heavy-dark register (Black Strap, Demerara). Categories don't fragment cleanly along the family lines — these axes describe the actual flavor instead. Re-score after tasting.",
+
+  "202": {"name": "Appleton Estate 8 Reserve Rum", "confidence": "high",
+    "reasoning": "Jamaican aged 8 yr, pot + column blend, ex-bourbon barrels, 43% ABV. Tasting: banana, coconut, toffee. Funk moderate (Appleton is balanced — pot-still ester present but not Wray-style aggressive). Bourbon-barrel vanilla.",
+    "profile": {"funk": 2, "sweet": 1, "oak": 2, "vanilla": 2, "molasses": 1, "grassy": 0}},
+
+  "606": {"name": "Avuá Amburana Cachaça", "confidence": "high",
+    "reasoning": "Brazilian fresh-cane cachaça aged in amburana wood — native Brazilian hardwood giving 'cinnamon, clove, vanilla, tonka.' Producer notes describe it as effectively its own category. Vanilla driven by amburana, grassy from the cane-juice base (somewhat masked by aging).",
+    "profile": {"funk": 0, "sweet": 1, "oak": 1, "vanilla": 3, "molasses": 0, "grassy": 2}},
+
+  "556": {"name": "Capi Cachaça", "confidence": "medium",
+    "reasoning": "Artisanal Brazilian cachaça, copper-alembic single-distilled from cane juice, no aging mentioned. 'Smooth and sweet with natural sugarcane aromas.' Pure cane-juice grassy character, low everything else.",
+    "profile": {"funk": 0, "sweet": 1, "oak": 0, "vanilla": 0, "molasses": 0, "grassy": 3}},
+
+  "224": {"name": "Clear Water Lorenz Cinnamon Rum", "confidence": "high",
+    "reasoning": "Triple-distilled cinnamon rum with organic cinnamon, vanilla bean, sweet table molasses. Spiced-rum style — added molasses pushes molasses + sweet up; explicit vanilla bean → vanilla 2. Cinnamon character isn't captured by these axes (no spice axis for rum).",
+    "profile": {"funk": 0, "sweet": 2, "oak": 1, "vanilla": 2, "molasses": 2, "grassy": 0}},
+
+  "200": {"name": "Clement 10 Year Rhum Agricole", "confidence": "high",
+    "reasoning": "AOC Martinique agricole, 10 yr in virgin/re-charred oak, 44% ABV, 97pts Wine Enthusiast. The long aging adds significant oak/vanilla and mellows the grassy character somewhat — still clearly agricole but less raw than blanc agricole.",
+    "profile": {"funk": 1, "sweet": 1, "oak": 3, "vanilla": 2, "molasses": 0, "grassy": 2}},
+
+  "203": {"name": "Cruzan Estate Diamond Black Strap Rum", "confidence": "high",
+    "reasoning": "Black strap molasses rum, 1-2 yr ex-bourbon, column-distilled since 1760. 'Rich molasses and ginger snap.' Defining the molasses=3 register. Modest oak/vanilla; not funky.",
+    "profile": {"funk": 0, "sweet": 2, "oak": 1, "vanilla": 1, "molasses": 3, "grassy": 0}},
+
+  "204": {"name": "Denizen Merchant's Reserve 8 Year Rum", "confidence": "high",
+    "reasoning": "Reverse-engineered Mai Tai rum: 8 yr blend of Jamaican pot still (Worthy Park, Hampden — high ester) + Martinique Grande Arome agricole. High funk from the Jamaican component, some grassy from the agricole side.",
+    "profile": {"funk": 3, "sweet": 1, "oak": 2, "vanilla": 2, "molasses": 1, "grassy": 1}},
+
+  "610": {"name": "Doctor Bird Private Barrel Cask Strength Madeira Finish Rum", "confidence": "high",
+    "reasoning": "B&B exclusive: Worthy Park unaged high-ester + aged medium-ester pot still rums, Madeira-cask finished, 59.5% ABV cask strength. Tasting: tropical fruit + Jamaican funk + Madeira-driven dried fruit/caramel/nuts. Max funk; Madeira adds sweet+vanilla.",
+    "profile": {"funk": 3, "sweet": 2, "oak": 2, "vanilla": 2, "molasses": 1, "grassy": 0}},
+
+  "557": {"name": "El Dorado 15 Year Old Rum", "confidence": "high",
+    "reasoning": "Guyanese Demerara, min 15 yr. Blend from EHP Wooden Coffey, Metal Coffey, Port Mourant Double Wooden Pot Still, Versailles Single Wooden Pot Still. Nose: dark coffee, candied orange, almonds, dark chocolate, pepper, vanilla. Notoriously heavily added-sugar (sweet=3); long aging + dark Demerara character → max oak + vanilla.",
+    "profile": {"funk": 1, "sweet": 3, "oak": 3, "vanilla": 3, "molasses": 2, "grassy": 0}},
+
+  "591": {"name": "Kuleana Agricole Rum", "confidence": "high",
+    "reasoning": "Hawaiian fresh-cane-juice agricole-style. Producer notes: 'Grassy, vegetal, funky character distinct from Jamaican or Guyanese rums. Fills the agricole style gap.' Slight funk from fermentation but not Jamaican-style; unaged/lightly aged so low oak/vanilla.",
+    "profile": {"funk": 1, "sweet": 1, "oak": 0, "vanilla": 0, "molasses": 0, "grassy": 3}},
+
+  "205": {"name": "Roaming Road Thailand 11 Year Rum", "confidence": "medium",
+    "reasoning": "Thai column-still single-cask, 11 yr, 100% molasses, 59.5% ABV cask strength. <190 bottles. Limited info on tasting notes; scored from build: column-still = less funk, long aging = high oak/vanilla, molasses base = moderate molasses register.",
+    "profile": {"funk": 1, "sweet": 1, "oak": 3, "vanilla": 2, "molasses": 2, "grassy": 0}},
+
+  "206": {"name": "Smith & Cross Traditional Jamaica Rum", "confidence": "high",
+    "reasoning": "Traditional Jamaican pot still, Navy Strength (57%), Wedderburn + Plummer distillates (the two highest-ester categories in the Jamaican classification system). No added sugar, no chill filtration. The benchmark for funk=3 + sweet=0. Heavy pot-still register pushes molasses up.",
+    "profile": {"funk": 3, "sweet": 0, "oak": 1, "vanilla": 1, "molasses": 2, "grassy": 0}},
+
+  "615": {"name": "Saint Benevolence Clairin", "confidence": "high",
+    "reasoning": "Haitian clairin (artisanal cane juice spirit) at 50% ABV. Field blend of indigenous cane clones, wild-yeast fermented 5-7 days. Wild fermentation adds funky/rustic character distinct from agricole; pure cane juice = high grassy, no molasses. Unaged so no oak/vanilla.",
+    "profile": {"funk": 2, "sweet": 0, "oak": 0, "vanilla": 0, "molasses": 0, "grassy": 3}}
+}
