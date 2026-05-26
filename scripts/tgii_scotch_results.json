@@ -1,0 +1,212 @@
+[
+  {
+    "ba_id": 215,
+    "ba_name": "Ardbeg Heavy Vapours Scotch",
+    "ba_path": "363/370/372/472/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "smoke": 3,
+      "sweet": 0,
+      "oak": 2,
+      "vanilla": 1,
+      "fruit": 1,
+      "body": 3
+    },
+    "confidence": "high",
+    "reasoning": "2023 Feis Ile release, 46% ABV. First Ardbeg distilled without the purifier = heavier oils and phenols. Tasting: intense peat, charcoal, licorice. Ardbeg is already the smoky end of Islay; no-purifier intensifies it. Heavy oily body."
+  },
+  {
+    "ba_id": 348,
+    "ba_name": "Blended Scotch",
+    "ba_path": "363/370/372/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "unofficial",
+    "source": "manual_override"
+  },
+  {
+    "ba_id": 637,
+    "ba_name": "Compass Box Br\u00fbl\u00e9e Royale Blended Malt Scotch Whisky",
+    "ba_path": "363/370/372/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "smoke": 1,
+      "sweet": 3,
+      "oak": 2,
+      "vanilla": 3,
+      "fruit": 2,
+      "body": 2
+    },
+    "confidence": "high",
+    "reasoning": "Limited-edition cr\u00e8me br\u00fbl\u00e9e-themed blended malt. Primarily Clynelish (Highlands) + Benrinnes (Speyside) + Speyburn, with ~0.5% Ardbeg as a 'kiss' of smoke evoking torched sugar. 49% ABV. Sweet/vanilla heavy by design."
+  },
+  {
+    "ba_id": 373,
+    "ba_name": "Islay Scotch",
+    "ba_path": "363/370/372/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "smoke": 3,
+      "sweet": 0,
+      "oak": 2,
+      "vanilla": 1,
+      "fruit": 1,
+      "body": 2
+    },
+    "confidence": "medium",
+    "reasoning": "Archetype placeholder \u2014 'peated single malt from Islay, Scotland.' Scored as the generic Islay style: heavy smoke, dry, modest oak/fruit. 43% ABV."
+  },
+  {
+    "ba_id": 351,
+    "ba_name": "Islay single malt Scotch",
+    "ba_path": "363/370/372/373/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "unofficial",
+    "source": "manual_override"
+  },
+  {
+    "ba_id": 216,
+    "ba_name": "Lagavulin 11 Year Caribbean Rum Cask Finish Offerman Edition",
+    "ba_path": "363/370/372/472/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "smoke": 3,
+      "sweet": 2,
+      "oak": 2,
+      "vanilla": 2,
+      "fruit": 2,
+      "body": 2
+    },
+    "confidence": "high",
+    "reasoning": "Nick Offerman Edition #4. 11 yrs bourbon/sherry casks + 8mo Caribbean rum cask finish, 46% ABV. Lagavulin's heavy peat softened by sweet molasses from rum finish."
+  },
+  {
+    "ba_id": 217,
+    "ba_name": "Lagavulin Offerman Edition 11 Years (2019)",
+    "ba_path": "363/370/372/472/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "smoke": 3,
+      "sweet": 1,
+      "oak": 2,
+      "vanilla": 2,
+      "fruit": 2,
+      "body": 2
+    },
+    "confidence": "high",
+    "reasoning": "First Offerman edition (2019). 11-yr Islay single malt. Peaty character with dried fruit notes. No special cask finish, so drier than the 2023 rum-finished version."
+  },
+  {
+    "ba_id": 218,
+    "ba_name": "Oban 14 Single Malt Scotch Whisky",
+    "ba_path": "363/370/372/473/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "smoke": 1,
+      "sweet": 2,
+      "oak": 2,
+      "vanilla": 2,
+      "fruit": 3,
+      "body": 2
+    },
+    "confidence": "high",
+    "reasoning": "14-yr Highland Coastal single malt, 43% ABV. 'Gateway to the Isles' \u2014 coastal/briny character without heavy peat. Tasting: dried figs, honey, maritime salt. Low smoke (Highlands, not Islay), high fruit (dried figs)."
+  },
+  {
+    "ba_id": 472,
+    "ba_name": "Peated Single Malt Scotch",
+    "ba_path": "363/370/372/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "smoke": 3,
+      "sweet": 1,
+      "oak": 2,
+      "vanilla": 1,
+      "fruit": 1,
+      "body": 2
+    },
+    "confidence": "medium",
+    "reasoning": "Archetype placeholder \u2014 'rule: smoke is dominant and unmistakable.' Scored as the generic peated-SM style: heavy smoke, modest everything else."
+  },
+  {
+    "ba_id": 473,
+    "ba_name": "Unpeated Single Malt Scotch",
+    "ba_path": "363/370/372/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "smoke": 0,
+      "sweet": 2,
+      "oak": 2,
+      "vanilla": 2,
+      "fruit": 2,
+      "body": 2
+    },
+    "confidence": "medium",
+    "reasoning": "Archetype placeholder \u2014 'rule: malt, fruit, and oak without dominant smoke.' Scored as the generic Speyside/Highland-ish unpeated style."
+  }
+]

@@ -1,0 +1,59 @@
+{
+  "_README": "LLM-derived 0–3 axis scores for ryes (axes: spice, sweet, oak, vanilla, fruit, body). Same axis set as bourbon. Re-score after tasting.",
+
+  "589": {
+    "name": "Corbin Cash Single Barrel Merced Rye 7 Year",
+    "confidence": "high",
+    "reasoning": "100% Merced Rye (California heirloom), 7 yrs single barrel, 65% ABV cask strength. Tasting notes: intense rye spice, peppermint, herbal, dark cherry, baking spices. 100% rye + max age + max proof = peak rye intensity.",
+    "profile": {"spice": 3, "sweet": 1, "oak": 3, "vanilla": 2, "fruit": 3, "body": 3}
+  },
+
+  "577": {
+    "name": "Freeland Spirits Rye Whiskey",
+    "confidence": "low",
+    "reasoning": "75/20/5 organic rye/Purple Karma Barley/Buckwheat. 100 proof. No age or tasting notes available — scored from mash construction alone. 75% rye is on the higher side, no corn so dry. Re-score after tasting.",
+    "profile": {"spice": 2, "sweet": 1, "oak": 1, "vanilla": 1, "fruit": 1, "body": 2}
+  },
+
+  "643": {
+    "name": "Hautes Glaces Vulson Rye Eau de Vie",
+    "confidence": "high",
+    "reasoning": "French Alpine RYE EAU-DE-VIE (not whiskey!) from native mountain rye, cellared but essentially unaged. Tasting: petrichor, hazelnut, licorice nose; rye bread, roasted-agave, gentian palate — 'blind-tastes mezcal-like.' Unaged means near-zero oak/vanilla; the herbal/savory eau-de-vie character means it's a poor substitute for classic rye whiskey in cocktails. Score is honest to the spirit; recipes calling for rye whiskey should not pick this.",
+    "profile": {"spice": 2, "sweet": 0, "oak": 1, "vanilla": 0, "fruit": 2, "body": 1}
+  },
+
+  "626": {
+    "name": "Heaven Hill Grain to Glass Kentucky Straight Rye Whiskey",
+    "confidence": "medium",
+    "reasoning": "63/24/13 rye/corn/malt — spicier end of Kentucky rye. ~6-7 yrs, 61.6% ABV cask strength. No specific tasting notes available, but the mashbill + age + proof profile points to a classic high-rye Kentucky whiskey.",
+    "profile": {"spice": 3, "sweet": 2, "oak": 2, "vanilla": 2, "fruit": 2, "body": 3}
+  },
+
+  "552": {
+    "name": "Mountain Summit Toasted Rye Whiskey",
+    "confidence": "high",
+    "reasoning": "95/5 rye/malted barley, 5 yrs, DOUBLE-oaked (charred new oak then re-barreled in toasted/charred). Tasting: toasted marshmallow, vanilla, butterscotch, minty rye spice. Double-oak treatment pushes oak and vanilla to max.",
+    "profile": {"spice": 3, "sweet": 2, "oak": 3, "vanilla": 3, "fruit": 1, "body": 2}
+  },
+
+  "619": {
+    "name": "Savage & Cooke Cask Finished Rye Whiskey",
+    "confidence": "high",
+    "reasoning": "51/45/4 rye/corn/barley (mid-rye), 3+ yrs #3 char oak, Grenache wine barrel finish. 50% ABV. Grenache finish adds wine fruit; high corn moderates the rye intensity.",
+    "profile": {"spice": 2, "sweet": 2, "oak": 2, "vanilla": 2, "fruit": 3, "body": 2}
+  },
+
+  "632": {
+    "name": "StilL 630 RallyPoint Straight Rye Whiskey",
+    "confidence": "medium",
+    "reasoning": "90/10 rye/malted barley, char #3 new oak, multi-year aged. Award-winning Missouri straight rye (ACSA Best in Class 2018). 45% ABV. Mashbill drives high spice; no corn = dry; no specific tasting notes available.",
+    "profile": {"spice": 3, "sweet": 1, "oak": 2, "vanilla": 2, "fruit": 1, "body": 2}
+  },
+
+  "507": {
+    "name": "Still Austin Cask Strength Straight Rye Whiskey",
+    "confidence": "high",
+    "reasoning": "100% Texas rye, 58% ABV cask strength, 3+ yrs. Tasting: cherry cobbler, buttery cinnamon nose. Texas climate extracts vanilla aggressively; 100% rye + cask strength = max spice and body; cherry note = high fruit.",
+    "profile": {"spice": 3, "sweet": 1, "oak": 2, "vanilla": 2, "fruit": 3, "body": 3}
+  }
+}

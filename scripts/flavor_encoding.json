@@ -38,6 +38,45 @@
       ]
     },
     {
+      "cocktail_id": 42,
+      "slots": [
+        {
+          "sort": 2,
+          "category": "bourbon",
+          "tolerance": "style",
+          "also_accept_categories": [
+            "rye"
+          ],
+          "constraints": [
+            {
+              "axis": "oak",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "vanilla",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "cocktail_id": 43,
       "slots": [
         {
@@ -178,6 +217,41 @@
       ]
     },
     {
+      "cocktail_id": 58,
+      "slots": [
+        {
+          "sort": 5,
+          "category": "bourbon",
+          "tolerance": "style",
+          "also_accept_categories": [
+            "rye"
+          ],
+          "constraints": [
+            {
+              "axis": "body",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
       "cocktail_id": 59,
       "slots": [
         {
@@ -239,6 +313,50 @@
               "kind": "band",
               "lo": 2,
               "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 69,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "scotch",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "oak",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "smoke",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 5,
+          "category": "scotch",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "smoke",
+              "kind": "band",
+              "lo": 3,
+              "hi": 3,
+              "out_weight": 1.5
             }
           ]
         }
@@ -431,6 +549,42 @@
       ]
     },
     {
+      "cocktail_id": 124,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "rye",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "oak",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "vanilla",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "cocktail_id": 135,
       "slots": [
         {
@@ -449,6 +603,38 @@
               "kind": "band",
               "lo": 2,
               "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 150,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "rye",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "body",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "spice",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3,
+              "out_weight": 1.5,
+              "hard": true
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
             }
           ]
         }
@@ -598,6 +784,36 @@
       ]
     },
     {
+      "cocktail_id": 280,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "scotch",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "body",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "smoke",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "cocktail_id": 311,
       "slots": [
         {
@@ -633,6 +849,36 @@
               "axis": "juniper",
               "kind": "band",
               "lo": 2,
+              "hi": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cocktail_id": 318,
+      "slots": [
+        {
+          "sort": 1,
+          "category": "scotch",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "fruit",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "smoke",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
               "hi": 3
             }
           ]
