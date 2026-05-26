@@ -1,0 +1,31 @@
+{
+  "_README": "LLM-derived 0–3 axis scores for American Single Malt whiskeys. Same axes as scotch (smoke, sweet, oak, vanilla, fruit, body) because smoke is still the defining dimension — though it's BBQ-wood or peated-finish smoke rather than Islay peat. Useful as scotch substitutes in smoke-forward applications.",
+
+  "506": {
+    "name": "Andalusia Stryker Texas Smoked Single Malt Whiskey",
+    "confidence": "high",
+    "reasoning": "Texas grain-to-glass single malt where the malted barley is smoked with oak, mesquite, and apple woods (Texas BBQ tradition, NOT peat). Aged in charred American oak. 50% ABV. Nose: caramel + BBQ smoke. Heavy smoke from the BBQ-wood treatment maps to smoke=3; charred new oak adds vanilla.",
+    "profile": {"smoke": 3, "sweet": 2, "oak": 2, "vanilla": 2, "fruit": 1, "body": 2}
+  },
+
+  "133": {
+    "name": "Bear Fight Small Batch",
+    "confidence": "medium",
+    "reasoning": "100% malted barley, aged in bourbon casks then finished in sherry + peated casks. 45% ABV. The peated finish adds smoke but only partially — full-strength peated maturation would be higher. Sherry adds fruit/sweet.",
+    "profile": {"smoke": 2, "sweet": 2, "oak": 2, "vanilla": 2, "fruit": 2, "body": 1}
+  },
+
+  "614": {
+    "name": "Wolves 5 Year American Single Malt Whiskey",
+    "confidence": "high",
+    "reasoning": "Aged 5 yrs in California wine barrels under Arizona heat (intense extraction) + Cognac cask finish. 48% ABV. Explicit tasting: honey, graham cracker, vanilla custard, nutmeg, clove, sweet oats, fig, ripe red fruit. No peat or smoke. The wine + cognac drive sweet/vanilla/fruit all to max.",
+    "profile": {"smoke": 0, "sweet": 3, "oak": 2, "vanilla": 3, "fruit": 3, "body": 2}
+  },
+
+  "247": {
+    "name": "Griffo x Lagunitas Still Waldos Single Malt Whiskey",
+    "confidence": "medium",
+    "reasoning": "Hop-influenced single malt — distilled from Lagunitas Waldos beer mash with hops. 5 yrs American oak. 42% ABV. Cherry-picked into ASM via extra_bottle_ids since BA path puts it under Hop-Influenced Whiskey (363/370/470/) alongside the unrelated Seven Stills experimentals. The hop character adds floral/citrus/herbal bitterness that the axes don't fully capture — like Crab Trapper, this is a quirky bottle that might rank in-pattern without conveying its actual weirdness.",
+    "profile": {"smoke": 0, "sweet": 1, "oak": 2, "vanilla": 2, "fruit": 2, "body": 1}
+  }
+}

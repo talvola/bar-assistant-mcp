@@ -1,0 +1,94 @@
+[
+  {
+    "ba_id": 506,
+    "ba_name": "Andalusia Stryker Texas Smoked Single Malt Whiskey",
+    "ba_path": "363/370/431/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "smoke": 3,
+      "sweet": 2,
+      "oak": 2,
+      "vanilla": 2,
+      "fruit": 1,
+      "body": 2
+    },
+    "confidence": "high",
+    "reasoning": "Texas grain-to-glass single malt where the malted barley is smoked with oak, mesquite, and apple woods (Texas BBQ tradition, NOT peat). Aged in charred American oak. 50% ABV. Nose: caramel + BBQ smoke. Heavy smoke from the BBQ-wood treatment maps to smoke=3; charred new oak adds vanilla."
+  },
+  {
+    "ba_id": 133,
+    "ba_name": "Bear Fight Small Batch",
+    "ba_path": "363/370/431/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "smoke": 2,
+      "sweet": 2,
+      "oak": 2,
+      "vanilla": 2,
+      "fruit": 2,
+      "body": 1
+    },
+    "confidence": "medium",
+    "reasoning": "100% malted barley, aged in bourbon casks then finished in sherry + peated casks. 45% ABV. The peated finish adds smoke but only partially \u2014 full-strength peated maturation would be higher. Sherry adds fruit/sweet."
+  },
+  {
+    "ba_id": 247,
+    "ba_name": "Griffo x Lagunitas Still Waldos Single Malt Whiskey",
+    "ba_path": "363/370/470/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "smoke": 0,
+      "sweet": 1,
+      "oak": 2,
+      "vanilla": 2,
+      "fruit": 2,
+      "body": 1
+    },
+    "confidence": "medium",
+    "reasoning": "Hop-influenced single malt \u2014 distilled from Lagunitas Waldos beer mash with hops. 5 yrs American oak. 42% ABV. Cherry-picked into ASM via extra_bottle_ids since BA path puts it under Hop-Influenced Whiskey (363/370/470/) alongside the unrelated Seven Stills experimentals. The hop character adds floral/citrus/herbal bitterness that the axes don't fully capture \u2014 like Crab Trapper, this is a quirky bottle that might rank in-pattern without conveying its actual weirdness."
+  },
+  {
+    "ba_id": 614,
+    "ba_name": "Wolves 5 Year American Single Malt Whiskey",
+    "ba_path": "363/370/431/",
+    "candidates": [
+      {
+        "score": 0.0,
+        "slug": ""
+      }
+    ],
+    "status": "matched",
+    "source": "llm_from_description",
+    "profile": {
+      "smoke": 0,
+      "sweet": 3,
+      "oak": 2,
+      "vanilla": 3,
+      "fruit": 3,
+      "body": 2
+    },
+    "confidence": "high",
+    "reasoning": "Aged 5 yrs in California wine barrels under Arizona heat (intense extraction) + Cognac cask finish. 48% ABV. Explicit tasting: honey, graham cracker, vanilla custard, nutmeg, clove, sweet oats, fig, ripe red fruit. No peat or smoke. The wine + cognac drive sweet/vanilla/fruit all to max."
+  }
+]

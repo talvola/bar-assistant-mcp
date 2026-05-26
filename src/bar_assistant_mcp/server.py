@@ -756,6 +756,8 @@ def _ensure_ingredient_meta(ingredient_id: int) -> tuple[str, str, float | None]
         category = "rye"
     elif path.startswith("363/370/372"):
         category = "scotch"
+    elif path.startswith("363/370/431"):
+        category = "american_single_malt"
     proof = (ing.get("strength") * 2) if ing.get("strength") else None
     with fdb.connect() as conn:
         fdb.upsert_ingredient_meta(conn, ingredient_id, name=name, category=category, proof=proof)

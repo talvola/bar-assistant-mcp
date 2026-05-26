@@ -27,6 +27,8 @@ DEFAULT_AXES = {
     "rye": ["spice", "sweet", "oak", "vanilla", "fruit", "body"],
     # Scotch swaps `spice` for `smoke` — peat is the defining axis.
     "scotch": ["smoke", "sweet", "oak", "vanilla", "fruit", "body"],
+    # American Single Malt shares scotch's axes (smoke is also the defining dim).
+    "american_single_malt": ["smoke", "sweet", "oak", "vanilla", "fruit", "body"],
 }
 
 

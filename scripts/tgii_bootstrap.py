@@ -152,6 +152,22 @@ CATEGORIES = {
         "category_word_re": re.compile(r"\b(scotch|whisky|whiskey|malt)\b"),
         "axes": ("smoke", "sweet", "oak", "vanilla", "fruit", "body"),
     },
+    # American Single Malt — distinct enough from scotch to be its own category
+    # (heavier new-oak, often smoked rather than peated). Shares scotch's axes
+    # since smoke is still the defining dimension. Used as scotch substitute in
+    # smoke-forward applications (Penicillin float, Godfather, etc.).
+    "american_single_malt": {
+        "ba_ancestor_path": "363/370/431/",
+        # `extra_bottle_ids` pulls in bottles whose materialized_path is outside
+        # the main ancestor — Griffo Waldos (id=247) is a hop-influenced single
+        # malt sitting at 363/370/470/ alongside the unrelated Seven Stills
+        # experimentals, so we cherry-pick it.
+        "extra_bottle_ids": (247,),
+        "min_path_depth": 3,
+        "skip_tgii": True,
+        "category_word_re": re.compile(r"\b(single|malt|american|whiskey|whisky)\b"),
+        "axes": ("smoke", "sweet", "oak", "vanilla", "fruit", "body"),
+    },
 }
 
 
@@ -229,23 +245,39 @@ def fuzzy_match(name, slugs, per_slug, idf, cfg, top_n=TOP_N):
 def list_shelf_bottles(api, cfg):
     """Shelf entries whose path starts with the category ancestor AND are at
     least cfg['min_path_depth'] deep (excludes subtype placeholders for
-    categories like gin that model styles)."""
+    categories like gin that model styles).
+
+    cfg['extra_bottle_ids'] additionally pulls in specific BA ingredients by
+    id — escape hatch for bottles that belong in the category but whose
+    materialized_path lives elsewhere (e.g. Griffo Waldos under Hop-Influenced
+    Whiskey rather than American Single Malt).
+    """
     bottles, page = [], 1
     ancestor = cfg["ba_ancestor_path"].strip("/")
     min_depth = cfg["min_path_depth"]
+    extra = set(cfg.get("extra_bottle_ids") or ())
+    seen_ids = set()
     while True:
         resp = api.list_ingredients(filter_on_shelf=True, limit=200, page=page)
         for ing in resp.get("data", []):
             path = (ing.get("materialized_path") or "").strip("/")
-            if not path.startswith(ancestor):
-                continue
-            if len(path.split("/")) < min_depth:
-                continue
-            bottles.append(ing)
+            path_match = path.startswith(ancestor) and len(path.split("/")) >= min_depth
+            if path_match or ing["id"] in extra:
+                bottles.append(ing)
+                seen_ids.add(ing["id"])
         meta = resp.get("meta", {})
         if page >= meta.get("last_page", 1):
             break
         page += 1
+    # Fetch any extras not encountered above (they may not be on shelf right now
+    # but the category still owns them; skip silently if BA returns 404).
+    for iid in extra - seen_ids:
+        try:
+            ing = api.get_ingredient(iid).get("data")
+            if ing:
+                bottles.append(ing)
+        except Exception:
+            pass
     return bottles
 
 

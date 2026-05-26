@@ -325,6 +325,9 @@
           "sort": 1,
           "category": "scotch",
           "tolerance": "style",
+          "also_accept_categories": [
+            "american_single_malt"
+          ],
           "constraints": [
             {
               "axis": "oak",
@@ -350,6 +353,9 @@
           "sort": 5,
           "category": "scotch",
           "tolerance": "style",
+          "also_accept_categories": [
+            "american_single_malt"
+          ],
           "constraints": [
             {
               "axis": "smoke",
@@ -790,6 +796,9 @@
           "sort": 1,
           "category": "scotch",
           "tolerance": "style",
+          "also_accept_categories": [
+            "american_single_malt"
+          ],
           "constraints": [
             {
               "axis": "body",
@@ -862,6 +871,9 @@
           "sort": 1,
           "category": "scotch",
           "tolerance": "style",
+          "also_accept_categories": [
+            "american_single_malt"
+          ],
           "constraints": [
             {
               "axis": "fruit",
