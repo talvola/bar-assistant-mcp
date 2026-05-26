@@ -1,0 +1,153 @@
+{
+  "_README": "LLM-derived 0–3 axis scores for amari (axes: bitter, sweet, citrus, herbal, dark, mint, root). Bitter is the defining axis; sweet opposes; the rest distinguish families (Fernet = mint, Cynar = root, Averna = dark, Aperol/Campari = citrus, Suze = bitter+root). Classics scored from canonical knowledge; artisanals scored from BA descriptions + producer notes. Smoky amari (Sfumato, Zucca) map smoke to 'dark'. Re-score after personal tasting.",
+
+  "_design_notes": "The 'root' axis captures earthy/vegetal/rhizome character (gentian, rhubarb, walnut, artichoke, chinotto). The 'dark' axis captures coffee/chocolate/molasses/cola/smoke — burnt or brown registers. They're independent: Cynar is root-high dark-low; Averna is dark-high root-low; Sfumato is both.",
+
+  "341": {"name": "Aperol", "confidence": "high",
+    "reasoning": "Canonical Italian aperitivo. Bittersweet orange, low bitter intensity, gentle herbal. Highest sweet+citrus, lowest bitter of the aperitivo family.",
+    "profile": {"bitter": 1, "sweet": 3, "citrus": 3, "herbal": 1, "dark": 0, "mint": 0, "root": 1}},
+
+  "174": {"name": "Campari", "confidence": "high",
+    "reasoning": "Iconic Italian aperitivo. Bitter orange + chinotto + cinchona. Mid-bitter, sweetened to balance. Defines the bittersweet-aperitivo family.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 2, "herbal": 1, "dark": 0, "mint": 0, "root": 2}},
+
+  "131": {"name": "Fernet-Branca", "confidence": "high",
+    "reasoning": "Canonical Italian fernet. Maximum bitter, zero sweet, dominant menthol/peppermint. The Fernet family archetype: bitter + mint + dry.",
+    "profile": {"bitter": 3, "sweet": 0, "citrus": 0, "herbal": 2, "dark": 0, "mint": 3, "root": 2}},
+
+  "249": {"name": "Fernet Paesani", "confidence": "high",
+    "reasoning": "Italian fernet, lower-sugar than typical amari but slightly less aggressive than Fernet-Branca. Same family character; menthol present but less peppermint-piercing.",
+    "profile": {"bitter": 3, "sweet": 0, "citrus": 0, "herbal": 2, "dark": 0, "mint": 2, "root": 2}},
+
+  "592": {"name": "Fred Jerbis Fernet 25 Chestnut Barrel", "confidence": "high",
+    "reasoning": "Friuli small-producer fernet: 25 botanicals (saffron, licorice, mint, myrrh, chamomile, pine, rhubarb, gentian), chestnut-barrel aged 40-60 days. Producer notes describe it as 'drier, lighter, more floral than Fernet-Branca' — so less aggressive bitter/mint, more herbal-floral character.",
+    "profile": {"bitter": 2, "sweet": 1, "citrus": 0, "herbal": 3, "dark": 0, "mint": 2, "root": 2}},
+
+  "130": {"name": "Cynar Ricetta Originale", "confidence": "high",
+    "reasoning": "Carciofo (artichoke) amaro. Vegetal/earthy root character is defining. Moderate bitter, modest sweet, dark notes from caramelization.",
+    "profile": {"bitter": 2, "sweet": 1, "citrus": 0, "herbal": 2, "dark": 1, "mint": 0, "root": 3}},
+
+  "509": {"name": "Cynar 70", "confidence": "high",
+    "reasoning": "Higher-proof (70 proof / 35% ABV) version of Cynar Ricetta — same recipe and character, just more concentrated. Body axis isn't in the amaro set but the profile vector is unchanged.",
+    "profile": {"bitter": 2, "sweet": 1, "citrus": 0, "herbal": 2, "dark": 1, "mint": 0, "root": 3}},
+
+  "190": {"name": "Amaro Averna", "confidence": "high",
+    "reasoning": "Sicilian dark Italian digestivo. Cola/molasses/citrus peel. Defines the dark/cola family. Mid-bitter, mid-sweet, max dark.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 1, "herbal": 1, "dark": 3, "mint": 0, "root": 1}},
+
+  "127": {"name": "Amaro Montenegro", "confidence": "high",
+    "reasoning": "Sweet/floral Italian digestivo. Orange + vanilla + violet + herbal complexity. Lowest bitter, highest sweet of the classical digestivi.",
+    "profile": {"bitter": 1, "sweet": 3, "citrus": 2, "herbal": 2, "dark": 1, "mint": 0, "root": 1}},
+
+  "128": {"name": "Amaro Nonino Quintessentia", "confidence": "high",
+    "reasoning": "Friulian alpine amaro on a grappa base (gives it distinctive lighter, drier body). Mountain herbs dominate; lower sweet than Italian classics.",
+    "profile": {"bitter": 2, "sweet": 1, "citrus": 1, "herbal": 3, "dark": 0, "mint": 0, "root": 2}},
+
+  "529": {"name": "Amaro Ramazzotti", "confidence": "high",
+    "reasoning": "Dark Italian digestivo (Milan). Earthier and more herbal than Averna; still dark/sweet-forward. Anise notes give it slight registered complexity.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 1, "herbal": 2, "dark": 3, "mint": 0, "root": 1}},
+
+  "537": {"name": "Amaro Meletti", "confidence": "high",
+    "reasoning": "Marche-region amaro with saffron and chocolate notes. Floral-forward dark Italian, lighter than Averna. Distinctive anise/saffron register.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 1, "herbal": 1, "dark": 3, "mint": 0, "root": 1}},
+
+  "486": {"name": "Amaro Braulio", "confidence": "high",
+    "reasoning": "Valtellina alpine amaro. Mountain herbs (yarrow, gentian, juniper berries), wood-aged. Drier than Nonino; subtle mint from alpine herbs.",
+    "profile": {"bitter": 2, "sweet": 1, "citrus": 0, "herbal": 3, "dark": 0, "mint": 1, "root": 2}},
+
+  "609": {"name": "Amaro CioCiaro", "confidence": "high",
+    "reasoning": "Bitter-orange-forward Italian amaro. Canonical Amer Picon substitute (Brooklyn, Pausa's Bastardo). Drier than Averna with pronounced citrus + gentian.",
+    "profile": {"bitter": 2, "sweet": 1, "citrus": 3, "herbal": 1, "dark": 1, "mint": 0, "root": 2}},
+
+  "523": {"name": "Amaro Abano", "confidence": "medium",
+    "reasoning": "Veneto amaro, medium-bodied with herbal and slightly minty notes. Used in Mott and Mulberry. Mid-bitter, modest sweet, herbal-forward with a touch of mint.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 1, "herbal": 2, "dark": 1, "mint": 1, "root": 1}},
+
+  "187": {"name": "Suze Saveur d'Autrefois", "confidence": "high",
+    "reasoning": "French pure-gentian aperitif. Maximum bitter, maximum root (gentian IS the root axis), low sweet. The benchmark for gentian-forward bitter.",
+    "profile": {"bitter": 3, "sweet": 1, "citrus": 0, "herbal": 1, "dark": 0, "mint": 0, "root": 3}},
+
+  "543": {"name": "Bonal Gentiane-Quina", "confidence": "high",
+    "reasoning": "French quinquina-style aperitif: wine base + gentian + cinchona. Lighter and sweeter than Suze; structurally closer to a sweet vermouth than a spirit-based amaro.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 0, "herbal": 1, "dark": 0, "mint": 0, "root": 3}},
+
+  "170": {"name": "Becherovka Original", "confidence": "high",
+    "reasoning": "Czech herbal liqueur (1807). Anise + cinnamon-forward, sweet, low bitter. Herbal character with subtle mint. Distinctive among amari for its baking-spice profile.",
+    "profile": {"bitter": 1, "sweet": 3, "citrus": 0, "herbal": 3, "dark": 0, "mint": 1, "root": 1}},
+
+  "604": {"name": "Cappelletti Pasubio Vino Amaro", "confidence": "high",
+    "reasoning": "Dolomite wine-based amaro (17% ABV — structurally closer to vermouth). Wild blueberries (mirtilli) smoked over pine, plus alpine herbs. Distinctive smoke-fruit profile.",
+    "profile": {"bitter": 1, "sweet": 3, "citrus": 0, "herbal": 3, "dark": 1, "mint": 0, "root": 1}},
+
+  "612": {"name": "Cappelletti Sfumato Rabarbaro", "confidence": "high",
+    "reasoning": "Smoky rhubarb amaro. Defining note is smoke-over-rhubarb (rhubarb root dried via smoking process). Roasted/tea-like/tarry/earthy/vegetal. Smoke character maps to 'dark' axis here; rhubarb root pushes 'root' to max.",
+    "profile": {"bitter": 2, "sweet": 1, "citrus": 0, "herbal": 1, "dark": 3, "mint": 0, "root": 3}},
+
+  "608": {"name": "Bordiga Centum Herbis", "confidence": "high",
+    "reasoning": "Piedmontese amaro with 100 botanicals. Alpine tradition; layered, complex herbal profile. Terroir-driven mountain character.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 1, "herbal": 3, "dark": 0, "mint": 1, "root": 2}},
+
+  "487": {"name": "Brucato Amaro Chaparral", "confidence": "high",
+    "reasoning": "California amaro with Sierra Nevada wild botanicals: sagebrush, yerba santa, manzanita. Distinctly Western herbal — pine + sage character.",
+    "profile": {"bitter": 2, "sweet": 1, "citrus": 1, "herbal": 3, "dark": 0, "mint": 0, "root": 2}},
+
+  "129": {"name": "Brucato Orchards", "confidence": "high",
+    "reasoning": "Arizona-style amaro: apricot, walnut, Meyer lemon, orange, cinnamon. Fruit-forward and citrus-bright; walnut adds root/earthy bridge. Low bitter, high sweet.",
+    "profile": {"bitter": 1, "sweet": 3, "citrus": 3, "herbal": 1, "dark": 1, "mint": 0, "root": 2}},
+
+  "248": {"name": "Faccia Brutto Amaro Gorini", "confidence": "medium",
+    "reasoning": "Brooklyn solera-aged amaro: 13 botanicals, whiskey-barrel aged. 40% ABV is on the higher side. Without specific tasting notes, scored as classic Italian-style with mild dark register from barrel aging.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 1, "herbal": 2, "dark": 2, "mint": 0, "root": 2}},
+
+  "558": {"name": "Forthave Marseille Amaro", "confidence": "high",
+    "reasoning": "Brooklyn small-batch amaro (medieval-recipe inspired). Eucalyptus + cinnamon + rhubarb + honey. Sweet-honeyed with cooling herbal character; subtle mint from eucalyptus.",
+    "profile": {"bitter": 1, "sweet": 2, "citrus": 0, "herbal": 2, "dark": 0, "mint": 1, "root": 2}},
+
+  "175": {"name": "Greenbar Grand Poppy California Amaro", "confidence": "high",
+    "reasoning": "Organic CA amaro: California poppy, grapefruit, bay leaf, gentian, artichoke. Citrus-forward bitter with the artichoke giving it a root anchor.",
+    "profile": {"bitter": 2, "sweet": 1, "citrus": 3, "herbal": 2, "dark": 0, "mint": 0, "root": 2}},
+
+  "618": {"name": "Mödr Amaro", "confidence": "high",
+    "reasoning": "Utah modern amaro — Wasatch Mountains botanicals. 'Balances herbal complexity, gentle bitterness, refined sweetness.' Oatmeal cookie + earthy botanicals — moderate on most axes.",
+    "profile": {"bitter": 1, "sweet": 2, "citrus": 1, "herbal": 2, "dark": 1, "mint": 0, "root": 2}},
+
+  "505": {"name": "Revolution Spirits Amico Amaro", "confidence": "high",
+    "reasoning": "Texas amaro made 'in the style of Campari or Aperol' — 12 botanicals including hibiscus, sumac, charred cedar, orange peel, gentian, cinchona. Aperitivo-style profile with American botanical twist.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 2, "herbal": 1, "dark": 0, "mint": 0, "root": 2}},
+
+  "185": {"name": "Riga Black Balsam", "confidence": "high",
+    "reasoning": "Traditional Latvian bitters (1752). 24 ingredients, 30-day oak aging, 45% ABV — high-intensity. Herbal-forward with dark/earthy register; subtle mint cooling.",
+    "profile": {"bitter": 3, "sweet": 1, "citrus": 0, "herbal": 3, "dark": 2, "mint": 1, "root": 2}},
+
+  "634": {"name": "See the Elephant Amaro di Rucola", "confidence": "high",
+    "reasoning": "Rucola (arugula) amaro from Cilento Coast. Eggnog + sarsaparilla + earthy/peppery. Distinctive vegetal-herbal profile from the arugula maceration.",
+    "profile": {"bitter": 2, "sweet": 1, "citrus": 0, "herbal": 3, "dark": 1, "mint": 0, "root": 2}},
+
+  "132": {"name": "Suncliffe Cultivaro", "confidence": "high",
+    "reasoning": "Arizona's first local amaro — dates, bitter orange, roasted pecans, ponderosa pine bark, nopales. SW take on Italian; balanced herbal-citrus-root with pecan adding nutty body.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 2, "herbal": 2, "dark": 1, "mint": 0, "root": 2}},
+
+  "635": {"name": "Violet Crown Midnight Marigold Bitter Cordial", "confidence": "high",
+    "reasoning": "Modern Texas bitter cordial: marigold + turmeric + coriander + caraway. Bright floral nose, honey/brown-sugar sweet, bitter gentian backbone. More cordial than classical amaro — sweet-floral dominant.",
+    "profile": {"bitter": 1, "sweet": 3, "citrus": 2, "herbal": 2, "dark": 0, "mint": 0, "root": 2}},
+
+  "538": {"name": "Zucca Rabarbaro", "confidence": "high",
+    "reasoning": "Italian rhubarb-based amaro. Smoky, earthy, bitter. Lighter and more vegetal than most amari. Smoke character maps to 'dark'; rhubarb root → max 'root'.",
+    "profile": {"bitter": 2, "sweet": 1, "citrus": 0, "herbal": 1, "dark": 2, "mint": 0, "root": 3}},
+
+  "596": {"name": "BroVo Amaro #14 by Mike Ryan", "confidence": "high",
+    "reasoning": "Chocolate-forward amaro: Guatemalan chocolate, thyme, cinnamon, sarsaparilla, angelica, vanilla, strong gentian finish. Agave-sweetened. Dark register dominant; gentian gives root bite.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 0, "herbal": 2, "dark": 3, "mint": 0, "root": 2}},
+
+  "598": {"name": "BroVo Amaro Kim by Peter Kim", "confidence": "high",
+    "reasoning": "Chicago regional — bitter-forward (quassia + burdock + gentian) with anar dana, orange peel, milk thistle. Designed for Japanese whiskey / shochu / sake pairing — so dry and bitter, not sweet.",
+    "profile": {"bitter": 3, "sweet": 1, "citrus": 2, "herbal": 2, "dark": 0, "mint": 0, "root": 3}},
+
+  "599": {"name": "BroVo Amaro Macquarrie", "confidence": "high",
+    "reasoning": "Cola-inspired by Miles MacQuarrie of Kimball House (Atlanta tribute). Nutmeg + vanilla + cinnamon + coriander + gentian. Cola flavors cooked into simple syrup. Direct dark-cola family member.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 1, "herbal": 1, "dark": 3, "mint": 0, "root": 2}},
+
+  "597": {"name": "BroVo Amaro Simo Wallace", "confidence": "high",
+    "reasoning": "Pouring Ribbons (NYC) — savory, umami-forward. Gentian + Dijon mustard + stewed orchard fruit + thyme + tarragon + baked apple + clove + damp earth + ginger/galangal. Highly distinctive savory profile; very root/earthy with herbal complexity.",
+    "profile": {"bitter": 2, "sweet": 2, "citrus": 0, "herbal": 2, "dark": 1, "mint": 0, "root": 3}}
+}

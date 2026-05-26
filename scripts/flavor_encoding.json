@@ -107,6 +107,45 @@
               "out_weight": 1.5
             }
           ]
+        },
+        {
+          "sort": 2,
+          "category": "amaro",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "citrus",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "dark",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "mint",
+              "kind": "band",
+              "lo": 0,
+              "hi": 0,
+              "out_weight": 2.0,
+              "hard": true
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -647,6 +686,50 @@
       ]
     },
     {
+      "cocktail_id": 159,
+      "slots": [
+        {
+          "sort": 2,
+          "category": "amaro",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "dark",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "mint",
+              "kind": "band",
+              "lo": 0,
+              "hi": 0,
+              "out_weight": 2.0,
+              "hard": true
+            },
+            {
+              "axis": "root",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
       "cocktail_id": 174,
       "slots": [
         {
@@ -956,6 +1039,45 @@
               "hi": 3
             }
           ]
+        },
+        {
+          "sort": 2,
+          "category": "amaro",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "citrus",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "dark",
+              "kind": "band",
+              "lo": 0,
+              "hi": 1
+            },
+            {
+              "axis": "mint",
+              "kind": "band",
+              "lo": 0,
+              "hi": 0,
+              "out_weight": 2.0,
+              "hard": true
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            }
+          ]
         }
       ]
     },
@@ -1193,6 +1315,37 @@
               "axis": "spice",
               "kind": "band",
               "lo": 0,
+              "hi": 3
+            }
+          ]
+        },
+        {
+          "sort": 3,
+          "category": "amaro",
+          "tolerance": "style",
+          "constraints": [
+            {
+              "axis": "bitter",
+              "kind": "band",
+              "lo": 1,
+              "hi": 3
+            },
+            {
+              "axis": "dark",
+              "kind": "band",
+              "lo": 0,
+              "hi": 2
+            },
+            {
+              "axis": "herbal",
+              "kind": "band",
+              "lo": 2,
+              "hi": 3
+            },
+            {
+              "axis": "sweet",
+              "kind": "band",
+              "lo": 1,
               "hi": 3
             }
           ]

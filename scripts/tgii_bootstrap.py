@@ -168,6 +168,35 @@ CATEGORIES = {
         "category_word_re": re.compile(r"\b(single|malt|american|whiskey|whisky)\b"),
         "axes": ("smoke", "sweet", "oak", "vanilla", "fruit", "body"),
     },
+    # Amaro covers bitter aperitivi (Aperol/Campari) + classical Italian
+    # digestivi (Averna/Montenegro/Nonino) + fernet family + alpine/gentian +
+    # American artisanal (BroVo, Brucato, etc). Most bottles live under
+    # 364/407/ but Aperol/Campari are at 364/414/ (bittersweet aperitivi)
+    # and Suze/Bonal are at 364/409/ (herbal liqueurs) — pulled in by id.
+    # Seven axes capture the family variation: bitter is the defining axis,
+    # opposed by sweet; the rest (citrus/herbal/dark/mint/root) distinguish
+    # families like Fernet (mint+bitter), Cynar (root/vegetal), Averna (dark),
+    # Montenegro (sweet+citrus), Suze (root/gentian).
+    "amaro": {
+        "ba_ancestor_path": "364/407/",
+        "extra_bottle_ids": (
+            174,  # Campari — under 364/414/ (bittersweet aperitivi)
+            341,  # Aperol — under 364/414/
+            187,  # Suze Saveur d'Autrefois — under 364/409/ (Herbal Liqueurs)
+            543,  # Bonal Gentiane-Quina — under 365/435/ (Vermouth-adjacent quina)
+            487,  # Brucato Amaro Chaparral — NULL path
+        ),
+        # BA has both depth-2 brand bottles (Cappelletti Pasubio, BroVo collection,
+        # Mödr, etc. — direct children of the Amaro category) AND depth-3 bottles
+        # (Averna under 'Dark/Cola', Cynar under 'Vegetal', etc.). Use depth=2 to
+        # capture both; subtype placeholders (Citrus Amaro, Vegetal Amaro, etc.)
+        # are filtered downstream by skipping no-ABV / no-description entries
+        # during scoring.
+        "min_path_depth": 2,
+        "skip_tgii": True,
+        "category_word_re": re.compile(r"\b(amaro|amari|fernet|liqueur|aperitif)\b"),
+        "axes": ("bitter", "sweet", "citrus", "herbal", "dark", "mint", "root"),
+    },
 }
 
 

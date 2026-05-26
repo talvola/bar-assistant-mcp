@@ -758,6 +758,13 @@ def _ensure_ingredient_meta(ingredient_id: int) -> tuple[str, str, float | None]
         category = "scotch"
     elif path.startswith("363/370/431"):
         category = "american_single_malt"
+    elif path.startswith("364/407"):
+        category = "amaro"
+    elif ingredient_id in (174, 341, 187, 543, 487):
+        # Cross-path amari: Campari/Aperol (364/414/), Suze (364/409/),
+        # Bonal (365/435/), Brucato Chaparral (NULL path). See tgii_bootstrap.py
+        # CATEGORIES['amaro']['extra_bottle_ids'].
+        category = "amaro"
     proof = (ing.get("strength") * 2) if ing.get("strength") else None
     with fdb.connect() as conn:
         fdb.upsert_ingredient_meta(conn, ingredient_id, name=name, category=category, proof=proof)

@@ -29,6 +29,10 @@ DEFAULT_AXES = {
     "scotch": ["smoke", "sweet", "oak", "vanilla", "fruit", "body"],
     # American Single Malt shares scotch's axes (smoke is also the defining dim).
     "american_single_malt": ["smoke", "sweet", "oak", "vanilla", "fruit", "body"],
+    # Amaro — bitter/sweet/citrus/herbal/dark/mint/root distinguish families
+    # (Fernet = bitter+mint, Cynar = root, Averna = dark, Aperol = citrus+sweet,
+    # Suze = bitter+root, etc.).
+    "amaro": ["bitter", "sweet", "citrus", "herbal", "dark", "mint", "root"],
 }
 
 
