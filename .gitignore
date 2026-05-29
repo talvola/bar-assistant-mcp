@@ -64,3 +64,4 @@ test_*.txt
 # OS
 .DS_Store
 Thumbs.db
+backups/
