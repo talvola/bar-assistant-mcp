@@ -8,11 +8,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import httpx
 from mcp.server.fastmcp import FastMCP
 
 from .api import BarAssistantAPI
-from . import flavor as fl
-from . import flavor_db as fdb
 
 # Initialize FastMCP server (auth wired in main() for HTTP mode)
 mcp = FastMCP(
@@ -720,82 +719,16 @@ def bar_delete_ingredient(id: str) -> str:
 
 # ===== Flavor Matching =====
 #
-# These tools layer a per-category flavor-axis system on top of BA's ingredient
-# and cocktail data. Profiles + slot constraints live in a sidecar SQLite (see
-# flavor_db.py); the engine is in flavor.py. Bootstrap data and design notes
-# are in scripts/ and the project memory ("bar_assistant_roadmap").
+# Phase B: flavor data + the scoring engine live natively in Bar Assistant
+# (tables flavor_*, engine in app/Services/Flavor). These MCP tools are thin
+# wrappers over the BA /api/flavor + per-ingredient/cocktail flavor endpoints
+# — no local SQLite, no local engine. Single source of truth is BA.
 
 
-_GIN_AXES_HELP = (
-    "TGII gin axes (0–3 integer scale): juniper, citrus, floral, heat, spice, herbal, fruited."
-)
-
-
-def _ensure_ingredient_meta(ingredient_id: int) -> tuple[str, str, float | None]:
-    """Ensure ingredient_meta has a row for this BA ingredient; return (name, category, proof)."""
-    with fdb.connect() as conn:
-        row = conn.execute(
-            "SELECT name, category, proof FROM ingredient_meta WHERE ingredient_id=?",
-            (ingredient_id,),
-        ).fetchone()
-        if row and row["name"]:
-            return row["name"], row["category"] or "", row["proof"]
-
-    ing = get_api().get_ingredient(ingredient_id).get("data", {})
-    name = ing.get("name", f"#{ingredient_id}")
-    # Category inference from BA's materialized_path
-    path = (ing.get("materialized_path") or "").strip("/")
-    category = ""
-    if path.startswith("363/383"):
-        category = "gin"
-    elif path.startswith("363/403"):
-        category = "aquavit"
-    elif path.startswith("363/370/371"):
-        category = "bourbon"
-    elif path.startswith("363/370/347"):
-        category = "rye"
-    elif path.startswith("363/370/372"):
-        category = "scotch"
-    elif path.startswith("363/370/431"):
-        category = "american_single_malt"
-    elif path.startswith("364/407"):
-        category = "amaro"
-    elif ingredient_id in (174, 341, 187, 543, 487, 540):
-        # Cross-path amari: Campari/Aperol (364/414/), Suze + Salers (364/409/),
-        # Bonal (365/435/), Brucato Chaparral (NULL path). See tgii_bootstrap.py
-        # CATEGORIES['amaro']['extra_bottle_ids']. Suze/Salers are gentian-bitter
-        # so they're amaro despite living under BA's Herbal Liqueurs path.
-        category = "amaro"
-    elif path.startswith("364/409"):
-        # Herbal Liqueurs — but only after the amaro cross-path check above
-        # (Suze + Salers live here too but are bitter aperitifs, not herbal lq).
-        category = "herbal_liqueur"
-    elif path.startswith("364/436") or ingredient_id in (125, 338):
-        # Anise family (absinthe, pastis) folded into herbal_liqueur — the
-        # existing axes already include anise; no separate category needed.
-        category = "herbal_liqueur"
-    elif path.startswith("363/378"):
-        category = "rum"
-    elif ingredient_id == 203:
-        # Cruzan Black Strap Rum — broken path ("468/") in BA. Hard-coded.
-        category = "rum"
-    elif path.startswith("365/418") or path.startswith("365/435"):
-        # Vermouth (365/418/) + quinquina-family aperitif wines (365/435/).
-        # Bonal (id=543, also at 365/435/) is amaro and caught earlier.
-        category = "vermouth"
-    elif ingredient_id in (600, 601, 602, 603, 527):
-        # BroVo vermouth collection + Cocchi Americano — all NULL paths.
-        category = "vermouth"
-    elif path.startswith("364/408"):
-        category = "fruit_liqueur"
-    elif ingredient_id in (488, 196, 566, 499, 136):
-        # Cross-path fruit liqueurs: St-Germain (NULL), Cointreau (413/566/),
-        # Triple Sec (413/), Kijafa (NULL), Skunk Brothers Apple Pie (364/437/).
-        category = "fruit_liqueur"
-    proof = (ing.get("strength") * 2) if ing.get("strength") else None
-    with fdb.connect() as conn:
-        fdb.upsert_ingredient_meta(conn, ingredient_id, name=name, category=category, proof=proof)
-    return name, category, proof
+def _category_axes(client: BarAssistantAPI) -> dict[str, list[str]]:
+    """Map of category -> axis list from BA."""
+    data = client.get_flavor_categories().get("data", [])
+    return {c["category"]: c["axes"] for c in data}
 
 
 @mcp.tool()
@@ -806,10 +739,9 @@ def bar_list_flavor_axes(category: str = "gin") -> str:
     0–3 system. Use this to discover valid axis names before setting profiles
     or slot constraints.
     """
-    with fdb.connect() as conn:
-        axes = fdb.get_axes(conn, category)
+    axes = _category_axes(get_api()).get(category)
     if not axes:
-        return f"No axes defined for category '{category}'. Configure with bar_set_flavor_axes."
+        return f"No axes defined for category '{category}'."
     return f"**{category}** axes (0–3): " + ", ".join(axes)
 
 
@@ -821,14 +753,16 @@ def bar_get_flavor_profile(ingredient_id: int) -> str:
     juniper/citrus/floral/heat/spice/herbal/fruited). Returns provenance too
     (source = tgii / llm_from_description / manual; confidence; notes).
     """
-    with fdb.connect() as conn:
-        data = fdb.get_profile(conn, ingredient_id)
-    if not data:
+    resp = get_api().get_flavor_profile(ingredient_id)
+    if not resp:
         return f"No flavor profile recorded for ingredient {ingredient_id}."
-    lines = [f"**Profile for ingredient {ingredient_id}**"]
+    data = resp["data"]
+    lines = [f"**Profile for ingredient {ingredient_id}** (category: {data.get('category') or '-'})"]
     lines.append("  " + " ".join(f"{a}={v}" for a, v in data["profile"].items()))
-    lines.append(f"  source: {data['source']}   confidence: {data['confidence'] or '-'}   scored: {data['scored_at']}")
-    if data["notes"]:
+    lines.append(f"  source: {data.get('source')}   confidence: {data.get('confidence') or '-'}   scored: {data.get('scored_at')}")
+    if not data.get("suggestable_for_classics", True):
+        lines.append("  ⚠ not suggestable for classics (novelty/allocated bottle)")
+    if data.get("notes"):
         lines.append(f"  notes: {data['notes']}")
     return "\n".join(lines)
 
@@ -837,29 +771,63 @@ def bar_get_flavor_profile(ingredient_id: int) -> str:
 def bar_set_flavor_profile(
     ingredient_id: int,
     profile: dict[str, int],
+    category: str | None = None,
     source: str = "manual",
     confidence: str | None = None,
     notes: str | None = None,
+    suggestable_for_classics: bool | None = None,
 ) -> str:
-    """Set or update the flavor profile for an ingredient (partial updates allowed).
+    """Set or update the flavor profile for an ingredient.
+
+    Partial updates are supported: `profile` may contain only the axes you want
+    to change — they're merged over the existing profile before saving. If the
+    ingredient has no profile yet, you must pass `category` (and ideally the
+    full axis set for that category).
 
     Args:
         ingredient_id: BA ingredient_id of the specific bottle.
-        profile: dict of axis → integer score. Unspecified axes are left as-is.
-                 For gin: any of juniper, citrus, floral, heat, spice, herbal,
-                 fruited; values 0–3. See bar_list_flavor_axes.
+        profile: dict of axis → integer score (0–3). Merged over existing axes.
+        category: required only when the ingredient has no profile yet (e.g.
+                  "gin", "amaro"). See bar_list_flavor_axes for valid axes.
         source: provenance — "tgii", "llm_from_description", "manual", etc.
         confidence: "high" | "medium" | "low" | None.
-        notes: free-text reasoning (e.g. tasting note that justifies the scoring).
-
-    Used when re-scoring a bottle after tasting, correcting a stale LLM guess,
-    or initially scoring a bottle that wasn't in the TGII bootstrap.
+        notes: free-text reasoning.
+        suggestable_for_classics: set False for novelty/allocated bottles the
+                  matcher should never surface even if their profile fits.
     """
-    _ensure_ingredient_meta(ingredient_id)
-    with fdb.connect() as conn:
-        fdb.set_profile(conn, ingredient_id, profile, source=source, confidence=confidence, notes=notes)
-    changed = ", ".join(f"{k}={v}" for k, v in profile.items())
-    return f"Updated profile for ingredient {ingredient_id}: {changed}  (source={source})"
+    client = get_api()
+    existing = client.get_flavor_profile(ingredient_id)
+    if existing:
+        d = existing["data"]
+        merged = {**d.get("profile", {}), **profile}
+        cat = category or d.get("category")
+        body: dict[str, Any] = {
+            "category": cat,
+            "profile": merged,
+            "source": source,
+            "confidence": confidence if confidence is not None else d.get("confidence"),
+            "notes": notes if notes is not None else d.get("notes"),
+        }
+        if suggestable_for_classics is not None:
+            body["suggestable_for_classics"] = suggestable_for_classics
+        elif "suggestable_for_classics" in d:
+            body["suggestable_for_classics"] = d["suggestable_for_classics"]
+    else:
+        if not category:
+            return ("Ingredient has no profile yet — pass `category` (e.g. "
+                    "category=\"gin\") so the axes can be validated.")
+        body = {"category": category, "profile": profile, "source": source,
+                "confidence": confidence, "notes": notes}
+        if suggestable_for_classics is not None:
+            body["suggestable_for_classics"] = suggestable_for_classics
+
+    try:
+        resp = client.set_flavor_profile(ingredient_id, body)
+    except Exception as e:
+        return f"Failed to set profile: {e}"
+    saved = resp.get("data", {}).get("profile", body["profile"])
+    changed = ", ".join(f"{k}={v}" for k, v in saved.items())
+    return f"Updated profile for ingredient {ingredient_id} ({body['category']}): {changed}  (source={source})"
 
 
 @mcp.tool()
@@ -871,21 +839,14 @@ def bar_describe_slots(cocktail_id: int) -> str:
     constraints declared in the flavor DB. Use this to find the right
     `slot_sort` before calling `bar_alternatives_for_slot` or constraint setters.
     """
-    cocktail = get_api().get_cocktail(cocktail_id).get("data", {})
+    client = get_api()
+    cocktail = client.get_cocktail(cocktail_id).get("data", {})
     if not cocktail:
         return f"Cocktail {cocktail_id} not found."
 
-    with fdb.connect() as conn:
-        existing_slots = {
-            r["sort"] for r in conn.execute(
-                "SELECT sort FROM slot_meta WHERE cocktail_id=?", (cocktail_id,)
-            ).fetchall()
-        }
-        constrained = {
-            r["sort"] for r in conn.execute(
-                "SELECT DISTINCT sort FROM slot_constraint WHERE cocktail_id=?", (cocktail_id,)
-            ).fetchall()
-        }
+    overlay = client.get_cocktail_flavor_slots(cocktail_id).get("data", {})
+    existing_slots = set(overlay.get("slots_with_meta", []))
+    constrained = set(overlay.get("slots_with_constraints", []))
 
     lines = [f"**{cocktail.get('name', '?')}** (id={cocktail_id}) slots:"]
     for ing in cocktail.get("ingredients", []):
@@ -930,14 +891,19 @@ def bar_set_slot_meta(
                    a small flat penalty so in-category ranks first.
         proof_min / proof_max: enforce a proof range (US proof).
     """
-    with fdb.connect() as conn:
-        fdb.upsert_slot_meta(
-            conn, cocktail_id, sort,
-            category=category, tolerance=tolerance,
-            exact_ingredient_id=exact_ingredient_id,
-            also_accept_categories=also_accept_categories,
-            proof_min=proof_min, proof_max=proof_max,
-        )
+    body: dict[str, Any] = {"category": category, "tolerance": tolerance}
+    if exact_ingredient_id is not None:
+        body["exact_ingredient_id"] = exact_ingredient_id
+    if also_accept_categories:
+        body["also_accept_categories"] = also_accept_categories
+    if proof_min is not None:
+        body["proof_min"] = proof_min
+    if proof_max is not None:
+        body["proof_max"] = proof_max
+    try:
+        get_api().set_slot_meta(cocktail_id, sort, body)
+    except Exception as e:
+        return f"Failed to set slot meta: {e}"
     return f"Slot meta set for cocktail {cocktail_id} sort {sort}: category={category}, tolerance={tolerance}"
 
 
@@ -961,9 +927,12 @@ def bar_set_band_constraint(
 
     For gin axes are 0–3; lo/hi are inclusive integer bounds.
     """
-    with fdb.connect() as conn:
-        fdb.set_constraint(conn, cocktail_id, sort, axis, "band",
-                           band_lo=lo, band_hi=hi, out_weight=out_weight, hard=hard)
+    try:
+        get_api().set_slot_constraint(cocktail_id, sort, axis, {
+            "kind": "band", "lo": lo, "hi": hi, "out_weight": out_weight, "hard": hard,
+        })
+    except Exception as e:
+        return f"Failed to set band constraint: {e}"
     h = " (hard)" if hard else ""
     return f"Band constraint set: cocktail {cocktail_id} sort {sort} {axis}=[{lo},{hi}] out_weight={out_weight}{h}"
 
@@ -985,52 +954,44 @@ def bar_set_point_constraint(
 
     For gin axes are 0–3; value is an integer.
     """
-    with fdb.connect() as conn:
-        fdb.set_constraint(conn, cocktail_id, sort, axis, "point",
-                           point_value=value, weight=weight)
+    try:
+        get_api().set_slot_constraint(cocktail_id, sort, axis, {
+            "kind": "point", "value": value, "weight": weight,
+        })
+    except Exception as e:
+        return f"Failed to set point constraint: {e}"
     return f"Point constraint set: cocktail {cocktail_id} sort {sort} {axis}={value} weight={weight}"
 
 
 @mcp.tool()
 def bar_delete_slot_constraint(cocktail_id: int, sort: int, axis: str) -> str:
     """Remove a single axis constraint from a recipe slot."""
-    with fdb.connect() as conn:
-        n = fdb.delete_constraint(conn, cocktail_id, sort, axis)
+    try:
+        resp = get_api().delete_slot_constraint(cocktail_id, sort, axis)
+    except Exception as e:
+        return f"Failed to delete constraint: {e}"
+    n = resp.get("data", {}).get("deleted", "?")
     return f"Deleted {n} constraint(s) for cocktail {cocktail_id} sort {sort} axis {axis}"
 
 
 @mcp.tool()
 def bar_get_slot_constraints(cocktail_id: int) -> str:
     """List all flavor constraints declared for a cocktail's slots."""
-    with fdb.connect() as conn:
-        slots = fdb.load_slots_for_cocktail(conn, cocktail_id)
+    slots = get_api().get_cocktail_flavor_constraints(cocktail_id).get("data", {}).get("slots", [])
     if not slots:
         return f"No slot constraints declared for cocktail {cocktail_id}."
     lines = [f"**Slot constraints for cocktail {cocktail_id}**"]
     for s in slots:
-        also = f" (also_accept: {','.join(s.also_accept_categories)})" if s.also_accept_categories else ""
-        lines.append(f"  sort={s.sort}  category={s.category}  tolerance={s.tolerance}{also}")
-        for axis, c in s.constraints.items():
-            if isinstance(c, fl.Point):
-                lines.append(f"    {axis}: Point({c.value}) weight={c.weight}")
+        accept = s.get("also_accept_categories") or []
+        also = f" (also_accept: {','.join(accept)})" if accept else ""
+        lines.append(f"  sort={s['sort']}  category={s['category']}  tolerance={s['tolerance']}{also}")
+        for c in s.get("constraints", []):
+            if c["kind"] == "point":
+                lines.append(f"    {c['axis']}: Point({c['point_value']}) weight={c['weight']}")
             else:
-                h = ", hard" if c.hard else ""
-                lines.append(f"    {axis}: Band({c.lo}–{c.hi}, out_weight={c.out_weight}{h})")
+                h = ", hard" if c["hard"] else ""
+                lines.append(f"    {c['axis']}: Band({c['band_lo']}–{c['band_hi']}, out_weight={c['out_weight']}{h})")
     return "\n".join(lines)
-
-
-def _shelf_ingredient_ids() -> set[int]:
-    out: set[int] = set()
-    page = 1
-    while True:
-        resp = get_api().list_ingredients(filter_on_shelf=True, limit=200, page=page)
-        for ing in resp.get("data", []):
-            out.add(ing["id"])
-        meta = resp.get("meta", {})
-        if page >= meta.get("last_page", 1):
-            break
-        page += 1
-    return out
 
 
 @mcp.tool()
@@ -1056,30 +1017,27 @@ def bar_alternatives_for_slot(
         include_strays: surface hard-disqualified picks too, with reasons.
         top_n: max bottles to return.
     """
-    with fdb.connect() as conn:
-        slot = fdb.load_slot(conn, cocktail_id, sort)
-        if slot is None:
+    try:
+        resp = get_api().get_slot_alternatives(
+            cocktail_id, sort,
+            on_shelf_only=on_shelf_only, include_strays=include_strays, top_n=top_n,
+        )
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 404:
             return (f"No slot_meta declared for cocktail {cocktail_id} sort {sort}. "
                     "Call bar_set_slot_meta first.")
-        bottles = fdb.load_bottles(conn, category=None)
+        return f"Error: {e}"
+    data = resp.get("data", {})
+    alts = data.get("alternatives", [])
+    if not alts:
+        return f"No matches for cocktail {cocktail_id} slot {sort} (category={data.get('category')})."
 
-    if on_shelf_only:
-        shelf = _shelf_ingredient_ids()
-        for b in bottles:
-            b.in_stock = b.id in shelf
-    else:
-        for b in bottles:
-            b.in_stock = True
-
-    results = fl.alternatives_for_slot(bottles, slot, top_n=top_n, include_strays=include_strays)
-    if not results:
-        return f"No matches for cocktail {cocktail_id} slot {sort} (category={slot.category})."
-
-    lines = [f"**Alternatives for cocktail {cocktail_id}, slot {sort} ({slot.category}):**"]
-    for i, (b, a) in enumerate(results, 1):
-        flags = f"  — {'; '.join(a.flags)}" if a.flags else ""
-        conf = f" [{b.confidence}]" if b.confidence else ""
-        lines.append(f"  {i}. {b.name}  penalty={a.penalty:.1f}  [{a.verdict}]{conf}{flags}")
+    lines = [f"**Alternatives for cocktail {cocktail_id}, slot {sort} ({data.get('category')}):**"]
+    for i, a in enumerate(alts, 1):
+        b = a["bottle"]
+        flags = f"  — {'; '.join(a['flags'])}" if a.get("flags") else ""
+        conf = f" [{b['confidence']}]" if b.get("confidence") else ""
+        lines.append(f"  {i}. {b['name']}  penalty={a['penalty']:.1f}  [{a['verdict']}]{conf}{flags}")
     return "\n".join(lines)
 
 
@@ -1090,27 +1048,24 @@ def bar_uses_for_bottle(ingredient_id: int, top_n: int = 10) -> str:
     Useful when a new bottle arrives — find which existing constrained recipes
     welcome it before adding the bottle to your shelf.
     """
-    name, category, proof = _ensure_ingredient_meta(ingredient_id)
-    with fdb.connect() as conn:
-        prof = fdb.get_profile(conn, ingredient_id)
-        slots = fdb.load_all_slots(conn)
-    if not prof:
+    try:
+        data = get_api().get_ingredient_flavor_uses(ingredient_id, top_n=top_n).get("data", {})
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 404:
+            return f"Ingredient {ingredient_id} not found."
+        return f"Error: {e}"
+    name = data.get("name", f"#{ingredient_id}")
+    if not data.get("has_profile"):
         return f"Ingredient {ingredient_id} ({name}) has no flavor profile yet."
-    if not slots:
-        return "No recipes have slot constraints declared yet."
-
-    bottle = fl.Bottle(
-        id=ingredient_id, name=name, category=category, profile=prof["profile"],
-        proof=proof, source=prof.get("source") or "", confidence=prof.get("confidence") or "",
-    )
-    matches = fl.uses_for_bottle(bottle, slots, top_n=top_n)
+    matches = data.get("matches", [])
     if not matches:
-        return f"No constrained recipes accept category={category} for {name}."
+        return f"No constrained recipes accept category={data.get('category')} for {name}."
 
     lines = [f"**Recipes welcoming {name}:**"]
-    for slot, a in matches:
-        flags = f"  — {'; '.join(a.flags)}" if a.flags else ""
-        lines.append(f"  cocktail {slot.cocktail_id} sort {slot.sort}  penalty={a.penalty:.1f}  [{a.verdict}]{flags}")
+    for m in matches:
+        flags = f"  — {'; '.join(m['flags'])}" if m.get("flags") else ""
+        cname = m.get("cocktail_name", f"#{m['cocktail_id']}")
+        lines.append(f"  {cname} (id={m['cocktail_id']}) sort {m['sort']}  penalty={m['penalty']:.1f}  [{m['verdict']}]{flags}")
     return "\n".join(lines)
 
 
@@ -1130,35 +1085,18 @@ def bar_find_gaps(
         threshold: penalty above which a slot counts as a gap (defaults to 3.0,
                    roughly "two-axis miss or one hard-cap brush").
     """
-    with fdb.connect() as conn:
-        all_slots = fdb.load_all_slots(conn)
-        bottles = fdb.load_bottles(conn, category=None)
-    if cocktail_ids is not None:
-        wanted = set(cocktail_ids)
-        slots = [s for s in all_slots if s.cocktail_id in wanted]
-    else:
-        slots = all_slots
-    if not slots:
-        return "No constrained slots to evaluate."
-
-    shelf = _shelf_ingredient_ids()
-    for b in bottles:
-        b.in_stock = b.id in shelf
-
-    gaps = fl.find_gaps(bottles, slots, threshold=threshold)
+    data = get_api().get_flavor_gaps(threshold=threshold, cocktail_ids=cocktail_ids).get("data", {})
+    gaps = data.get("gaps", [])
     if not gaps:
         return f"No gaps — every evaluated slot has an in-stock match under penalty {threshold}."
 
-    names: dict[int, str] = {}
-    def name_for(cid: int) -> str:
-        if cid not in names:
-            names[cid] = get_api().get_cocktail(cid).get("data", {}).get("name", f"#{cid}")
-        return names[cid]
-
     lines = [f"**Gaps ({len(gaps)} slot(s) at threshold {threshold}):**"]
-    for slot, bottle, penalty, reason in gaps:
-        best = f"best: {bottle.name} (penalty={penalty:.1f})" if bottle else "best: nothing in stock"
-        lines.append(f"  {name_for(slot.cocktail_id)} (id={slot.cocktail_id}) sort {slot.sort} [{slot.category}]  {best}  — {reason}")
+    for g in gaps:
+        if g.get("best_bottle_name"):
+            best = f"best: {g['best_bottle_name']} (penalty={g['penalty']})"
+        else:
+            best = "best: nothing in stock"
+        lines.append(f"  {g['cocktail_name']} (id={g['cocktail_id']}) sort {g['sort']} [{g['category']}]  {best}  — {g['reason']}")
     return "\n".join(lines)
 
 

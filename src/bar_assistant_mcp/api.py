@@ -296,6 +296,62 @@ class BarAssistantAPI:
         bid = bar_id or self.bar_id
         return self.get(f"/api/bars/{bid}/stats/totals", include_bar=False)
 
+    # ===== Flavor matching (Phase B — native in BA) =====
+    #
+    # As of the Phase B Slice 5 cut-over, flavor data lives in BA (not the MCP's
+    # SQLite sidecar). These wrap the /api/flavor and per-ingredient/cocktail
+    # flavor endpoints. The scoring engine runs server-side in BA.
+
+    def get_flavor_categories(self) -> dict[str, Any]:
+        return self.get("/api/flavor/categories")
+
+    def get_flavor_profile(self, ingredient_id: int) -> dict[str, Any] | None:
+        """Profile for an ingredient, or None if it has no profile (404)."""
+        try:
+            return self.get(f"/api/ingredients/{ingredient_id}/flavor-profile")
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404:
+                return None
+            raise
+
+    def set_flavor_profile(self, ingredient_id: int, body: dict[str, Any]) -> dict[str, Any]:
+        return self.put(f"/api/ingredients/{ingredient_id}/flavor-profile", json=body)
+
+    def get_cocktail_flavor_slots(self, cocktail_id: int) -> dict[str, Any]:
+        return self.get(f"/api/cocktails/{cocktail_id}/flavor-slots")
+
+    def get_cocktail_flavor_constraints(self, cocktail_id: int) -> dict[str, Any]:
+        return self.get(f"/api/cocktails/{cocktail_id}/flavor-constraints")
+
+    def set_slot_meta(self, cocktail_id: int, sort: int, body: dict[str, Any]) -> dict[str, Any]:
+        return self.put(f"/api/cocktails/{cocktail_id}/slots/{sort}/meta", json=body)
+
+    def set_slot_constraint(self, cocktail_id: int, sort: int, axis: str, body: dict[str, Any]) -> dict[str, Any]:
+        return self.put(f"/api/cocktails/{cocktail_id}/slots/{sort}/constraints/{axis}", json=body)
+
+    def delete_slot_constraint(self, cocktail_id: int, sort: int, axis: str) -> dict[str, Any]:
+        return self.delete(f"/api/cocktails/{cocktail_id}/slots/{sort}/constraints/{axis}")
+
+    def get_slot_alternatives(
+        self, cocktail_id: int, sort: int,
+        on_shelf_only: bool = True, include_strays: bool = False, top_n: int = 10,
+    ) -> dict[str, Any]:
+        params = {
+            "on_shelf_only": "true" if on_shelf_only else "false",
+            "include_strays": "true" if include_strays else "false",
+            "top_n": top_n,
+        }
+        return self.get(f"/api/cocktails/{cocktail_id}/slots/{sort}/alternatives", params=params)
+
+    def get_ingredient_flavor_uses(self, ingredient_id: int, top_n: int = 10) -> dict[str, Any]:
+        return self.get(f"/api/ingredients/{ingredient_id}/flavor-uses", params={"top_n": top_n})
+
+    def get_flavor_gaps(self, threshold: float = 3.0, cocktail_ids: list[int] | None = None) -> dict[str, Any]:
+        params: dict[str, Any] = {"threshold": threshold}
+        if cocktail_ids:
+            params["cocktail_ids[]"] = cocktail_ids
+        return self.get("/api/flavor/gaps", params=params)
+
     # ===== Profile =====
 
     def get_profile(self) -> dict[str, Any]:

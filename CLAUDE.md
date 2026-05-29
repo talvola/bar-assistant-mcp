@@ -153,15 +153,13 @@ For trusted sources where review isn't needed:
 
 All in rapid succession without presenting a plan for approval.
 
-## Flavor Matching (Phase A)
+## Flavor Matching (Phase B — native in Bar Assistant)
 
-Per-category integer flavor axes (gin: 7 axes, 0–3, sourced from The Gin Is In), per-recipe-slot Point/Band constraints, and three use cases on top: ranked alternatives for a slot, recipes welcoming a bottle, and stock-gap finding. Storage in SQLite sidecar at `data/flavor.sqlite` (overridable via `BAR_ASSISTANT_FLAVOR_DB`).
+Per-category integer flavor axes (gin: 7 axes, 0–3), per-recipe-slot Point/Band constraints, and use cases on top: ranked alternatives for a slot, recipes welcoming a bottle, stock-gap finding. **As of the Phase B Slice 5 cut-over (2026-05-29), all flavor data + the scoring engine live natively in Bar Assistant** (tables `flavor_*`, engine in `app/Services/Flavor/`, endpoints under `/api/flavor` + per-ingredient/cocktail). The old MCP SQLite sidecar (`flavor.py`/`flavor_db.py`/`data/flavor.sqlite`) is **retired** — these MCP tools are now thin wrappers over the BA HTTP endpoints (see `api.py` flavor methods). Single source of truth is BA; Salt Rim and the MCP both read/write the same data.
 
-**Modules:**
-- `flavor.py` — pure engine (Bottle, RecipeSlot, Point, Band, assess, alternatives_for_slot, uses_for_bottle, find_gaps)
-- `flavor_db.py` — SQLite layer (category_axes, ingredient_meta, flavor_profile, slot_meta, slot_constraint)
+Bootstrap artifacts (`scripts/tgii_*`, `flavor_encoding.json`) remain as the historical record of how the data was authored, but BA is authoritative now. To re-seed a fresh BA from scratch: run the BA migrations (seeds 11 categories) then `scripts/port_phase_a_to_ba.py` (loads profiles + slot constraints from `flavor_encoding.json`-derived data via the BA API).
 
-**MCP tools (in `server.py`):**
+**MCP tools (in `server.py`, all BA-backed):**
 - `bar_list_flavor_axes(category="gin")`
 - `bar_get_flavor_profile(ingredient_id)`
 - `bar_set_flavor_profile(ingredient_id, profile, source, confidence, notes)`
