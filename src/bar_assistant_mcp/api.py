@@ -122,12 +122,21 @@ class BarAssistantAPI:
         return self.delete(f"/api/cocktails/{id_or_slug}")
 
     def get_makeable_cocktails(self, user_id: int = 1) -> dict[str, Any]:
-        """Get cocktails that can be made with shelf ingredients."""
-        return self.get(f"/api/users/{user_id}/cocktails")
+        """Get cocktails that can be made with shelf ingredients.
+
+        v6: makeable-from-shelf moved to the bar-level inventory endpoint.
+        For a single-user bar the bar inventory IS the shelf, so this is the
+        right semantic (and is consistent with get_shelf below).
+        """
+        return self.get(f"/api/bars/{self.bar_id}/inventory/cocktails")
 
     def get_favorite_cocktails(self, user_id: int = 1) -> dict[str, Any]:
-        """Get user's favorite cocktails."""
-        return self.get(f"/api/users/{user_id}/cocktails/favorites")
+        """Get user's favorite cocktails.
+
+        v6: /users/{id}/cocktails/favorites → /members/{id}/cocktail-favorites
+        ({id} is still the user id).
+        """
+        return self.get(f"/api/members/{user_id}/cocktail-favorites")
 
     # ===== Ingredients =====
 
@@ -185,49 +194,66 @@ class BarAssistantAPI:
         return self.get(f"/api/ingredients/{id_or_slug}/cocktails")
 
     # ===== Shelf =====
+    #
+    # v6 relocated the per-user shelf (/users/{id}/ingredients) into two
+    # concepts: per-member named inventories AND a bar-level inventory. For a
+    # single-user bar the bar inventory is the shelf — and it's the same
+    # bar_ingredients table the flavor matcher's on_shelf_only reads — so the
+    # MCP shelf tools target the bar inventory. The user_id param is retained
+    # for signature compatibility but no longer used.
 
     def get_shelf(self, user_id: int = 1) -> dict[str, Any]:
-        """Get user's shelf ingredients."""
-        return self.get(f"/api/users/{user_id}/ingredients")
+        """Get the bar's shelf ingredients (v6: bar-level inventory)."""
+        return self.get(f"/api/bars/{self.bar_id}/inventory/ingredients")
 
     def add_to_shelf(self, user_id: int, ingredient_ids: list[int]) -> dict[str, Any]:
-        """Add ingredients to user's shelf."""
+        """Add ingredients to the bar's shelf."""
         return self.post(
-            f"/api/users/{user_id}/ingredients/batch-store",
+            f"/api/bars/{self.bar_id}/inventory/ingredients/batch-store",
             json={"ingredients": ingredient_ids},
         )
 
     def remove_from_shelf(
         self, user_id: int, ingredient_ids: list[int]
     ) -> dict[str, Any]:
-        """Remove ingredients from user's shelf."""
+        """Remove ingredients from the bar's shelf."""
         return self.post(
-            f"/api/users/{user_id}/ingredients/batch-delete",
+            f"/api/bars/{self.bar_id}/inventory/ingredients/batch-delete",
             json={"ingredients": ingredient_ids},
         )
 
     # ===== Shopping List =====
+    #
+    # v6: /users/{id}/shopping-list → /members/{id}/shopping-list ({id} stays
+    # the user id; shopping lists remain per-member).
 
     def get_shopping_list(self, user_id: int = 1) -> dict[str, Any]:
         """Get user's shopping list."""
-        return self.get(f"/api/users/{user_id}/shopping-list")
+        return self.get(f"/api/members/{user_id}/shopping-list")
 
     def add_to_shopping_list(
         self, user_id: int, ingredient_ids: list[int]
     ) -> dict[str, Any]:
-        """Add ingredients to shopping list."""
+        """Add ingredients to shopping list.
+
+        v6: payload is now a list of {id, quantity} objects (quantity
+        defaults to 1 server-side) rather than bare ingredient ids.
+        """
         return self.post(
-            f"/api/users/{user_id}/shopping-list/batch-store",
-            json={"ingredients": ingredient_ids},
+            f"/api/members/{user_id}/shopping-list/batch-store",
+            json={"ingredients": [{"id": iid, "quantity": 1} for iid in ingredient_ids]},
         )
 
     def remove_from_shopping_list(
         self, user_id: int, ingredient_ids: list[int]
     ) -> dict[str, Any]:
-        """Remove ingredients from shopping list."""
+        """Remove ingredients from shopping list.
+
+        v6: batch-delete also reads `id` from each object in the list.
+        """
         return self.post(
-            f"/api/users/{user_id}/shopping-list/batch-delete",
-            json={"ingredients": ingredient_ids},
+            f"/api/members/{user_id}/shopping-list/batch-delete",
+            json={"ingredients": [{"id": iid} for iid in ingredient_ids]},
         )
 
     # ===== Collections =====
@@ -261,9 +287,14 @@ class BarAssistantAPI:
     # ===== Stats =====
 
     def get_bar_stats(self, bar_id: int | None = None) -> dict[str, Any]:
-        """Get bar statistics."""
+        """Get bar statistics.
+
+        v6: the single /bars/{id}/stats endpoint was split into sub-routes
+        (totals, taste, top, ingredient-distribution). `totals` carries the
+        headline counts the MCP surfaced before.
+        """
         bid = bar_id or self.bar_id
-        return self.get(f"/api/bars/{bid}/stats", include_bar=False)
+        return self.get(f"/api/bars/{bid}/stats/totals", include_bar=False)
 
     # ===== Profile =====
 
