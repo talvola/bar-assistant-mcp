@@ -221,3 +221,12 @@ Portainer's restart endpoint (and `docker restart`) does NOT re-pull — the con
 
 ### Parsing JSON from NAS-side curls
 The NAS `talvola` SSH user has no `python3` in PATH (Asustor stock). When hitting Portainer/etc. APIs over ssh, pipe the response back to the workstation: `ssh ... 'curl -sk -H "X-API-Key: ..." https://localhost:19943/api/...' | python3 -c '...'`. (Watch out for f-string + backslash inside `python3 -c` — use indexed access or move to a heredoc.)
+
+### Building images via the Portainer API: no BuildKit
+The Portainer `/docker/build` endpoint doesn't enable BuildKit, so `COPY --chmod=`/`--chown=` fail ("requires BuildKit"). Use plain `COPY` + a root `RUN chmod/chown`. Non-BuildKit variants live alongside the upstream Dockerfiles: BA `Dockerfile.prod` + `dev/sandbox/Dockerfile.sandbox`; build with `&dockerfile=Dockerfile.prod` in the build URL.
+
+### Build-context rsync flattens `src/`
+`rsync ... Dockerfile pyproject.toml src/ <nas>:build/` copies the *contents* of `src/` into the build root, not `src/` itself. After rsync, fix on the NAS: `cd build && rm -rf src && mkdir src && mv bar_assistant_mcp src/` before tarring + building.
+
+### Stack compose drift → container-name conflict on PUT
+A running container's image can differ from its stack's YAML (e.g. a manually-swapped `salt-rim:custom` while the YAML says `salt-rim:v4`). PUTting fresh YAML then fails with "container name already in use." Fix: DELETE the conflicting container(s) first via the Portainer API (named volumes like `bar_data` persist across removal), then re-PUT.
