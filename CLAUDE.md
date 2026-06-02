@@ -28,8 +28,9 @@ Decide whether each ingredient should be **generic** or **specific**:
 | **Specific** | Unique products with distinctive flavor profiles | Fernet-Branca, Green Chartreuse, Amaro Averna, Campari |
 
 **Guidelines:**
+- **Default base spirits to generic, and never bake in the current house bottle.** If the recipe text doesn't name a brand, use the generic category (Rye Whiskey 347, Bourbon 371, etc.) — not whatever specific bottle happens to be in stock. Specifying a base spirit is a deliberate choice the original recipe made, not the default. When in doubt, use generic or ask first; genericizing loses nothing because BA's variant system surfaces the actual shelf bottles (and the flavor matcher ranks them) for a generic slot.
+- Only use a **specific** ingredient when (a) the recipe explicitly names that brand, (b) the brand is integral to the drink's identity (Fernet-Branca, Green Chartreuse, Campari, Luxardo Maraschino), or (c) Erik asks for it. Otherwise verify before choosing specific.
 - If the recipe says "preferably X" or "recommended: X", use the **generic** category and note the recommendation in instructions
-- If a specific brand is integral to the cocktail's identity, use the **specific** ingredient
 - Amari and liqueurs are usually specific (Averna, Cynar, Benedictine)
 - Bitters are usually specific (Angostura, Peychaud's, Regans)
 
@@ -208,6 +209,8 @@ For categories TGII doesn't cover (rum, whiskey, etc.), skip the SVG path entire
 ### Ingredient payloads (cocktail create/update)
 Always backfill `sort` on each ingredient before sending — the BA API's `CocktailIngredientRequest::fromArray` requires it with no default, returns 500 if missing. Pattern used in `server.py`: `{**ing, "sort": ing.get("sort", idx + 1)}`. Apply to any new write tool that accepts ingredients.
 
+When re-PUTting a whole cocktail (bulk edits), watch the **garnish-as-ingredient** slots: TheCocktailDB-seeded drinks store count garnishes (Olive, Lime, cherry…) as ingredients with `amount=1, units=''`. BA's write validation requires a **numeric `amount` AND a non-empty `units`** on every slot, so echoing back `units=''` 422s ("units required when amount present"), and sending `amount:null` 422s ("amount must be a number"). Fix when rebuilding the payload: if `units` is empty, set `units="whole"` (a unit already used in the DB for count items) and `amount` to `1` if missing. `units` is a free-form string (the data has `"oz Chilled"`, `"tsp superfine"`), so any non-empty label is accepted.
+
 ### Testing changes against the live BA API without redeploying
 `.venv/bin/python -c "from bar_assistant_mcp.api import BarAssistantAPI; ..."` — import the fixed code directly, hit production BA with the stdio token from `.mcp.json`, clean up after. Faster than rebuilding the container.
 
@@ -230,3 +233,9 @@ The Portainer `/docker/build` endpoint doesn't enable BuildKit, so `COPY --chmod
 
 ### Stack compose drift → container-name conflict on PUT
 A running container's image can differ from its stack's YAML (e.g. a manually-swapped `salt-rim:custom` while the YAML says `salt-rim:v4`). PUTting fresh YAML then fails with "container name already in use." Fix: DELETE the conflicting container(s) first via the Portainer API (named volumes like `bar_data` persist across removal), then re-PUT.
+
+### Legacy mixed-case slugs break variant edits (v6)
+TheCocktailDB-seeded cocktails stored slugs with a mixed-case random suffix (e.g. `boulevardier-MBv9P`). BA v6's `Slug` value object (`src/Domain/Common/Slug.php`) enforces `^[a-z0-9]+(?:-[a-z0-9]+)*$`, so loading such a cocktail through the domain repo (`EloquentCocktailRepository::map`, the write path) throws a 500. PUTting a **variant** 500s because `updateCocktail` calls `findById` on the *parent* to validate `variantOf` — the bad slug is the parent's, not the one being edited. The slug isn't settable via the cocktail API, so fix it in the live sqlite: `UPDATE cocktails SET slug=lower(slug) WHERE slug<>lower(slug);` (verify `collisions=0` first). All 34 were case-only and normalized 2026-05-30.
+
+### Reaching the live BA sqlite / running commands in the prod container
+Portainer is reachable **directly from the workstation** at `https://192.168.1.64:19943` (no NAS hop needed; the NAS `talvola` user has neither docker-socket access nor `python3`). Drive the Docker **exec** API in two POSTs: create exec (`/endpoints/3/docker/containers/<id>/exec` with `{"AttachStdout":true,"AttachStderr":true,"Tty":true,"Cmd":["sh","-c",...]}`), then start it (`/endpoints/3/docker/exec/<execId>/start` with `{"Detach":false,"Tty":true}`). Live DB = `/var/www/cocktails/storage/bar-assistant/database.ba3.sqlite` (the `storage/database.sqlite` file is empty); `sqlite3` is in the image. Back up with `cp <db> <db>.bak-<tag>` before any write.
