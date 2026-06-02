@@ -100,10 +100,16 @@ Don't ask permission to do the sync — do it after each qualifying ingredient c
 
 ## Common Ingredient IDs (Reference)
 
-**Base Spirits:**
+**Base Spirits (generic categories — prefer these when genericizing):**
 - Bourbon Whiskey: 371
 - Rye Whiskey: 347
 - Aquavit: 403
+- London Dry Gin: 384
+- Genever: 405
+- Tequila Blanco: 390
+- Tequila Reposado: 391
+- Jamaican Rum: 534
+- Sloe Gin: 386
 
 **Vermouth:**
 - Sweet Vermouth: 420
@@ -116,6 +122,8 @@ Don't ask permission to do the sync — do it after each qualifying ingredient c
 - Benedictine D.O.M.: 171
 - Luxardo Maraschino: 182
 - Anise Liqueurs: 436
+- Amaretto: 647 (generic; created 2026-06-01)
+- Crème de Cacao: 649 (generic; created 2026-06-01)
 
 **Bitters:**
 - Angostura Aromatic Bitters: 139
