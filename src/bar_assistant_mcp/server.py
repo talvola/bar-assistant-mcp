@@ -13,12 +13,21 @@ from mcp.server.fastmcp import FastMCP
 
 from .api import BarAssistantAPI
 
+# House rules shared with EVERY client (Claude Code, iOS/desktop app, etc.) via the MCP
+# `instructions` field — compliant clients add this to the model's system prompt. This is the
+# single source of truth for ingredient/cocktail usage rules; CLAUDE.md @imports the same file.
+try:
+    _USAGE_RULES = (Path(__file__).parent / "usage_rules.md").read_text(encoding="utf-8")
+except OSError:
+    _USAGE_RULES = None
+
 # Initialize FastMCP server (auth wired in main() for HTTP mode)
 mcp = FastMCP(
     "bar-assistant",
     host="0.0.0.0",
     port=8100,
     streamable_http_path="/mcp",
+    instructions=_USAGE_RULES,
 )
 
 # Global API client (initialized on startup for stdio mode)
@@ -459,7 +468,12 @@ def bar_create_ingredient(
     parent_ingredient_id: int | None = None,
     images: list[int] | None = None,
 ) -> str:
-    """Create a new ingredient. Use parent_ingredient_id to place it in the hierarchy (e.g., under 'Gin' or 'Bourbon')."""
+    """Create a new ingredient. Use parent_ingredient_id to place it in the hierarchy (e.g., under 'Gin' or 'Bourbon').
+
+    Only create a NEW specific bottle when a recipe genuinely needs that brand (see the server
+    instructions' "Generic vs. specific" rule); for ordinary base-spirit slots, reuse the existing
+    generic category instead of adding a brand.
+    """
     client = get_api()
     ingredient_data: dict[str, Any] = {"name": name, "strength": strength}
     if description:
@@ -490,7 +504,13 @@ def bar_create_cocktail(
     images: list[int] | None = None,
     parent_cocktail_id: int | None = None,
 ) -> str:
-    """Create a new cocktail recipe with ingredients, instructions, and optional image."""
+    """Create a new cocktail recipe with ingredients, instructions, and optional image.
+
+    For each ingredient slot, prefer the GENERIC category (e.g. Rye Whiskey, London Dry Gin,
+    Tequila Blanco) over a specific bottle — see the server instructions' "Generic vs. specific"
+    rule. Only use a specific brand when the recipe names it, the brand defines the drink
+    (Fernet-Branca, Chartreuse, Campari, Luxardo Maraschino), or Erik asks.
+    """
     client = get_api()
     # BA API's CocktailIngredientRequest::fromArray reads $source['sort'] without a
     # default, so omitting it produces a 500. Backfill positionally.

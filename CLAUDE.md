@@ -8,6 +8,22 @@ This is the MCP (Model Context Protocol) server for Bar Assistant, providing too
 - `/home/erik/bar-assistant-mcp` - This MCP server (current)
 - `/home/erik/vue-salt-rim` - Salt Rim Web UI (Vue.js frontend)
 
+## Usage rules — single source of truth (shared with ALL MCP clients)
+
+The ingredient/cocktail **usage rules** (generic-vs-specific policy + keep-policy, common generic
+IDs, glass IDs, cocktail-creation guide, flavor workflow) live in
+`src/bar_assistant_mcp/usage_rules.md`. The server loads that file into FastMCP's `instructions`,
+so it is delivered to **every** MCP client — including the iOS/desktop Claude app — and added to the
+model's system prompt. It is `@import`ed below so this Claude Code session reads the identical text.
+**Edit usage rules in `usage_rules.md`, not here.** This CLAUDE.md keeps only Claude-Code/dev-specific
+guidance (the URL-add workflow, Google-Sheets sync, build/deploy, server internals).
+
+> Deploy note: the iOS app only picks up `usage_rules.md` / `instructions` changes after the remote
+> MCP container is rebuilt + recreated (LAN-only Portainer). The stdio/Claude-Code path picks them up
+> on next launch automatically.
+
+@src/bar_assistant_mcp/usage_rules.md
+
 ## Adding Cocktails from URLs
 
 When adding cocktails from blog posts or websites, follow this process:
@@ -20,19 +36,9 @@ When adding cocktails from blog posts or websites, follow this process:
 
 ### 2. Ingredient Strategy
 
-Decide whether each ingredient should be **generic** or **specific**:
-
-| Type | When to Use | Examples |
-|------|-------------|----------|
-| **Generic** | Base spirits, common modifiers where brand doesn't matter | Bourbon Whiskey, Rye Whiskey, Sweet Vermouth, Aquavit |
-| **Specific** | Unique products with distinctive flavor profiles | Fernet-Branca, Green Chartreuse, Amaro Averna, Campari |
-
-**Guidelines:**
-- **Default base spirits to generic, and never bake in the current house bottle.** If the recipe text doesn't name a brand, use the generic category (Rye Whiskey 347, Bourbon 371, etc.) — not whatever specific bottle happens to be in stock. Specifying a base spirit is a deliberate choice the original recipe made, not the default. When in doubt, use generic or ask first; genericizing loses nothing because BA's variant system surfaces the actual shelf bottles (and the flavor matcher ranks them) for a generic slot.
-- Only use a **specific** ingredient when (a) the recipe explicitly names that brand, (b) the brand is integral to the drink's identity (Fernet-Branca, Green Chartreuse, Campari, Luxardo Maraschino), or (c) Erik asks for it. Otherwise verify before choosing specific.
-- If the recipe says "preferably X" or "recommended: X", use the **generic** category and note the recommendation in instructions
-- Amari and liqueurs are usually specific (Averna, Cynar, Benedictine)
-- Bitters are usually specific (Angostura, Peychaud's, Regans)
+Generic vs. specific, the keep-policy, and common generic IDs are in `usage_rules.md`
+(imported above). Default base spirits to generic; only go specific when the recipe names the
+brand, the brand defines the drink, or Erik asks.
 
 ### 3. Search for Ingredients
 
@@ -98,59 +104,12 @@ Mergers & Acquisitions
 
 Don't ask permission to do the sync — do it after each qualifying ingredient creation and report what changed.
 
-## Common Ingredient IDs (Reference)
+## Common Ingredient IDs & Glass IDs
 
-**Base Spirits (generic categories — prefer these when genericizing):**
-- Bourbon Whiskey: 371
-- Rye Whiskey: 347
-- Aquavit: 403
-- London Dry Gin: 384
-- Genever: 405
-- Tequila Blanco: 390
-- Tequila Reposado: 391
-- Jamaican Rum: 534
-- Sloe Gin: 386
-- Rhum Agricole: 380 — split by style: **Blanc** 650 (Kuleana, clairin), **Vieux** 651 (Clement 10yr). Point unaged recipes (Ti' Punch, agricole Negroni) at Blanc. Clairin is kept under Blanc deliberately (still suggestable for blanc slots; the rum `funk` axis distinguishes it) rather than its own category.
-
-**Vermouth:**
-- Sweet Vermouth: 420
-
-**Amari & Liqueurs:**
-- Amaro Averna: 190
-- Fernet-Branca: 131
-- Cynar Ricetta Originale: 130
-- Green Chartreuse: 176
-- Benedictine D.O.M.: 171
-- Luxardo Maraschino: 182
-- Anise Liqueurs: 436
-- Amaretto: 647 (generic; created 2026-06-01)
-- Crème de Cacao: 649 (generic; created 2026-06-01)
-
-**Bitters:**
-- Angostura Aromatic Bitters: 139
-- Angostura Orange Bitters: 195
-- Peychaud's Bitters: 142
-
-**Syrups:**
-- Rich Demerara Syrup: 494
-
-**Garnishes:**
-- Lemon peel: 339
-- Orange peel: 311
-- Maraschino cherry: 310
-
-## Glass IDs
-
-- Old-fashioned glass: 1
-- Cocktail glass: 2
-- Highball glass: 3
-- Copper Mug: 4
-- Collins glass: 5
-- Martini Glass: 6
-- Wine Glass: 7
-- Collins Glass: 8
-- Coupe glass: 9
-- Rocks glass: 10
+Moved to `usage_rules.md` (imported above, and served to all MCP clients). The agricole
+style-split detail (Blanc 650 / Vieux 651, clairin-under-Blanc rationale) lives there too.
+Extra dev-only references not in the shared file: Anise Liqueurs 436 · Rich Demerara Syrup 494 ·
+Lemon peel 339 · Orange peel 311 · Maraschino cherry 310.
 
 ## Quick Add (No Review)
 
