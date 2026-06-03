@@ -110,6 +110,7 @@ Don't ask permission to do the sync — do it after each qualifying ingredient c
 - Tequila Reposado: 391
 - Jamaican Rum: 534
 - Sloe Gin: 386
+- Rhum Agricole: 380 — split by style: **Blanc** 650 (Kuleana, clairin), **Vieux** 651 (Clement 10yr). Point unaged recipes (Ti' Punch, agricole Negroni) at Blanc. Clairin is kept under Blanc deliberately (still suggestable for blanc slots; the rum `funk` axis distinguishes it) rather than its own category.
 
 **Vermouth:**
 - Sweet Vermouth: 420
@@ -218,6 +219,11 @@ For categories TGII doesn't cover (rum, whiskey, etc.), skip the SVG path entire
 Always backfill `sort` on each ingredient before sending — the BA API's `CocktailIngredientRequest::fromArray` requires it with no default, returns 500 if missing. Pattern used in `server.py`: `{**ing, "sort": ing.get("sort", idx + 1)}`. Apply to any new write tool that accepts ingredients.
 
 When re-PUTting a whole cocktail (bulk edits), watch the **garnish-as-ingredient** slots: TheCocktailDB-seeded drinks store count garnishes (Olive, Lime, cherry…) as ingredients with `amount=1, units=''`. BA's write validation requires a **numeric `amount` AND a non-empty `units`** on every slot, so echoing back `units=''` 422s ("units required when amount present"), and sending `amount:null` 422s ("amount must be a number"). Fix when rebuilding the payload: if `units` is empty, set `units="whole"` (a unit already used in the DB for count items) and `amount` to `1` if missing. `units` is a free-form string (the data has `"oz Chilled"`, `"tsp superfine"`), so any non-empty label is accepted.
+
+### Ingredient create/update gotchas
+- **`POST /api/ingredients` returns an empty body** (not the created object). Don't read the new id from the response — look it up afterward by exact name: `GET /api/ingredients?filter[name]=<name>` then match `x["name"]==name` (the filter is a substring match, so filter then exact-match in code).
+- **Ingredient update 422s if you echo back more than one image** ("images field must not have more than 1 items"). Some legacy/imported bottles carry 2 images; trim to `images[:1]` when rebuilding the update payload. Same class of gotcha as the garnish-units one.
+- **Genericizing by style → subcategory:** when a generic category is too coarse (e.g. Rhum Agricole spans blanc/vieux/clairin), create style subcategories under it and reparent the bottles, mirroring how the tree already splits gin (London Dry/Old Tom/Navy Strength) and tequila (Blanco/Reposado/Añejo). The per-category flavor axes refine *within* a style; the subcategory handles the coarse split. See the Rhum Agricole entry under "Common Ingredient IDs".
 
 ### Testing changes against the live BA API without redeploying
 `.venv/bin/python -c "from bar_assistant_mcp.api import BarAssistantAPI; ..."` — import the fixed code directly, hit production BA with the stdio token from `.mcp.json`, clean up after. Faster than rebuilding the container.
