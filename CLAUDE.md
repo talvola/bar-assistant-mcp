@@ -184,6 +184,9 @@ When re-PUTting a whole cocktail (bulk edits), watch the **garnish-as-ingredient
 - **Ingredient update 422s if you echo back more than one image** ("images field must not have more than 1 items"). Some legacy/imported bottles carry 2 images; trim to `images[:1]` when rebuilding the update payload. Same class of gotcha as the garnish-units one.
 - **Genericizing by style → subcategory:** when a generic category is too coarse (e.g. Rhum Agricole spans blanc/vieux/clairin), create style subcategories under it and reparent the bottles, mirroring how the tree already splits gin (London Dry/Old Tom/Navy Strength) and tequila (Blanco/Reposado/Añejo). The per-category flavor axes refine *within* a style; the subcategory handles the coarse split. See the Rhum Agricole entry under "Common Ingredient IDs".
 
+### Auditing which cocktails use an ingredient
+`GET /api/cocktails?filter[specific_ingredients]=<id>&per_page=100` returns **full** cocktail objects (name, `source`, `ingredients`), not just refs — use `meta.total` for a count and the `source`/`name` fields to classify generic-recipe (genericize) vs brand-named (keep specific). To bulk-swap an ingredient across recipes, GET each cocktail and re-PUT the whole `ingredients` array with the one id changed, preserving sort/units/substitutes/utensils/year/parent (apply the garnish empty-units + `sort` fixes above). To find house bottles to clean up: pull all `/api/ingredients`, use `hierarchy.root_ingredient_id` + `materialized_path` to locate leaf bottles under a base-spirit root, rank by `cocktails_count`.
+
 ### Testing changes against the live BA API without redeploying
 `.venv/bin/python -c "from bar_assistant_mcp.api import BarAssistantAPI; ..."` — import the fixed code directly, hit production BA with the stdio token from `.mcp.json`, clean up after. Faster than rebuilding the container.
 
@@ -194,6 +197,13 @@ Laravel logs go to container stdout, not `storage/logs/laravel.log` (which is em
 
 ### Picking up a rebuilt image
 Portainer's restart endpoint (and `docker restart`) does NOT re-pull — the container stays on its original image ID. After rebuilding `:latest`, PUT the stack YAML to force a recreate. See `deployment_guide` memory for the API call.
+
+### Redeploying the MCP server (so iOS picks up usage_rules.md / instructions changes)
+Portainer is reachable straight from the workstation (`https://192.168.1.64:19943`), so skip the rsync-to-NAS/flatten dance — build the context locally and POST it. Full command sequence in `deployment_guide` memory; in brief:
+1. Rollback tag: `POST /endpoints/3/docker/images/bar-assistant-mcp:v6/tag?repo=bar-assistant-mcp&tag=pre-<label>`
+2. `tar -cf ctx.tar --exclude=__pycache__ Dockerfile pyproject.toml README.md src` → `POST /endpoints/3/docker/build?t=bar-assistant-mcp:v6&dockerfile=Dockerfile` (Content-Type: application/x-tar). Stack 5 runs the **`:v6`** tag, not `:latest`.
+3. `PUT /api/stacks/5?endpointId=3` with `{"StackFileContent":<yaml>,"Env":[],"Prune":false}` to **recreate** (a restart won't pick up the rebuilt tag).
+Recreate drops in-memory OAuth tokens → **iOS must re-auth** on next connect (which is when it pulls the new instructions). The stdio/Claude-Code side gets `usage_rules.md` changes on next launch with no deploy.
 
 ### Parsing JSON from NAS-side curls
 The NAS `talvola` SSH user has no `python3` in PATH (Asustor stock). When hitting Portainer/etc. APIs over ssh, pipe the response back to the workstation: `ssh ... 'curl -sk -H "X-API-Key: ..." https://localhost:19943/api/...' | python3 -c '...'`. (Watch out for f-string + backslash inside `python3 -c` — use indexed access or move to a heredoc.)
