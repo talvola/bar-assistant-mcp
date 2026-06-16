@@ -151,6 +151,39 @@ def _img_count(item: dict[str, Any]) -> int | None:
     return len(imgs) if isinstance(imgs, list) else None
 
 
+# Top-level category roots that hold non-bottle commodities (juices, syrups,
+# garnishes/produce, dairy, ice/salt). A leaf under one of these is never a
+# "real bottle you'd source artwork or a profile for". Mirrors BA's root tree.
+_COMMODITY_ROOTS: set[int] = {
+    367,  # Mixers & Juices
+    368,  # Syrups & Sweeteners
+    369,  # Garnishes
+    438,  # Dairy & Eggs
+    439,  # Other (Ice, Salt, Tabasco, …)
+}
+
+
+def _root_id(ingredient: dict[str, Any]) -> int | None:
+    """Top-of-tree ancestor id; for a root-level ingredient, its own id."""
+    parts = [p for p in (ingredient.get("materialized_path") or "").split("/") if p]
+    return int(parts[0]) if parts else ingredient.get("id")
+
+
+def _is_commodity(ingredient: dict[str, Any]) -> bool:
+    """True for non-bottle commodities (juices, syrups, produce, dairy, ice).
+
+    Two signals: (1) the leaf sits under a known commodity root, or (2) it's a
+    root-level item with no alcoholic strength (real root-level bottles — BroVo
+    vermouths, Cocchi, St-Germain, Empirical — carry an ABV; syrups/juice/produce
+    don't). Spirit/liqueur/wine/bitters bottles are never flagged.
+    """
+    parts = [p for p in (ingredient.get("materialized_path") or "").split("/") if p]
+    if parts:
+        return int(parts[0]) in _COMMODITY_ROOTS
+    # root-level: keep only if it has an ABV (alcoholic product)
+    return not (ingredient.get("strength") or 0) > 0
+
+
 def _is_leaf_ingredient(ingredient: dict[str, Any]) -> bool | None:
     """True if a specific bottle (no descendants), False if a category, None if unknown.
 
@@ -183,6 +216,7 @@ def _list_ingredients_impl(
     name: str | None = None,
     specific_only: bool = False,
     missing_image_only: bool = False,
+    exclude_commodities: bool = False,
     on_shelf_only: bool = False,
     origin: str | None = None,
     strength_min: float | None = None,
@@ -193,9 +227,10 @@ def _list_ingredients_impl(
 ) -> str:
     """Shared backend for bar_list_ingredients / bar_search_ingredients.
 
-    `specific_only` and `missing_image_only` are client-side filters BA can't
-    express server-side, so when either is set we page through the full result
-    set (with images+descendants embedded) and slice locally.
+    `specific_only`, `missing_image_only`, and `exclude_commodities` are
+    client-side filters BA can't express server-side, so when any is set we page
+    through the full result set (with images+descendants embedded) and slice
+    locally.
     """
     client = get_api()
     server_filters: dict[str, Any] = {
@@ -208,13 +243,15 @@ def _list_ingredients_impl(
         "sort": sort,
     }
 
-    client_side = specific_only or missing_image_only
+    client_side = specific_only or missing_image_only or exclude_commodities
     if client_side:
         items = client.list_all_ingredients(include="images,descendants", **server_filters)
         if specific_only:
             items = [i for i in items if _is_leaf_ingredient(i) is True]
         if missing_image_only:
             items = [i for i in items if _img_count(i) == 0]
+        if exclude_commodities:
+            items = [i for i in items if not _is_commodity(i)]
         total = len(items)
         start = (page - 1) * limit
         page_items = items[start:start + limit]
@@ -362,6 +399,7 @@ def bar_search_ingredients(
     limit: int = 10,
     specific_only: bool = False,
     missing_image_only: bool = False,
+    exclude_commodities: bool = False,
 ) -> str:
     """Search for ingredients by name.
 
@@ -369,13 +407,17 @@ def bar_search_ingredients(
     - specific_only: only specific bottles (leaf ingredients), skipping the
       generic category/parent ingredients.
     - missing_image_only: only matches that have no image attached.
+    - exclude_commodities: drop non-bottle commodities (juices, syrups, produce,
+      dairy, ice/salt). Combine with missing_image_only for a clean "bottles that
+      still need artwork" list.
     """
     return _list_ingredients_impl(
         name=query,
         limit=limit,
         specific_only=specific_only,
         missing_image_only=missing_image_only,
-        detailed=not (specific_only or missing_image_only),
+        exclude_commodities=exclude_commodities,
+        detailed=not (specific_only or missing_image_only or exclude_commodities),
         empty_msg=f"No ingredients found matching '{query}'",
     )
 
@@ -397,6 +439,7 @@ def bar_list_ingredients(
     name: str | None = None,
     specific_only: bool = False,
     missing_image_only: bool = False,
+    exclude_commodities: bool = False,
     on_shelf_only: bool = False,
     origin: str | None = None,
     strength_min: float | None = None,
@@ -405,6 +448,10 @@ def bar_list_ingredients(
 ) -> str:
     """List and filter ingredients.
 
+    For an "incomplete entries" worklist (bottles missing an image / ABV / flavor
+    profile), prefer **`bar_audit_ingredients`** — it already scopes to real
+    bottles and groups the gaps. Use this tool for general browsing/filtering.
+
     Filters:
     - category: restrict to a category's whole subtree (recursive). Pass the
       *category ingredient's ID* — in Bar Assistant categories ARE ingredients
@@ -412,9 +459,14 @@ def bar_list_ingredients(
       every bottle filed anywhere under it.
     - name: substring match on the ingredient name.
     - specific_only: only specific bottles (leaf ingredients), excluding the
-      generic category/parent ingredients themselves.
+      generic category/parent ingredients themselves. NOTE: "leaf" is structural —
+      it still includes commodity leaves (juices, syrups, produce). Add
+      exclude_commodities for a real-bottle list.
     - missing_image_only: only ingredients with no image attached — use this to
       find bottles whose artwork still needs filling in.
+    - exclude_commodities: drop non-bottle commodities (juices, syrups, produce,
+      dairy, ice/salt). The combo specific_only + missing_image_only +
+      exclude_commodities is the clean "real bottles still missing artwork" list.
     - on_shelf_only: only ingredients currently in the bar's inventory.
     - origin: substring match on origin (country/region).
     - strength_min / strength_max: ABV bounds (e.g. strength_min=40).
@@ -431,6 +483,7 @@ def bar_list_ingredients(
         name=name,
         specific_only=specific_only,
         missing_image_only=missing_image_only,
+        exclude_commodities=exclude_commodities,
         on_shelf_only=on_shelf_only,
         origin=origin,
         strength_min=strength_min,
@@ -502,12 +555,17 @@ def bar_audit_ingredients(
     on_shelf_only: bool = False,
     check_flavor: bool = True,
     include_uncategorized: bool = False,
+    include_commodities: bool = False,
 ) -> str:
-    """Audit specific bottles for incomplete data, so historical gaps can be cleaned up.
+    """Audit real bottles for incomplete data, so historical gaps can be cleaned up.
+
+    This is the canonical "what's incomplete" worklist — it reports real bottles,
+    not commodity leaves. (For raw structural listing use bar_list_ingredients.)
 
     Reports, per specific bottle (leaf ingredient — generic parent categories are
     skipped), which of these are missing:
-    - **image**
+    - **image** — commodity leaves (juices, syrups, produce, dairy, ice) are
+      excluded by default, so this is "bottles needing artwork".
     - **ABV / strength** (only for bottles in a tracked spirit/liqueur category)
     - **flavor profile** — only for bottles whose category supports flavor axes
       (gin, rye, bourbon, scotch, american_single_malt, aquavit, amaro,
@@ -524,7 +582,9 @@ def bar_audit_ingredients(
     - check_flavor: set False to skip the per-bottle flavor-profile scan (faster;
       reports only image/ABV gaps).
     - include_uncategorized: also audit root-level leaves not filed under any
-      category (commodity items like juices/syrups). Off by default.
+      category. Off by default.
+    - include_commodities: include commodity items (juices, syrups, produce…) in
+      the missing-image list. Off by default.
     """
     client = get_api()
     leaves = [
@@ -559,7 +619,7 @@ def bar_audit_ingredients(
     for i in leaves:
         pid = _parent_id(i)
         cat = parent_cat.get(pid)
-        if _img_count(i) == 0:
+        if _img_count(i) == 0 and (include_commodities or not _is_commodity(i)):
             missing_image.append(i)
         if cat and not i.get("strength"):
             missing_abv.append(i)
