@@ -60,6 +60,28 @@ Use `bar_create_cocktail` with: **name**, **description** (tasting notes / chara
 - Before adding, search with `bar_search_cocktails` to avoid duplicates; if it exists, offer to
   fill missing fields instead.
 
+## Creating a specific ingredient — fill it in completely
+
+When you add a **specific bottle** (a real branded product, not a generic category), don't leave
+it half-populated — incomplete entries pile up as historical debt. Fill in, at creation time:
+
+- **strength** (ABV) — always; look it up if not given.
+- **description** and **origin** — a sentence of character + the country/region.
+- **an image** — upload one with `bar_upload_image(url, copyright=…)` (or
+  `bar_upload_image_file`) and attach it. This is the single most-skipped field.
+- **a flavor profile — when the bottle's category supports axes.** Axes exist for: gin, rye,
+  bourbon, scotch, american_single_malt, aquavit, amaro, herbal_liqueur, rum, vermouth,
+  fruit_liqueur. If the new bottle falls in one of these, score it right away with
+  `bar_set_flavor_profile(id, profile, category=…, source="llm_from_description")` (0–3 per axis;
+  check the axis names with `bar_list_flavor_axes(category)`). Categories **not** in that list
+  (vodka, tonic, juices, syrups…) have no axes — skip the profile for those, it's expected.
+  For a genuine novelty/joke/savory bottle, set `suggestable_for_classics=false` so the matcher
+  won't propose it for classic recipes.
+
+To find existing gaps to backfill, run **`bar_audit_ingredients`** (optionally scoped to a
+`category` subtree, or `on_shelf_only`) — it lists specific bottles missing an image, ABV, or a
+flavor profile (the last only for axis-supported categories).
+
 ## Flavor matching (optional, per-recipe precision)
 
 Categories have integer flavor axes (e.g. gin 7 axes, rum: funk/sweet/oak/vanilla/molasses/grassy).

@@ -195,6 +195,34 @@ FastMCP's `@mcp.tool()` is a passthrough — decorated functions remain plain ca
 ### Debugging deployed-server errors
 Laravel logs go to container stdout, not `storage/logs/laravel.log` (which is empty). Use the Portainer logs API on `bar-assistant-api` to read exceptions. Deploy/debug details in memory (`deployment_guide`, `ba_api_quirks`).
 
+### Ingredient/cocktail list filters (v6 query gotchas)
+The `/api/ingredients` and `/api/cocktails` list endpoints filter via Spatie QueryBuilder
+(`app/Http/Filters/{Ingredient,Cocktail}QueryFilter.php`). Two traps the MCP tools now handle:
+- **No `category_id` filter on ingredients** — it 400s. Categories ARE ingredients in v6, so
+  filter a category's subtree with `filter[descendants_of]=<category ingredient id>` (recursive) or
+  its direct children with `filter[parent_ingredient_id]` (`=null` → roots only). The MCP
+  `bar_list_ingredients(category=…)` maps to `descendants_of`.
+- **Boolean callback filters only honor the string `"true"`** — `filter[on_shelf]=1` (and
+  `filter[favorites]=1`) are silently ignored (the callback checks `=== true`), returning the
+  *unfiltered* set. Always send `"true"`. The old MCP code shipped `"1"`/`"0"` and so never
+  actually filtered.
+- **No server-side "missing image" or "leaf/specific-only" filter.** `bar_list_ingredients`
+  (`specific_only`, `missing_image_only`) and `bar_list_cocktails` (`missing_image_only`) implement
+  these client-side: page all results with `include=images,descendants`, then filter where
+  `images` is empty / `hierarchy.descendants` is empty (leaf = specific bottle). Image/descendant
+  relations are absent unless `include`d.
+
+### Triaging a down stack (esp. after a NAS reboot)
+Localize the failure with a probe ladder before touching anything — expected codes:
+MCP OAuth discovery (`erikbar.../.well-known/oauth-authorization-server`) 200 · MCP `/mcp` 401 ·
+Salt Rim `/` 200 · BA API `erikbarapi.../api/server/version` 200. iOS MCP login proxies to the BA
+API, so a BA 502 breaks login while MCP itself probes healthy.
+**`running (healthy)` can be a lie:** BA's healthcheck is a `runc exec`, which silently fails
+("no space left on device") when the NAS `/tmp` tmpfs fills — the container shows `healthy` while
+the app is wedged and unreachable on `:3000`/its bridge IP. Restart the one container (not a stack
+recreate): `POST /endpoints/3/docker/containers/bar-assistant-api/restart` (204). The recurring
+`/tmp`-filler is Plex sonic analysis — see `project_plex_tmp_breaks_docker` memory.
+
 ### Picking up a rebuilt image
 Portainer's restart endpoint (and `docker restart`) does NOT re-pull — the container stays on its original image ID. After rebuilding `:latest`, PUT the stack YAML to force a recreate. See `deployment_guide` memory for the API call.
 

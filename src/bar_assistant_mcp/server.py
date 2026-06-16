@@ -5,6 +5,8 @@ import json
 import mimetypes
 import os
 import sys
+from collections import Counter, defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -143,6 +145,98 @@ def format_ingredient(ingredient: dict[str, Any], detailed: bool = False) -> str
     return "\n".join(lines)
 
 
+def _img_count(item: dict[str, Any]) -> int | None:
+    """Number of images, or None if the images relation wasn't loaded."""
+    imgs = item.get("images")
+    return len(imgs) if isinstance(imgs, list) else None
+
+
+def _is_leaf_ingredient(ingredient: dict[str, Any]) -> bool | None:
+    """True if a specific bottle (no descendants), False if a category, None if unknown.
+
+    Only meaningful when the ``descendants`` relation was requested.
+    """
+    desc = ingredient.get("hierarchy", {}).get("descendants")
+    return (len(desc) == 0) if isinstance(desc, list) else None
+
+
+def _ingredient_line(ingredient: dict[str, Any]) -> str:
+    """One actionable list row: name, id, cocktail count, and image status."""
+    name = ingredient.get("name", "Unknown")
+    iid = ingredient.get("id", "")
+    bits: list[str] = []
+    cc = ingredient.get("cocktails_count")
+    if cc is not None:
+        bits.append(f"{cc} cocktails")
+    n_img = _img_count(ingredient)
+    if n_img == 0:
+        bits.append("NO IMAGE")
+    suffix = f" — {', '.join(bits)}" if bits else ""
+    return f"- {name} (ID: {iid}){suffix}"
+
+
+def _list_ingredients_impl(
+    *,
+    limit: int = 50,
+    page: int = 1,
+    category: int | None = None,
+    name: str | None = None,
+    specific_only: bool = False,
+    missing_image_only: bool = False,
+    on_shelf_only: bool = False,
+    origin: str | None = None,
+    strength_min: float | None = None,
+    strength_max: float | None = None,
+    sort: str | None = None,
+    detailed: bool = False,
+    empty_msg: str = "No ingredients match those filters.",
+) -> str:
+    """Shared backend for bar_list_ingredients / bar_search_ingredients.
+
+    `specific_only` and `missing_image_only` are client-side filters BA can't
+    express server-side, so when either is set we page through the full result
+    set (with images+descendants embedded) and slice locally.
+    """
+    client = get_api()
+    server_filters: dict[str, Any] = {
+        "name": name,
+        "descendants_of": category,
+        "filter_on_shelf": on_shelf_only,
+        "origin": origin,
+        "strength_min": strength_min,
+        "strength_max": strength_max,
+        "sort": sort,
+    }
+
+    client_side = specific_only or missing_image_only
+    if client_side:
+        items = client.list_all_ingredients(include="images,descendants", **server_filters)
+        if specific_only:
+            items = [i for i in items if _is_leaf_ingredient(i) is True]
+        if missing_image_only:
+            items = [i for i in items if _img_count(i) == 0]
+        total = len(items)
+        start = (page - 1) * limit
+        page_items = items[start:start + limit]
+        if not page_items:
+            return empty_msg
+        header = f"Ingredients ({len(page_items)} of {total} matching)"
+        return header + ":\n" + "\n".join(_ingredient_line(i) for i in page_items)
+
+    data = client.list_ingredients(limit=limit, page=page, include="images", **server_filters)
+    items = data.get("data", [])
+    if not items:
+        return empty_msg
+    meta = data.get("meta", {})
+    total = meta.get("total", len(items))
+    if detailed:
+        body = "\n\n---\n\n".join(format_ingredient(i) for i in items)
+        return f"Found {len(items)} ingredients:\n\n" + body
+    return f"Ingredients ({len(items)} of {total}):\n" + "\n".join(
+        _ingredient_line(i) for i in items
+    )
+
+
 # ===== Cocktail Tools =====
 
 
@@ -171,22 +265,67 @@ def bar_get_cocktail(id: str) -> str:
 def bar_list_cocktails(
     limit: int = 25,
     page: int = 1,
-    favorites_only: bool | None = None,
-    tag: str | None = None,
+    name: str | None = None,
+    favorites_only: bool = False,
+    tag_id: int | None = None,
+    ingredient_id: int | None = None,
+    method_id: int | None = None,
+    glass_id: int | None = None,
+    collection_id: int | None = None,
+    parent_cocktail_id: int | None = None,
+    abv_min: float | None = None,
+    abv_max: float | None = None,
+    missing_image_only: bool = False,
     sort: str | None = None,
 ) -> str:
-    """List cocktails with optional filters. Use to browse the cocktail collection."""
+    """List and filter cocktails. Use to browse or audit the collection.
+
+    Filters:
+    - name: substring match on the cocktail name.
+    - favorites_only: only favorited cocktails.
+    - tag_id / ingredient_id / method_id / glass_id / collection_id: restrict by
+      tag, an ingredient used, prep method, glass, or collection (IDs from the
+      matching list_* tools).
+    - parent_cocktail_id: only variants/riffs of a given cocktail.
+    - abv_min / abv_max: ABV bounds.
+    - missing_image_only: only cocktails with no image attached (audit helper).
+    - sort: "name" (default), "-name", "abv", "-abv", "average_rating",
+      "total_ingredients", "created_at", "random".
+    """
     client = get_api()
-    data = client.list_cocktails(
-        limit=limit,
-        page=page,
+    common = dict(
+        name=name,
         filter_favorites=favorites_only,
+        filter_tag=tag_id,
+        filter_ingredient=ingredient_id,
+        filter_method=method_id,
+        filter_glass=glass_id,
+        filter_collection=collection_id,
+        parent_cocktail_id=parent_cocktail_id,
+        abv_min=abv_min,
+        abv_max=abv_max,
         sort=sort,
     )
+
+    if missing_image_only:
+        items = client.list_all_cocktails(include="images", **common)
+        items = [c for c in items if _img_count(c) == 0]
+        total = len(items)
+        start = (page - 1) * limit
+        page_items = items[start:start + limit]
+        if not page_items:
+            return "No cocktails match those filters."
+        return f"Cocktails ({len(page_items)} of {total} matching):\n" + "\n".join(
+            f"- {c.get('name')} (ID: {c.get('id')})" for c in page_items
+        )
+
+    data = client.list_cocktails(limit=limit, page=page, **common)
     cocktails = data.get("data", [])
+    if not cocktails:
+        return "No cocktails match those filters."
     meta = data.get("meta", {})
     total = meta.get("total", len(cocktails))
-    formatted = [f"- {c.get('name')}" for c in cocktails]
+    formatted = [f"- {c.get('name')} (ID: {c.get('id')})" for c in cocktails]
     return f"Cocktails ({len(cocktails)} of {total}):\n" + "\n".join(formatted)
 
 
@@ -218,15 +357,27 @@ def bar_favorite_cocktails(user_id: int = 1) -> str:
 
 
 @mcp.tool()
-def bar_search_ingredients(query: str, limit: int = 10) -> str:
-    """Search for ingredients by name."""
-    client = get_api()
-    data = client.search_ingredients(query, limit)
-    ingredients = data.get("data", [])
-    if not ingredients:
-        return f"No ingredients found matching '{query}'"
-    formatted = [format_ingredient(i) for i in ingredients]
-    return f"Found {len(ingredients)} ingredients:\n\n" + "\n\n---\n\n".join(formatted)
+def bar_search_ingredients(
+    query: str,
+    limit: int = 10,
+    specific_only: bool = False,
+    missing_image_only: bool = False,
+) -> str:
+    """Search for ingredients by name.
+
+    Optional flags narrow the results (handy for cleanup work):
+    - specific_only: only specific bottles (leaf ingredients), skipping the
+      generic category/parent ingredients.
+    - missing_image_only: only matches that have no image attached.
+    """
+    return _list_ingredients_impl(
+        name=query,
+        limit=limit,
+        specific_only=specific_only,
+        missing_image_only=missing_image_only,
+        detailed=not (specific_only or missing_image_only),
+        empty_msg=f"No ingredients found matching '{query}'",
+    )
 
 
 @mcp.tool()
@@ -242,22 +393,50 @@ def bar_get_ingredient(id: str) -> str:
 def bar_list_ingredients(
     limit: int = 50,
     page: int = 1,
-    on_shelf_only: bool | None = None,
+    category: int | None = None,
+    name: str | None = None,
+    specific_only: bool = False,
+    missing_image_only: bool = False,
+    on_shelf_only: bool = False,
+    origin: str | None = None,
+    strength_min: float | None = None,
+    strength_max: float | None = None,
     sort: str | None = None,
 ) -> str:
-    """List ingredients with optional filters."""
-    client = get_api()
-    data = client.list_ingredients(
+    """List and filter ingredients.
+
+    Filters:
+    - category: restrict to a category's whole subtree (recursive). Pass the
+      *category ingredient's ID* — in Bar Assistant categories ARE ingredients
+      (e.g. Rye Whiskey 347, London Dry Gin 384, Rhum Agricole 380). Returns
+      every bottle filed anywhere under it.
+    - name: substring match on the ingredient name.
+    - specific_only: only specific bottles (leaf ingredients), excluding the
+      generic category/parent ingredients themselves.
+    - missing_image_only: only ingredients with no image attached — use this to
+      find bottles whose artwork still needs filling in.
+    - on_shelf_only: only ingredients currently in the bar's inventory.
+    - origin: substring match on origin (country/region).
+    - strength_min / strength_max: ABV bounds (e.g. strength_min=40).
+    - sort: "name" (default), "-name", "created_at", "strength",
+      "total_cocktails", "-total_cocktails" (most-used first).
+
+    Output marks each ingredient's cocktail count and flags "NO IMAGE" so the
+    list is directly actionable.
+    """
+    return _list_ingredients_impl(
         limit=limit,
         page=page,
-        filter_on_shelf=on_shelf_only,
+        category=category,
+        name=name,
+        specific_only=specific_only,
+        missing_image_only=missing_image_only,
+        on_shelf_only=on_shelf_only,
+        origin=origin,
+        strength_min=strength_min,
+        strength_max=strength_max,
         sort=sort,
     )
-    ingredients = data.get("data", [])
-    meta = data.get("meta", {})
-    total = meta.get("total", len(ingredients))
-    formatted = [f"- {i.get('name')}" for i in ingredients]
-    return f"Ingredients ({len(ingredients)} of {total}):\n" + "\n".join(formatted)
 
 
 @mcp.tool()
@@ -270,6 +449,149 @@ def bar_ingredient_cocktails(id: str) -> str:
         return "No cocktails use this ingredient."
     formatted = [f"- {c.get('name')}" for c in cocktails]
     return f"Cocktails using this ingredient ({len(cocktails)}):\n" + "\n".join(formatted)
+
+
+# Parent (style/category) ingredient IDs whose bottles carry flavor axes, grouped by
+# the BA flavor category. Mirrors BA's `flavor_ingredient_categories` table; used as a
+# fast seed for "does this bottle support axes / is it a spirit that should have an ABV".
+# The audit additionally LEARNS this map live from already-profiled bottles, so new
+# parents are picked up automatically — refresh the seed when convenient but it need
+# not be exhaustive. (Categories without axes — vodka, tonic, juices — are absent by design.)
+_FLAVOR_CATEGORY_PARENTS: dict[str, set[int]] = {
+    "gin": {384, 385, 387, 461, 462, 463},
+    "aquavit": {403},
+    "bourbon": {371},
+    "rye": {347},
+    "scotch": {372, 472, 473, 474},
+    "american_single_malt": {431, 470},
+    "amaro": {407, 414, 415, 456, 457, 458, 459, 460},
+    "herbal_liqueur": {402, 409, 416, 436},
+    "rum": {404, 465, 467, 468, 469, 534, 650, 651},
+    "vermouth": {418, 419, 420, 421, 435},
+    "fruit_liqueur": {386, 408, 417, 437, 566},
+}
+_PARENT_CATEGORY: dict[int, str] = {
+    pid: cat for cat, pids in _FLAVOR_CATEGORY_PARENTS.items() for pid in pids
+}
+
+
+def _parent_id(ingredient: dict[str, Any]) -> int | None:
+    """Immediate parent ingredient id from the materialized path (None at root)."""
+    parts = [p for p in (ingredient.get("materialized_path") or "").split("/") if p]
+    return int(parts[-1]) if parts else None
+
+
+def _scan_profiles(
+    client: BarAssistantAPI, ingredients: list[dict[str, Any]]
+) -> dict[int, dict[str, Any] | None]:
+    """Fetch each ingredient's flavor profile concurrently. Value is None if absent."""
+    def one(ing: dict[str, Any]) -> tuple[int, dict[str, Any] | None]:
+        try:
+            resp = client.get_flavor_profile(ing["id"])
+            return ing["id"], (resp.get("data") if resp else None)
+        except Exception:
+            return ing["id"], None
+
+    with ThreadPoolExecutor(max_workers=10) as ex:
+        return dict(ex.map(one, ingredients))
+
+
+@mcp.tool()
+def bar_audit_ingredients(
+    category: int | None = None,
+    on_shelf_only: bool = False,
+    check_flavor: bool = True,
+    include_uncategorized: bool = False,
+) -> str:
+    """Audit specific bottles for incomplete data, so historical gaps can be cleaned up.
+
+    Reports, per specific bottle (leaf ingredient — generic parent categories are
+    skipped), which of these are missing:
+    - **image**
+    - **ABV / strength** (only for bottles in a tracked spirit/liqueur category)
+    - **flavor profile** — only for bottles whose category supports flavor axes
+      (gin, rye, bourbon, scotch, american_single_malt, aquavit, amaro,
+      herbal_liqueur, rum, vermouth, fruit_liqueur). Bottles in categories with no
+      axes are never flagged for a missing profile.
+
+    Axis support is seeded from a known map AND learned live from bottles that
+    already have a profile, so it stays correct as the taxonomy grows.
+
+    Args:
+    - category: restrict to one category's subtree (pass the category ingredient's
+      ID, e.g. 347 Rye). Strongly recommended — it makes the flavor scan far cheaper.
+    - on_shelf_only: only audit bottles currently in the bar.
+    - check_flavor: set False to skip the per-bottle flavor-profile scan (faster;
+      reports only image/ABV gaps).
+    - include_uncategorized: also audit root-level leaves not filed under any
+      category (commodity items like juices/syrups). Off by default.
+    """
+    client = get_api()
+    leaves = [
+        i
+        for i in client.list_all_ingredients(
+            include="images,descendants", descendants_of=category
+        )
+        if _is_leaf_ingredient(i) is True
+    ]
+    if on_shelf_only:
+        leaves = [i for i in leaves if i.get("in_bar_shelf")]
+    if not include_uncategorized:
+        leaves = [i for i in leaves if _parent_id(i) is not None]
+
+    if not leaves:
+        return "No specific bottles match the audit scope."
+
+    # Category support: seed map ∪ live-learned map (from already-profiled siblings).
+    parent_cat: dict[int, str] = dict(_PARENT_CATEGORY)
+    profiles: dict[int, dict[str, Any] | None] = {}
+    if check_flavor:
+        profiles = _scan_profiles(client, leaves)
+        learned: dict[int, Counter] = defaultdict(Counter)
+        for i in leaves:
+            prof, pid = profiles.get(i["id"]), _parent_id(i)
+            if prof and pid is not None:
+                learned[pid][prof.get("category")] += 1
+        for pid, counts in learned.items():
+            parent_cat.setdefault(pid, counts.most_common(1)[0][0])
+
+    missing_image, missing_abv, missing_profile = [], [], []
+    for i in leaves:
+        pid = _parent_id(i)
+        cat = parent_cat.get(pid)
+        if _img_count(i) == 0:
+            missing_image.append(i)
+        if cat and not i.get("strength"):
+            missing_abv.append(i)
+        if check_flavor and cat and profiles.get(i["id"]) is None:
+            missing_profile.append((i, cat))
+
+    def lines(items: list[dict[str, Any]]) -> str:
+        return "\n".join(f"  - {i['name']} (ID: {i['id']})" for i in sorted(items, key=lambda x: x["name"]))
+
+    scope = f" under category {category}" if category else ""
+    scope += " (on-shelf)" if on_shelf_only else ""
+    out = [f"**Ingredient audit{scope}** — {len(leaves)} specific bottles scanned\n"]
+
+    out.append(f"🖼  Missing image ({len(missing_image)}):")
+    out.append(lines(missing_image) or "  (none)")
+    out.append(f"\n🍸 Missing ABV/strength ({len(missing_abv)}):")
+    out.append(lines(missing_abv) or "  (none)")
+    if check_flavor:
+        out.append(f"\n📊 Missing flavor profile — axis-supported only ({len(missing_profile)}):")
+        if missing_profile:
+            by_cat: dict[str, list[dict[str, Any]]] = defaultdict(list)
+            for i, cat in missing_profile:
+                by_cat[cat].append(i)
+            for cat in sorted(by_cat):
+                out.append(f"  [{cat}]")
+                out.append("\n".join(f"    - {i['name']} (ID: {i['id']})"
+                                     for i in sorted(by_cat[cat], key=lambda x: x["name"])))
+        else:
+            out.append("  (none)")
+    else:
+        out.append("\n📊 Flavor profile scan skipped (check_flavor=False).")
+    return "\n".join(out)
 
 
 # ===== Shelf Tools =====
@@ -473,6 +795,14 @@ def bar_create_ingredient(
     Only create a NEW specific bottle when a recipe genuinely needs that brand (see the server
     instructions' "Generic vs. specific" rule); for ordinary base-spirit slots, reuse the existing
     generic category instead of adding a brand.
+
+    Fill a new specific bottle in COMPLETELY — don't leave historical gaps:
+    - set `strength` (ABV; look it up), `description`, and `origin`;
+    - upload and attach an `image` (bar_upload_image / bar_upload_image_file);
+    - if its category supports flavor axes (gin, rye, bourbon, scotch, american_single_malt,
+      aquavit, amaro, herbal_liqueur, rum, vermouth, fruit_liqueur), score a flavor profile with
+      bar_set_flavor_profile right after creating it.
+    Run bar_audit_ingredients to find existing bottles still missing any of these.
     """
     client = get_api()
     ingredient_data: dict[str, Any] = {"name": name, "strength": strength}

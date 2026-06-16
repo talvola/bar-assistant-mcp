@@ -77,28 +77,68 @@ class BarAssistantAPI:
         self,
         limit: int = 25,
         page: int = 1,
+        name: str | None = None,
         filter_favorites: bool | None = None,
         filter_tag: str | None = None,
         filter_ingredient: int | None = None,
         filter_method: int | None = None,
         filter_glass: int | None = None,
+        filter_collection: int | None = None,
+        parent_cocktail_id: int | None = None,
+        abv_min: float | None = None,
+        abv_max: float | None = None,
+        include: str | None = None,
         sort: str | None = None,
     ) -> dict[str, Any]:
-        """List cocktails with optional filters."""
+        """List cocktails with optional filters.
+
+        Boolean filters use the string ``"true"`` (Spatie ignores ``"1"`` in
+        callback filters — see the cocktail filter source). The method/glass
+        filter keys are ``cocktail_method_id`` / ``glass_id`` per v6.
+        """
         params: dict[str, Any] = {"per_page": limit, "page": page}
-        if filter_favorites is not None:
-            params["filter[favorites]"] = "1" if filter_favorites else "0"
+        if name:
+            params["filter[name]"] = name
+        if filter_favorites:
+            params["filter[favorites]"] = "true"
         if filter_tag:
             params["filter[tag_id]"] = filter_tag
         if filter_ingredient:
             params["filter[ingredient_id]"] = filter_ingredient
         if filter_method:
-            params["filter[method_id]"] = filter_method
+            params["filter[cocktail_method_id]"] = filter_method
         if filter_glass:
             params["filter[glass_id]"] = filter_glass
+        if filter_collection:
+            params["filter[collection_id]"] = filter_collection
+        if parent_cocktail_id is not None:
+            params["filter[parent_cocktail_id]"] = parent_cocktail_id
+        if abv_min is not None:
+            params["filter[abv_min]"] = abv_min
+        if abv_max is not None:
+            params["filter[abv_max]"] = abv_max
+        if include:
+            params["include"] = include
         if sort:
             params["sort"] = sort
         return self.get("/api/cocktails", params=params)
+
+    def list_all_cocktails(
+        self, page_size: int = 100, max_items: int = 3000, **filters: Any
+    ) -> list[dict[str, Any]]:
+        """Page through /api/cocktails for client-side filters (e.g. missing-image)."""
+        out: list[dict[str, Any]] = []
+        page = 1
+        while len(out) < max_items:
+            data = self.list_cocktails(limit=page_size, page=page, **filters)
+            batch = data.get("data", [])
+            out.extend(batch)
+            meta = data.get("meta", {})
+            last_page = meta.get("last_page")
+            if not batch or (last_page is not None and page >= last_page):
+                break
+            page += 1
+        return out
 
     def get_cocktail(self, id_or_slug: str | int) -> dict[str, Any]:
         """Get a specific cocktail by ID or slug."""
@@ -144,19 +184,74 @@ class BarAssistantAPI:
         self,
         limit: int = 50,
         page: int = 1,
-        filter_category: int | None = None,
+        name: str | None = None,
+        descendants_of: int | None = None,
+        parent_id: int | str | None = None,
         filter_on_shelf: bool | None = None,
+        on_shopping_list: bool | None = None,
+        origin: str | None = None,
+        strength_min: float | None = None,
+        strength_max: float | None = None,
+        include: str | None = None,
         sort: str | None = None,
     ) -> dict[str, Any]:
-        """List ingredients with optional filters."""
+        """List ingredients with optional filters.
+
+        v6 notes (see app/Http/Filters/IngredientQueryFilter.php):
+        - There is **no** `category_id` filter (it 400s). "Categories" are just
+          parent ingredients, so filter a category's whole subtree with
+          `descendants_of=<category ingredient id>` (recursive) or its direct
+          children with `parent_id`. `parent_id="null"` returns only root
+          (top-level) ingredients.
+        - Boolean filters must be the string ``"true"`` — ``"1"`` is silently
+          ignored by Spatie's callback filters (it checks ``=== true``).
+        - `include` (e.g. "images,descendants") controls which relations the
+          response embeds; images/descendants are absent unless requested.
+        """
         params: dict[str, Any] = {"per_page": limit, "page": page}
-        if filter_category:
-            params["filter[category_id]"] = filter_category
-        if filter_on_shelf is not None:
-            params["filter[on_shelf]"] = "1" if filter_on_shelf else "0"
+        if name:
+            params["filter[name]"] = name
+        if descendants_of is not None:
+            params["filter[descendants_of]"] = descendants_of
+        if parent_id is not None:
+            params["filter[parent_ingredient_id]"] = parent_id
+        if filter_on_shelf:
+            params["filter[on_shelf]"] = "true"
+        if on_shopping_list:
+            params["filter[on_shopping_list]"] = "true"
+        if origin:
+            params["filter[origin]"] = origin
+        if strength_min is not None:
+            params["filter[strength_min]"] = strength_min
+        if strength_max is not None:
+            params["filter[strength_max]"] = strength_max
+        if include:
+            params["include"] = include
         if sort:
             params["sort"] = sort
         return self.get("/api/ingredients", params=params)
+
+    def list_all_ingredients(
+        self, page_size: int = 100, max_items: int = 2000, **filters: Any
+    ) -> list[dict[str, Any]]:
+        """Page through /api/ingredients and return the flattened ``data`` list.
+
+        Used for client-side filters BA can't express server-side (e.g.
+        missing-image, leaf-only). Pass the same kwargs as ``list_ingredients``
+        (minus ``limit``/``page``). Stops at ``max_items`` as a safety cap.
+        """
+        out: list[dict[str, Any]] = []
+        page = 1
+        while len(out) < max_items:
+            data = self.list_ingredients(limit=page_size, page=page, **filters)
+            batch = data.get("data", [])
+            out.extend(batch)
+            meta = data.get("meta", {})
+            last_page = meta.get("last_page")
+            if not batch or (last_page is not None and page >= last_page):
+                break
+            page += 1
+        return out
 
     def get_ingredient(self, id_or_slug: str | int) -> dict[str, Any]:
         """Get a specific ingredient by ID or slug."""
