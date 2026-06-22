@@ -99,10 +99,24 @@ Mergers & Acquisitions
 2. **Placeholder row exists** (A,B filled; D–G blank): enrich D–G. Don't touch A, B, C, H.
 3. **Row already enriched** (D–G filled): no-op — just mention it.
 4. **No row exists**: append a new row at the bottom of the active list with A–G filled in. Leave H blank to match the recent-enrichment pattern.
+   - Leave **C/Notes blank** too (it's empty on every enriched row); "A–G" here means the data columns A,B,D,E,F,G.
+   - Keep **Category (B) a plain label** matching the sheet (Rum, Whiskey, Bacanora, Sherry) — strip parenthetical
+     qualifiers research agents add (e.g. "Bacanora (agave spirit)" → "Bacanora", "Whiskey (limited release)" → "Whiskey").
 
 **Description voice:** match existing rows (see rows ~180–204 to calibrate) — em-dash-heavy, includes process specifics (mash bill / botanicals / distillation / aging), tasting notes in nose / palate / finish format when documented, and one sentence on cocktail role. No marketing fluff. Use real research (producer pages, Difford's, Drinkhacker, retailer copy), not fabricated detail.
 
+**Verify identity, not just the assumed style** — a request's framing can be wrong; research overturned it twice
+(Astor Amaro is Sweetdram-made, not Forthave's Monofloral; Old Potrero Christmas Spirit is beer-distilled, not malted rye).
+
 Don't ask permission to do the sync — do it after each qualifying ingredient creation and report what changed.
+
+**Bulk backfill (Erik pre-adds name-only rows):** when many Column-A-only rows appear, fan out parallel
+research subagents (~5–6 bottles each, primed with the rows ~180–204 voice calibration), then write all
+enriched cells in one `update_cells` over `B<start>:G<end>` (leave C/Notes + H/Status blank).
+- Major retailer pages (astorwines, klwines, thewhiskyexchange, …) **403 on WebFetch** — research via
+  subagents using WebSearch + producer/Difford's/SherryNotes/Drinkhacker pages, or have Erik paste the text.
+- Retailer **product-page ABV is often wrong** — trust the physical-label ABV Erik reports over it
+  (Astor Amaro page 30% vs label 34%; Il Mallo page 38% vs bottle 42%).
 
 ## Common Ingredient IDs & Glass IDs
 
