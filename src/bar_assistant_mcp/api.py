@@ -1,7 +1,37 @@
 """Bar Assistant API Client."""
 
+import html
 import httpx
 from typing import Any
+
+# BA's JSON resources HTML-escape text on read but store verbatim on write, so echoing a
+# GET back into a PUT re-escapes it — one extra level per edit. Decoding reads here keeps
+# the DB holding raw text, which is what Salt Rim's markdown render expects.
+_TEXT_FIELDS = frozenset(
+    {"name", "description", "instructions", "garnish", "source", "origin", "note", "units"}
+)
+
+
+def _unescape(value: str) -> str:
+    """Decode HTML entities to a fixpoint (values may be escaped several levels deep)."""
+    for _ in range(10):
+        decoded = html.unescape(value)
+        if decoded == value:
+            return value
+        value = decoded
+    return value
+
+
+def _decode_text(node: Any) -> Any:
+    """Recursively decode entity-escaped text fields in an API response."""
+    if isinstance(node, dict):
+        return {
+            k: _unescape(v) if k in _TEXT_FIELDS and isinstance(v, str) else _decode_text(v)
+            for k, v in node.items()
+        }
+    if isinstance(node, list):
+        return [_decode_text(v) for v in node]
+    return node
 
 
 class BarAssistantAPI:
@@ -37,7 +67,7 @@ class BarAssistantAPI:
         response.raise_for_status()
         if not response.content:
             return {}
-        return response.json()
+        return _decode_text(response.json())
 
     def get(
         self, endpoint: str, params: dict | None = None, include_bar: bool = True
