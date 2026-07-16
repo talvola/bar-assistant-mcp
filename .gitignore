@@ -44,6 +44,10 @@ mcpb/dist/
 # Secrets (never commit!)
 mcpb/secrets.json
 secrets.json
+# Holds a live BAR_ASSISTANT_TOKEN for the stdio transport. Copy .mcp.json.example
+# and fill in a token from POST /api/auth/login (scoped PATs from /api/tokens lack
+# the ability:* that images/glasses/tags/cocktail-methods endpoints require).
+.mcp.json
 
 # Credentials
 *-cred.txt
