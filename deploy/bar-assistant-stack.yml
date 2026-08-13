@@ -1,0 +1,98 @@
+# Portainer stack 1 ("bar-assistant") on endpoint 3 — the production BA API + Salt Rim + deps.
+#
+# This file is a COPY for version control. The deployed source of truth lives inside Portainer
+# (/data/compose/1/docker-compose.yml on the NAS); edits here do nothing until you redeploy:
+#   PUT /api/stacks/1?endpointId=3  {"StackFileContent": <this file>, "Env": [...], "Prune": false}
+# Env VALUES (MEILI_MASTER_KEY, API_URL, MEILISEARCH_URL, ALLOW_REGISTRATION) are stored in the
+# stack's Env in Portainer, NOT here — they must be passed back on every PUT or they are lost.
+# See CLAUDE.md "Redeploying" + the deployment_guide memory.
+#
+# Keep this in sync after any stack change; drift here is invisible to git (which is how
+# bar-assistant-web ended up running as a renamed 4983e5040672_bar-assistant-web container).
+
+version: "3.8"
+
+volumes:
+  bar_data:
+  meilisearch_data:
+
+services:
+  meilisearch:
+    image: getmeili/meilisearch:v1.15
+    container_name: bar-meilisearch
+    environment:
+      - MEILI_NO_ANALYTICS=true
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+      - MEILI_ENV=production
+    restart: unless-stopped
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch_data:/meili_data
+
+  redis:
+    image: redis:alpine
+    container_name: bar-redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    restart: unless-stopped
+
+  bar-assistant:
+    image: bar-assistant:v6-flavor
+    container_name: bar-assistant-api
+    depends_on:
+      - meilisearch
+      - redis
+    environment:
+      - APP_URL=${API_URL}
+      - MEILISEARCH_KEY=${MEILI_MASTER_KEY}
+      - MEILISEARCH_HOST=http://meilisearch:7700
+      - REDIS_HOST=redis
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+      - ALLOW_REGISTRATION=${ALLOW_REGISTRATION:-false}
+      - LOG_CHANNEL=stderr
+    restart: unless-stopped
+    ports:
+      - "3000:8080"
+    volumes:
+      - bar_data:/var/www/cocktails/storage/bar-assistant
+    # The image's built-in healthcheck runs `php-fpm-healthcheck`, which only probes php-fpm.
+    # On the recurring post-reboot s6 deadlock, php-fpm's master is alive but nginx never
+    # starts, so nothing listens on 8080 while the container still reports "healthy".
+    # Probe the actual HTTP listener instead so that failure is visible (and autoheal-able).
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -m 5 http://127.0.0.1:8080/api/server/version >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    labels:
+      - autoheal=true
+
+  # `restart: unless-stopped` does NOT act on an unhealthy healthcheck, so the check above
+  # only reports. This sidecar restarts any container labelled autoheal=true that goes
+  # unhealthy, which closes the loop on the post-reboot wedge.
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: bar-autoheal
+    restart: unless-stopped
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=autoheal
+      - AUTOHEAL_INTERVAL=15
+      - AUTOHEAL_START_PERIOD=120
+      - AUTOHEAL_DEFAULT_STOP_TIMEOUT=30
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  salt-rim:
+    image: salt-rim:flavor-v6
+    container_name: bar-assistant-web
+    depends_on:
+      - bar-assistant
+    environment:
+      - API_URL=${API_URL}
+      - MEILISEARCH_URL=${MEILISEARCH_URL}
+    restart: unless-stopped
+    ports:
+      - "3001:8080"
