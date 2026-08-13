@@ -1,0 +1,21 @@
+# Portainer stack 5 ("bar-assistant-mcp") on endpoint 3 — the remote MCP server (HTTP+OAuth).
+#
+# This file is a COPY for version control; the deployed source of truth lives inside Portainer.
+# Redeploy (required to pick up a rebuilt image — a restart does NOT re-pull):
+#   PUT /api/stacks/5?endpointId=3  {"StackFileContent": <this file>, "Env": [], "Prune": false}
+# The stack has NO Env in Portainer — everything it needs is inline below.
+#
+# Note the image tag is :v6, not :latest. Recreating drops in-memory OAuth tokens, so iOS must
+# re-auth on next connect — which is also when it picks up usage_rules.md / instructions changes.
+# See CLAUDE.md "Redeploying the MCP server" + the deployment_guide memory.
+
+services:
+  mcp:
+    image: bar-assistant-mcp:v6
+    container_name: bar-assistant-mcp
+    restart: unless-stopped
+    ports: ["8100:8100"]
+    environment:
+      - BAR_ASSISTANT_URL=https://erikbarapi.duckdns.org
+      - BAR_ASSISTANT_BAR_ID=1
+      - MCP_ISSUER_URL=https://erikbar.duckdns.org

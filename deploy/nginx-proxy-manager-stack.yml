@@ -1,0 +1,31 @@
+# Portainer stack 2 ("nginx") on endpoint 3 — Nginx Proxy Manager, the public TLS entrypoint
+# for erikbar.duckdns.org / erikbarapi.duckdns.org / erikbarsearch.duckdns.org.
+#
+# This file is a COPY for version control; the deployed source of truth lives inside Portainer.
+#   PUT /api/stacks/2?endpointId=3  {"StackFileContent": <this file>, "Env": [], "Prune": false}
+# The stack has NO Env in Portainer.
+#
+# The proxy HOSTS and location blocks are NOT in this file — they live in NPM's own database
+# (npm_data volume) and are managed via the NPM admin UI/API on :81. See nginx-config in this
+# repo for the erikbar.duckdns.org location blocks, and the infra_nas_npm memory.
+#
+# Kept verbatim as deployed, including its uniform leading indentation, so a redeploy of this
+# file is byte-identical to what is running.
+
+  version: "3.8"
+  services:
+    npm:
+      image: jc21/nginx-proxy-manager:latest
+      container_name: nginx-proxy-manager
+      restart: unless-stopped
+      ports:
+        - "380:80"
+        - "444:443"
+        - "81:81"
+      volumes:
+        - npm_data:/data
+        - npm_letsencrypt:/etc/letsencrypt
+
+  volumes:
+    npm_data:
+    npm_letsencrypt:
