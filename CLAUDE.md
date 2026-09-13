@@ -204,7 +204,7 @@ When re-PUTting a whole cocktail (bulk edits), watch the **garnish-as-ingredient
 ### Testing changes against the live BA API without redeploying
 `.venv/bin/python -c "from bar_assistant_mcp.api import BarAssistantAPI; ..."` — import the fixed code directly, hit production BA with the stdio token from `.mcp.json`, clean up after. Faster than rebuilding the container.
 
-FastMCP's `@mcp.tool()` is a passthrough — decorated functions remain plain callables. Test them as `server.bar_describe_slots(668)`, not `.fn(...)` (no wrapper attribute exists).
+FastMCP's `@mcp.tool()` is a passthrough — decorated functions remain plain callables. Test them as `server.bar_describe_slots(668)`, not `.fn(...)` (no wrapper attribute exists). The stdio client is only built in `main()`, so set `server._api = BarAssistantAPI(url, token)` first or `get_api()` raises "not configured" even with the env vars exported.
 
 ### Debugging deployed-server errors
 Laravel logs go to container stdout, not `storage/logs/laravel.log` (which is empty). Use the Portainer logs API on `bar-assistant-api` to read exceptions. Deploy/debug details in memory (`deployment_guide`, `ba_api_quirks`).
