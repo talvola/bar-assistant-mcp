@@ -1194,11 +1194,18 @@ def bar_set_flavor_profile(
     ingredient has no profile yet, you must pass `category` (and ideally the
     full axis set for that category).
 
+    **Changing category** (e.g. re-filing a bottle from `amaro` to
+    `herbal_liqueur`): pass the new `category` and a `profile` scored on the
+    *new* category's axes. The old profile is replaced, not merged — the old
+    category's axes would be invalid for the new one. Axes you omit default
+    to 0. Check axis names with bar_list_flavor_axes(category).
+
     Args:
         ingredient_id: BA ingredient_id of the specific bottle.
-        profile: dict of axis → integer score (0–3). Merged over existing axes.
+        profile: dict of axis → integer score (0–3). Merged over existing axes
+                 (same category) or used as the full profile (new category).
         category: required only when the ingredient has no profile yet (e.g.
-                  "gin", "amaro"). See bar_list_flavor_axes for valid axes.
+                  "gin", "amaro"), or to move it to a different category.
         source: provenance — "tgii", "llm_from_description", "manual", etc.
         confidence: "high" | "medium" | "low" | None.
         notes: free-text reasoning.
@@ -1207,37 +1214,50 @@ def bar_set_flavor_profile(
     """
     client = get_api()
     existing = client.get_flavor_profile(ingredient_id)
-    if existing:
-        d = existing["data"]
+    d = existing["data"] if existing else {}
+    old_cat = d.get("category")
+    cat = category or old_cat
+    if not cat:
+        return ("Ingredient has no profile yet — pass `category` (e.g. "
+                "category=\"gin\") so the axes can be validated.")
+
+    valid_axes = _category_axes(client).get(cat)
+    if not valid_axes:
+        return f"Unknown flavor category '{cat}'. See bar_list_flavor_axes."
+    unknown = sorted(set(profile) - set(valid_axes))
+    if unknown:
+        return (f"Profile has axes not defined for '{cat}': {', '.join(unknown)}. "
+                f"Valid axes: {', '.join(valid_axes)}.")
+
+    category_changed = bool(old_cat) and cat != old_cat
+    if existing and not category_changed:
         merged = {**d.get("profile", {}), **profile}
-        cat = category or d.get("category")
-        body: dict[str, Any] = {
-            "category": cat,
-            "profile": merged,
-            "source": source,
-            "confidence": confidence if confidence is not None else d.get("confidence"),
-            "notes": notes if notes is not None else d.get("notes"),
-        }
-        if suggestable_for_classics is not None:
-            body["suggestable_for_classics"] = suggestable_for_classics
-        elif "suggestable_for_classics" in d:
-            body["suggestable_for_classics"] = d["suggestable_for_classics"]
     else:
-        if not category:
-            return ("Ingredient has no profile yet — pass `category` (e.g. "
-                    "category=\"gin\") so the axes can be validated.")
-        body = {"category": category, "profile": profile, "source": source,
-                "confidence": confidence, "notes": notes}
-        if suggestable_for_classics is not None:
-            body["suggestable_for_classics"] = suggestable_for_classics
+        # New profile, or moving categories: never carry the old axes over.
+        merged = {axis: profile.get(axis, 0) for axis in valid_axes}
+
+    body: dict[str, Any] = {
+        "category": cat,
+        "profile": merged,
+        "source": source,
+        "confidence": confidence if confidence is not None else d.get("confidence"),
+        "notes": notes if notes is not None else d.get("notes"),
+    }
+    if suggestable_for_classics is not None:
+        body["suggestable_for_classics"] = suggestable_for_classics
+    elif "suggestable_for_classics" in d:
+        body["suggestable_for_classics"] = d["suggestable_for_classics"]
 
     try:
         resp = client.set_flavor_profile(ingredient_id, body)
+    except httpx.HTTPStatusError as e:
+        return f"Failed to set profile: {e}\nBA response: {e.response.text}"
     except Exception as e:
         return f"Failed to set profile: {e}"
     saved = resp.get("data", {}).get("profile", body["profile"])
     changed = ", ".join(f"{k}={v}" for k, v in saved.items())
-    return f"Updated profile for ingredient {ingredient_id} ({body['category']}): {changed}  (source={source})"
+    moved = f" (moved from {old_cat})" if category_changed else ""
+    return f"Updated profile for ingredient {ingredient_id} ({cat}{moved}): {changed}  (source={source})"
 
 
 @mcp.tool()
