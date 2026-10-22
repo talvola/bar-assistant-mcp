@@ -3,7 +3,7 @@ FROM python:3.12-slim AS base
 WORKDIR /app
 
 # Install the package
-COPY pyproject.toml README.md ./
+COPY pyproject.toml README.md uv.lock ./
 COPY src/ src/
 # python:3.12 images ship pip 25.0.1, whose vendored certifi trusts the
 # compromised emSign ECC Root CA - G3. apt verifies packages by GPG signature,
@@ -15,8 +15,15 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates && \
     rm -rf /var/lib/apt/lists/* && \
     python -c "import ssl,sys; f=sys.argv[1]; bad=[c for c in ssl.create_default_context(cafile=f).get_ca_certs() if 'emSign ECC Root CA - G3' in str(c['subject'])]; sys.exit(f + ' still trusts emSign ECC Root CA - G3' if bad else 0)" $PIP_CERT
-RUN pip install --no-cache-dir --upgrade "pip>=26.2.2" && \
-    pip install --no-cache-dir . && \
+# Dependencies come from uv.lock with hashes, so the image runs exactly what was
+# tested (an unpinned `pip install .` once pulled mcp 2.x, which dropped FastMCP)
+# and a tampered download fails the hash check whatever the trust store says.
+RUN pip install --no-cache-dir --upgrade "pip>=26.2.2" "uv==0.13.5" && \
+    uv export --frozen --no-dev --no-emit-project -o /tmp/requirements.txt && \
+    pip install --no-cache-dir --require-hashes -r /tmp/requirements.txt && \
+    pip install --no-cache-dir --no-deps . && \
+    pip uninstall -y uv && \
+    python -c "import bar_assistant_mcp.server" && \
     python -c "import certifi,ssl,sys; f=certifi.where(); bad=[c for c in ssl.create_default_context(cafile=f).get_ca_certs() if 'emSign ECC Root CA - G3' in str(c['subject'])]; sys.exit(f + ' still trusts emSign ECC Root CA - G3' if bad else 0)"
 
 # HTTP transport mode
