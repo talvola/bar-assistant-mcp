@@ -5,7 +5,10 @@ WORKDIR /app
 # Install the package
 COPY pyproject.toml README.md ./
 COPY src/ src/
-RUN pip install --no-cache-dir .
+# python:3.12 images ship pip 25.0.1, whose vendored certifi trusts the
+# compromised emSign ECC Root CA - G3; upgrade pip before installing anything.
+RUN pip install --no-cache-dir --upgrade "pip>=26.2.2" && \
+    pip install --no-cache-dir .
 
 # HTTP transport mode
 ENV BAR_ASSISTANT_URL=""
